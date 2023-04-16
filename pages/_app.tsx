@@ -1,7 +1,10 @@
 import 'styles/global.css'
 
+import { ApolloProvider } from '@apollo/client'
 import { IBM_Plex_Mono, Inter, PT_Serif } from '@next/font/google'
 import { AppProps } from 'next/app'
+
+import client from '../apollo-client'
 
 const mono = IBM_Plex_Mono({
   variable: '--font-mono',
@@ -35,7 +38,9 @@ export default function App({ Component, pageProps }: AppProps) {
         `}
       </style>
 
-      <Component {...pageProps} />
+      <ApolloProvider client={client}>
+        <Component {...pageProps} />
+      </ApolloProvider>
     </>
   )
 }
