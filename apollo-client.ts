@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache } from '@apollo/client'
 
 const client = new ApolloClient({
   connectToDevTools: true,
-  uri: 'https://6qd0txmw.api.sanity.io/v1/graphql/development/default',
+  uri: process.env.SANITY_GRAPHQL_SCHEMA_URL,
   cache: new InMemoryCache(),
 })
 

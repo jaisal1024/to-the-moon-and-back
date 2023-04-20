@@ -1,78 +1,76 @@
+import Layout from 'components/Layout'
 import NextImage from 'components/NextImage'
-import { AllSeriesQuery, SanityImageAsset } from 'gql/graphql'
+import type { Image as SanityImage } from 'sanity'
 
 import client from '../apollo-client'
 import { graphql } from '../gql/gql'
-import type { Image as SanityImage } from 'sanity'
+import { InferGetStaticPropsType } from 'next/types'
 
-export default function IndexPage({ data }: { data: AllSeriesQuery }) {
-  console.log('IndexPage rendering: ', data)
+export default function IndexPage({
+  data,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
+  console.debug(`IndexPage rendering: ${data}`)
   if (!data) {
     return (
-      <>
+      <Layout>
         <div>¯\_(ツ)_/¯</div>
         <p>
           Your data will show up here when you have configured everything
           correctly
         </p>
         <pre>Unknown Error</pre>
-      </>
+      </Layout>
     )
   }
-  const { allSeries: series } = data
+  const { allCollections: collections } = data
   return (
-    <>
-      <header>
-        <h1>Jaisal Friedman</h1>
-      </header>
-      <main>
-        <h2>series</h2>
-        {series.length > 0 && (
-          <ul>
-            {series.map((serie) => (
-              <>
-                <li key={serie._id}>{serie.title}</li>
-                <div className="relative max-w-[200px]">
-                  <NextImage
-                    image={serie.photos[0].photo as SanityImage} // need to fix with a proper null guard on _type, _ref
-                    alt={serie.title}
-                  />
-                </div>
-              </>
-            ))}
-          </ul>
-        )}
-        {series.length < 1 && <p>No series to show</p>}
-        {series.length > 0 && (
-          <div>
-            <pre>{JSON.stringify(series, null, 2)}</pre>
-          </div>
-        )}
-        {series.length < 1 && (
-          <div>
-            <div>¯\_(ツ)_/¯</div>
-            <p>
-              Your data will show up here when you have configured everything
-              correctly
-            </p>
-          </div>
-        )}
-      </main>
-    </>
+    <Layout>
+      <h2>collections</h2>
+      {collections.length > 0 && (
+        <ul>
+          {collections.map((collection) => (
+            <div key={collection._id}>
+              <li> {collection.title}</li>
+              <div className="relative max-w-[200px]">
+                <NextImage
+                  image={collection.photos[0].photo as SanityImage} // need to fix with a proper null guard on _type, _ref
+                  alt={collection.title}
+                />
+              </div>
+            </div>
+          ))}
+        </ul>
+      )}
+      {collections.length < 1 && <p>No collections to show</p>}
+      {collections.length > 0 && (
+        <div>
+          <pre>{JSON.stringify(collections, null, 2)}</pre>
+        </div>
+      )}
+      {collections.length < 1 && (
+        <div>
+          <div>¯\_(ツ)_/¯</div>
+          <p>
+            Your data will show up here when you have configured everything
+            correctly
+          </p>
+        </div>
+      )}
+    </Layout>
   )
 }
 
 export async function getStaticProps() {
-  console.log('getStaticProps')
   const { data } = await client
     .query({
       query: graphql(/* GraphQL */ `
-        query allSeries {
-          allSeries {
+        query collections {
+          allCollections {
             _id
             title
             description
             date
+            location
             slug {
               current
             }
@@ -92,17 +90,13 @@ export async function getStaticProps() {
       `),
     })
     .then((res) => {
-      console.log('res: ', res)
       return res
     })
     .catch((err) => {
-      console.error('error encountered: ', err)
-      return {
-        data: {},
-      }
+      throw new Error('getStatisProps failed for index.tsx', err)
     })
 
-  console.log('data: ', data)
+  console.debug(`getStaticProps index.tsx data: ${data}`)
   return {
     props: {
       data,

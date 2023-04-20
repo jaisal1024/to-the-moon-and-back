@@ -1,4 +1,3 @@
-import { SanityImageAsset } from 'gql/graphql'
 import Image, { ImageProps } from 'next/image'
 import React from 'react'
 import type { Image as SanityImage } from 'sanity'

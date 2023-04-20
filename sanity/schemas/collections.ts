@@ -1,9 +1,9 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export default defineType({
-  name: 'series',
+  name: 'collections',
   type: 'document',
-  title: 'Series',
+  title: 'Collections',
   fields: [
     defineField({
       name: 'title',
@@ -27,6 +27,11 @@ export default defineType({
       name: 'date',
       type: 'date',
       title: 'Date',
+    }),
+    defineField({
+      name: 'location',
+      type: 'string',
+      title: 'Location',
     }),
     defineField({
       name: 'photos',

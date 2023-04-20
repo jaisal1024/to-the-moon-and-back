@@ -34,6 +34,57 @@ export type BooleanFilter = {
   neq?: InputMaybe<Scalars['Boolean']>;
 };
 
+export type Collections = Document & {
+  __typename?: 'Collections';
+  /** Date the document was created */
+  _createdAt?: Maybe<Scalars['DateTime']>;
+  /** Document ID */
+  _id?: Maybe<Scalars['ID']>;
+  _key?: Maybe<Scalars['String']>;
+  /** Current document revision */
+  _rev?: Maybe<Scalars['String']>;
+  /** Document type */
+  _type?: Maybe<Scalars['String']>;
+  /** Date the document was last modified */
+  _updatedAt?: Maybe<Scalars['DateTime']>;
+  date?: Maybe<Scalars['Date']>;
+  description?: Maybe<Scalars['String']>;
+  location?: Maybe<Scalars['String']>;
+  photos?: Maybe<Array<Maybe<Shot>>>;
+  slug?: Maybe<Slug>;
+  title?: Maybe<Scalars['String']>;
+};
+
+export type CollectionsFilter = {
+  /** Apply filters on document level */
+  _?: InputMaybe<Sanity_DocumentFilter>;
+  _createdAt?: InputMaybe<DatetimeFilter>;
+  _id?: InputMaybe<IdFilter>;
+  _key?: InputMaybe<StringFilter>;
+  _rev?: InputMaybe<StringFilter>;
+  _type?: InputMaybe<StringFilter>;
+  _updatedAt?: InputMaybe<DatetimeFilter>;
+  date?: InputMaybe<DateFilter>;
+  description?: InputMaybe<StringFilter>;
+  location?: InputMaybe<StringFilter>;
+  slug?: InputMaybe<SlugFilter>;
+  title?: InputMaybe<StringFilter>;
+};
+
+export type CollectionsSorting = {
+  _createdAt?: InputMaybe<SortOrder>;
+  _id?: InputMaybe<SortOrder>;
+  _key?: InputMaybe<SortOrder>;
+  _rev?: InputMaybe<SortOrder>;
+  _type?: InputMaybe<SortOrder>;
+  _updatedAt?: InputMaybe<SortOrder>;
+  date?: InputMaybe<SortOrder>;
+  description?: InputMaybe<SortOrder>;
+  location?: InputMaybe<SortOrder>;
+  slug?: InputMaybe<SlugSorting>;
+  title?: InputMaybe<SortOrder>;
+};
+
 export type CrossDatasetReference = {
   __typename?: 'CrossDatasetReference';
   _dataset?: Maybe<Scalars['String']>;
@@ -234,16 +285,21 @@ export type IntFilter = {
 
 export type RootQuery = {
   __typename?: 'RootQuery';
+  Collections?: Maybe<Collections>;
   Document?: Maybe<Document>;
   SanityFileAsset?: Maybe<SanityFileAsset>;
   SanityImageAsset?: Maybe<SanityImageAsset>;
-  Series?: Maybe<Series>;
   Shot?: Maybe<Shot>;
+  allCollections: Array<Collections>;
   allDocument: Array<Document>;
   allSanityFileAsset: Array<SanityFileAsset>;
   allSanityImageAsset: Array<SanityImageAsset>;
-  allSeries: Array<Series>;
   allShot: Array<Shot>;
+};
+
+
+export type RootQueryCollectionsArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -262,13 +318,16 @@ export type RootQuerySanityImageAssetArgs = {
 };
 
 
-export type RootQuerySeriesArgs = {
+export type RootQueryShotArgs = {
   id: Scalars['ID'];
 };
 
 
-export type RootQueryShotArgs = {
-  id: Scalars['ID'];
+export type RootQueryAllCollectionsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  sort?: InputMaybe<Array<CollectionsSorting>>;
+  where?: InputMaybe<CollectionsFilter>;
 };
 
 
@@ -293,14 +352,6 @@ export type RootQueryAllSanityImageAssetArgs = {
   offset?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<Array<SanityImageAssetSorting>>;
   where?: InputMaybe<SanityImageAssetFilter>;
-};
-
-
-export type RootQueryAllSeriesArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  sort?: InputMaybe<Array<SeriesSorting>>;
-  where?: InputMaybe<SeriesFilter>;
 };
 
 
@@ -683,54 +734,6 @@ export type Sanity_DocumentFilter = {
   references?: InputMaybe<Scalars['ID']>;
 };
 
-export type Series = Document & {
-  __typename?: 'Series';
-  /** Date the document was created */
-  _createdAt?: Maybe<Scalars['DateTime']>;
-  /** Document ID */
-  _id?: Maybe<Scalars['ID']>;
-  _key?: Maybe<Scalars['String']>;
-  /** Current document revision */
-  _rev?: Maybe<Scalars['String']>;
-  /** Document type */
-  _type?: Maybe<Scalars['String']>;
-  /** Date the document was last modified */
-  _updatedAt?: Maybe<Scalars['DateTime']>;
-  date?: Maybe<Scalars['Date']>;
-  description?: Maybe<Scalars['String']>;
-  photos?: Maybe<Array<Maybe<Shot>>>;
-  slug?: Maybe<Slug>;
-  title?: Maybe<Scalars['String']>;
-};
-
-export type SeriesFilter = {
-  /** Apply filters on document level */
-  _?: InputMaybe<Sanity_DocumentFilter>;
-  _createdAt?: InputMaybe<DatetimeFilter>;
-  _id?: InputMaybe<IdFilter>;
-  _key?: InputMaybe<StringFilter>;
-  _rev?: InputMaybe<StringFilter>;
-  _type?: InputMaybe<StringFilter>;
-  _updatedAt?: InputMaybe<DatetimeFilter>;
-  date?: InputMaybe<DateFilter>;
-  description?: InputMaybe<StringFilter>;
-  slug?: InputMaybe<SlugFilter>;
-  title?: InputMaybe<StringFilter>;
-};
-
-export type SeriesSorting = {
-  _createdAt?: InputMaybe<SortOrder>;
-  _id?: InputMaybe<SortOrder>;
-  _key?: InputMaybe<SortOrder>;
-  _rev?: InputMaybe<SortOrder>;
-  _type?: InputMaybe<SortOrder>;
-  _updatedAt?: InputMaybe<SortOrder>;
-  date?: InputMaybe<SortOrder>;
-  description?: InputMaybe<SortOrder>;
-  slug?: InputMaybe<SlugSorting>;
-  title?: InputMaybe<SortOrder>;
-};
-
 export type Shot = Document & {
   __typename?: 'Shot';
   /** Date the document was created */
@@ -820,10 +823,16 @@ export type StringFilter = {
   nin?: InputMaybe<Array<Scalars['String']>>;
 };
 
-export type AllSeriesQueryVariables = Exact<{ [key: string]: never; }>;
+export type CollectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllSeriesQuery = { __typename?: 'RootQuery', allSeries: Array<{ __typename?: 'Series', _id?: string | null, title?: string | null, description?: string | null, date?: any | null, slug?: { __typename?: 'Slug', current?: string | null } | null, photos?: Array<{ __typename?: 'Shot', title?: string | null, photo?: { __typename?: 'Image', _key?: string | null, asset?: { __typename?: 'SanityImageAsset', url?: string | null, _type?: string | null, _ref?: string | null } | null } | null } | null> | null }> };
+export type CollectionQuery = { __typename?: 'RootQuery', Collections?: { __typename?: 'Collections', _id?: string | null, title?: string | null, description?: string | null, location?: string | null, date?: any | null, slug?: { __typename?: 'Slug', current?: string | null } | null, photos?: Array<{ __typename?: 'Shot', title?: string | null, photo?: { __typename?: 'Image', _key?: string | null, asset?: { __typename?: 'SanityImageAsset', url?: string | null, _type?: string | null, _ref?: string | null } | null } | null } | null> | null } | null };
+
+export type CollectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export const AllSeriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"allSeries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allSeries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"slug"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"current"}}]}},{"kind":"Field","name":{"kind":"Name","value":"photos"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"photo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","alias":{"kind":"Name","value":"_ref"},"name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"_type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_key"}}]}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<AllSeriesQuery, AllSeriesQueryVariables>;
+export type CollectionsQuery = { __typename?: 'RootQuery', allCollections: Array<{ __typename?: 'Collections', _id?: string | null, title?: string | null, description?: string | null, date?: any | null, location?: string | null, slug?: { __typename?: 'Slug', current?: string | null } | null, photos?: Array<{ __typename?: 'Shot', title?: string | null, photo?: { __typename?: 'Image', _key?: string | null, asset?: { __typename?: 'SanityImageAsset', url?: string | null, _type?: string | null, _ref?: string | null } | null } | null } | null> | null }> };
+
+
+export const CollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Collections"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"slug"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"current"}}]}},{"kind":"Field","name":{"kind":"Name","value":"photos"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"photo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","alias":{"kind":"Name","value":"_ref"},"name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"_type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_key"}}]}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQuery, CollectionQueryVariables>;
+export const CollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"collections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allCollections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"slug"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"current"}}]}},{"kind":"Field","name":{"kind":"Name","value":"photos"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"photo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","alias":{"kind":"Name","value":"_ref"},"name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"_type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"_key"}}]}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionsQuery, CollectionsQueryVariables>;
