@@ -1,10 +1,10 @@
-import Layout from 'components/Layout'
-import NextImage from 'components/NextImage'
+import Layout from '../../components/Layout'
+import NextImage from '../../components/NextImage'
 import { InferGetStaticPropsType } from 'next'
 import type { Image as SanityImage } from 'sanity'
 
-import client from '../../apollo-client'
-import { graphql } from '../../gql/gql'
+import client from 'apollo-client'
+import { graphql } from 'gql/gql'
 
 export default function SeriesIdPage({
   data,
@@ -48,7 +48,7 @@ export async function getStaticProps({ context }) {
   const { data } = await client
     .query({
       query: graphql(/* GraphQL */ `
-        query collection {
+        query GetCollection {
           Collections(id: "${collection_id}") {
             _id
             title

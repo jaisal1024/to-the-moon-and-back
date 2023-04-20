@@ -1,9 +1,9 @@
-import Layout from 'components/Layout'
-import NextImage from 'components/NextImage'
+import Layout from '../components/Layout'
+import NextImage from '../components/NextImage'
 import type { Image as SanityImage } from 'sanity'
 
-import client from '../apollo-client'
-import { graphql } from '../gql/gql'
+import client from 'apollo-client'
+import { graphql } from 'gql/gql'
 import { InferGetStaticPropsType } from 'next/types'
 
 export default function IndexPage({
@@ -64,8 +64,8 @@ export async function getStaticProps() {
   const { data } = await client
     .query({
       query: graphql(/* GraphQL */ `
-        query collections {
-          allCollections {
+        query GetCollections {
+          allCollections(limit: 10, offset: 0, sort: { _createdAt: DESC }) {
             _id
             title
             description

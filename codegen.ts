@@ -7,7 +7,7 @@ dotenv.config()
 const config: CodegenConfig = {
   overwrite: true,
   schema: process.env.SANITY_GRAPHQL_SCHEMA_URL,
-  documents: '{components,pages}/**/*.{tsx,ts}',
+  documents: 'src/**/*.{tsx,ts}',
   generates: {
     './gql/': {
       preset: 'client',
