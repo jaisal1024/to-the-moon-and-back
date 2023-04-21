@@ -1,16 +1,21 @@
-import Layout from '../../components/Layout'
-import NextImage from '../../components/NextImage'
-import { InferGetStaticPropsType } from 'next'
+import Layout from 'src/components/Layout'
+import NextImage from 'src/components/NextImage'
+import {
+  GetStaticPathsResult,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
+} from 'next'
 import type { Image as SanityImage } from 'sanity'
 
 import client from 'apollo-client'
-import { graphql } from 'gql/gql'
+import { graphql } from 'src/gql/gql'
+import { GET_COLLECTION } from 'src/queries/GetCollection'
 
 export default function SeriesIdPage({
-  data,
+  collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`CollectionId rendering: ${data}`)
-  if (!data) {
+  console.debug(`CollectionId rendering: ${collection}`)
+  if (!collection) {
     return (
       <Layout>
         <div>¯\_(ツ)_/¯</div>
@@ -22,7 +27,6 @@ export default function SeriesIdPage({
       </Layout>
     )
   }
-  const { collection } = data
   return (
     <Layout>
       <h1>A Photo Series: </h1>
@@ -40,57 +44,75 @@ export default function SeriesIdPage({
   )
 }
 
-export async function getStaticProps({ context }) {
-  if (!!context.id || !(typeof context.id !== 'string')) {
-    throw new Error('context.id missing in getStaticProps')
+export async function getStaticProps(context: GetStaticPropsContext) {
+  if (
+    !context.params.id ||
+    !(
+      (
+        typeof context.params.id[0] !== 'string' ||
+        context.params.id[0].length > 0
+      ) // checks if array type
+    )
+  ) {
+    throw new Error(
+      `context.params.id missing in getStaticProps: ${JSON.stringify(
+        context.params
+      )}`
+    )
   }
-  const collection_id = context.id as string
+  console.log('running getStaticProps for collection id: ', context.params.id)
+  const slug =
+    typeof context.params.id === 'string'
+      ? context.params.id
+      : context.params.id[0]
+  const { data } = await client
+    .query({
+      query: GET_COLLECTION,
+      variables: { slug_current: slug },
+    })
+    .catch((err) => {
+      console.error('getStaticProps failed', err)
+      throw err
+    })
+  if (!data) {
+    throw new Error(
+      `getStaticProps empty return value for collection id: ${slug}`
+    )
+  }
+  console.debug(`getStaticProps for ${slug} data: ${JSON.stringify(data)}`)
+  const collection = data.allCollections[0]
+  return {
+    props: {
+      collection,
+    },
+  }
+}
+
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const { data } = await client
     .query({
       query: graphql(/* GraphQL */ `
-        query GetCollection {
-          Collections(id: "${collection_id}") {
-            _id
-            title
-            description
-            location
-            date
+        query GetCollectionSlugs {
+          allCollections {
             slug {
               current
-            }
-            photos {
-              photo {
-                asset {
-                  url
-                  _ref: _id
-                  _type
-                }
-                _key
-              }
-              title
             }
           }
         }
       `),
     })
-    .then((res) => {
-      return res
-    })
     .catch((err) => {
-      throw new Error(
-        `getStaticProps failed for collection id: ${collection_id}`,
-        err
-      )
+      console.error('getStaticPaths failed', err)
+      throw err
     })
   if (!data) {
-    throw new Error(
-      `getStaticProps empty return value for collection id: ${collection_id}`
-    )
+    throw new Error('getStaticPaths empty return value')
   }
-  console.debug(`getStaticProps for ${collection_id} data: ${data}`)
+
   return {
-    props: {
-      data,
-    },
+    paths: data.allCollections.map((collection) => ({
+      params: { id: collection?.slug.current ?? '' }, // shouldn't happen could be bad if it starts null'ing out
+    })),
+    fallback: false,
   }
 }

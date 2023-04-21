@@ -1,10 +1,11 @@
-import Layout from '../components/Layout'
-import NextImage from '../components/NextImage'
+import Layout from 'src/components/Layout'
+import NextImage from 'src/components/NextImage'
 import type { Image as SanityImage } from 'sanity'
 
 import client from 'apollo-client'
-import { graphql } from 'gql/gql'
 import { InferGetStaticPropsType } from 'next/types'
+import { GET_COLLECTIONS } from 'src/queries/GetCollections'
+import { SortOrder } from 'src/gql/graphql'
 
 export default function IndexPage({
   data,
@@ -63,37 +64,15 @@ export default function IndexPage({
 export async function getStaticProps() {
   const { data } = await client
     .query({
-      query: graphql(/* GraphQL */ `
-        query GetCollections {
-          allCollections(limit: 10, offset: 0, sort: { _createdAt: DESC }) {
-            _id
-            title
-            description
-            date
-            location
-            slug {
-              current
-            }
-            photos {
-              photo {
-                asset {
-                  url
-                  _ref: _id
-                  _type
-                }
-                _key
-              }
-              title
-            }
-          }
-        }
-      `),
-    })
-    .then((res) => {
-      return res
+      query: GET_COLLECTIONS,
+      variables: {
+        offset: 0,
+        sort: { _createdAt: SortOrder.Desc },
+      },
     })
     .catch((err) => {
-      throw new Error('getStatisProps failed for index.tsx', err)
+      console.error('getStaticProps failed for index.tsx', err)
+      throw err
     })
 
   console.debug(`getStaticProps index.tsx data: ${data}`)

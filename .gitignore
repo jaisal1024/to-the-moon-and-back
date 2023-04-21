@@ -51,4 +51,4 @@ studio/.env.development
 # graphql generated fils
 # generated code
 # - GQL
-gql/**
+src/gql/**
