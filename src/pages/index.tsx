@@ -1,11 +1,10 @@
-import Layout from 'src/components/Layout'
-import NextImage from 'src/components/NextImage'
-import type { Image as SanityImage } from 'sanity'
-
 import client from 'apollo-client'
 import { InferGetStaticPropsType } from 'next/types'
-import { GET_COLLECTIONS } from 'src/queries/GetCollections'
+import type { Image as SanityImage } from 'sanity'
+import Layout from 'src/components/Layout'
+import NextImage from 'src/components/NextImage'
 import { SortOrder } from 'src/gql/graphql'
+import { GET_COLLECTIONS } from 'src/queries/GetCollections'
 
 export default function IndexPage({
   data,

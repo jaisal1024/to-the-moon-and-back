@@ -1,10 +1,9 @@
-import 'styles/global.css'
+import '../styles/global.css'
 
 import { ApolloProvider } from '@apollo/client'
 import { IBM_Plex_Mono, Inter, PT_Serif } from '@next/font/google'
-import { AppProps } from 'next/app'
-
 import client from 'apollo-client'
+import { AppProps } from 'next/app'
 
 const mono = IBM_Plex_Mono({
   variable: '--font-mono',

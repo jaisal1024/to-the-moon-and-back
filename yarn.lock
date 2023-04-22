@@ -2072,7 +2072,7 @@
   dependencies:
     tslib "^2.4.0"
 
-"@tailwindcss/typography@^0.5.8":
+"@tailwindcss/typography@^0.5.9":
   version "0.5.9"
   resolved "https://registry.yarnpkg.com/@tailwindcss/typography/-/typography-0.5.9.tgz#027e4b0674929daaf7c921c900beee80dbad93e8"
   integrity sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==
@@ -3909,6 +3909,11 @@ eslint-config-next@13.0.8-canary.5:
     eslint-plugin-react "^7.31.7"
     eslint-plugin-react-hooks "^4.5.0"
 
+eslint-config-prettier@^8.8.0:
+  version "8.8.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.8.0.tgz#bfda738d412adc917fd7b038857110efe98c9348"
+  integrity sha512-wLbQiFre3tdGgpDv67NQKnJuTlcUVYHas3k+DZCc2U2BadthoEY4B7hLPvAxaqdyOGCzuLfii2fqGph10va7oA==
+
 eslint-import-resolver-node@^0.3.6, eslint-import-resolver-node@^0.3.7:
   version "0.3.7"
   resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.7.tgz#83b375187d412324a1963d84fa664377a23eb4d7"
@@ -4019,6 +4024,11 @@ eslint-plugin-unused-imports@^2.0.0:
   integrity sha512-3APeS/tQlTrFa167ThtP0Zm0vctjr4M44HMpeg1P4bK6wItarumq0Ma82xorMKdFsWpphQBlRPzw/pxiVELX1A==
   dependencies:
     eslint-rule-composer "^0.3.0"
+
+eslint-prettier@^0.0.0-empty:
+  version "0.0.0-empty"
+  resolved "https://registry.yarnpkg.com/eslint-prettier/-/eslint-prettier-0.0.0-empty.tgz#47e8d7b6c3a83f5ba364078d8ad67e17ad933f3b"
+  integrity sha512-SXB1qOJbk8eptXC0ZNyHIAPNNEKGsmlPFKvoRJBmY6t0UWmNnRdbWa7LIRDC+1ksQoHgL0iub7BGqKgGLMxcUw==
 
 eslint-rule-composer@^0.3.0:
   version "0.3.0"
@@ -7646,7 +7656,7 @@ synckit@0.8.5, synckit@^0.8.5:
     "@pkgr/utils" "^2.3.1"
     tslib "^2.5.0"
 
-tailwindcss@^3.2.4:
+tailwindcss@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-3.3.1.tgz#b6662fab6a9b704779e48d083a9fef5a81d2b81e"
   integrity sha512-Vkiouc41d4CEq0ujXl6oiGFQ7bA3WEhUZdTgXAhtKxSy49OmKs8rEfQmupsfF0IGW8fv2iQkp1EVUuapCFrZ9g==

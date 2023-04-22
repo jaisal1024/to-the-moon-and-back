@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 
 export default function NavBar() {
   const { route } = useRouter()
+  console.log(route)
   return (
     <div className="flex w-full flex-row">
       <h1>Jaisal Friedman</h1>

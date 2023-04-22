@@ -1,4 +1,4 @@
-import Layout from 'components/Layout'
+import Layout from 'src/components/Layout'
 
 export default function AboutPage() {
   return (
@@ -6,4 +6,10 @@ export default function AboutPage() {
       <h2> About me !? </h2>
     </Layout>
   )
+}
+
+export async function getStaticProps() {
+  return {
+    props: {},
+  }
 }

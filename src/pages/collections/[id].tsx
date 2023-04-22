@@ -1,13 +1,12 @@
-import Layout from 'src/components/Layout'
-import NextImage from 'src/components/NextImage'
+import client from 'apollo-client'
 import {
   GetStaticPathsResult,
   GetStaticPropsContext,
   InferGetStaticPropsType,
 } from 'next'
 import type { Image as SanityImage } from 'sanity'
-
-import client from 'apollo-client'
+import Layout from 'src/components/Layout'
+import NextImage from 'src/components/NextImage'
 import { graphql } from 'src/gql/gql'
 import { GET_COLLECTION } from 'src/queries/GetCollection'
 
