@@ -1,13 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.{ts,tsx}'],
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  // purge: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    // Overriding fontFamily to use @next/font loaded families
-    fontFamily: {
-      mono: 'var(--font-mono)',
-      sans: 'var(--font-sans)',
-      serif: 'var(--font-serif)',
-    },
+    extend: {},
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [],
 }
+
