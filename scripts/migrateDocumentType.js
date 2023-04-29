@@ -1,5 +1,5 @@
 import { getCliClient } from 'sanity/cli'
-import { apiVersion } from '../sanity/env'
+import { apiVersion } from 'src/sanity/env'
 
 const client = getCliClient().withConfig({ apiVersion })
 

@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header>
         <NavBar />
       </header>
-      <main>{children}</main>
+      <main className="p-4">{children}</main>
       <footer>
         <Footer />
       </footer>

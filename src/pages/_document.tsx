@@ -1,10 +1,12 @@
+import { useTheme } from '@mui/material'
 import { Head, Html, Main, NextScript } from 'next/document'
 
 export default function Document() {
+  const theme = useTheme()
   return (
     <Html lang="en">
       <Head />
-      <body className="bg-white text-black dark:bg-black dark:text-white">
+      <body style={{ backgroundColor: theme.palette.background.default }}>
         <Main />
         <NextScript />
       </body>
