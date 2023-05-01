@@ -31,7 +31,7 @@ export default function SeriesIdPage({
           <Typography variant="h3">{collection.location}</Typography>
         </div>
       </div>
-      <ImageGrid collectionImages={collection.photos} />
+      <ImageGrid collection={collection.photos} />
     </Layout>
   )
 }

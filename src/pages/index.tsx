@@ -1,6 +1,8 @@
 import client from 'apollo-client'
 import { InferGetStaticPropsType } from 'next/types'
+import { useCallback } from 'react'
 import type { Image as SanityImage } from 'sanity'
+import ImageGrid from 'src/components/ImageGrid'
 import Layout from 'src/components/Layout'
 import NextImage from 'src/components/NextImage'
 import { SortOrder } from 'src/gql/graphql'
@@ -11,33 +13,25 @@ export default function IndexPage({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   console.debug(`IndexPage rendering: ${data}`)
   const { allCollections: collections } = data
+
+  const mapCollectionsToImageGrid = useCallback(() => {
+    return collections.map((collection) => {
+      return {
+        title: collection.title,
+        photo: collection.photos[0].photo,
+        button: {
+          title: collection.title,
+          href: `/collections/${collection.slug.current}`,
+        },
+      }
+    })
+  }, [collections])
   return (
     <Layout>
-      <h2>collections</h2>
       {collections.length > 0 && (
-        <ul>
-          {collections.map((collection) => (
-            <div key={collection._id}>
-              <li> {collection.title}</li>
-              <div className="relative max-w-[200px]">
-                <NextImage
-                  image={collection.photos[0].photo as SanityImage} // need to fix with a proper null guard on _type, _ref
-                  alt={collection.title}
-                />
-              </div>
-            </div>
-          ))}
-        </ul>
+        <ImageGrid collection={mapCollectionsToImageGrid()} />
       )}
-      {collections.length < 1 && <p>No collections to show</p>}
-      {collections.length < 1 && (
-        <h1>
-          <div>¯\_(ツ)_/¯</div>
-          <h3>
-            Error encountered while loading all collections. Please try again.
-          </h3>
-        </h1>
-      )}
+      {collections.length < 1 && <h1>No collections to show.</h1>}
     </Layout>
   )
 }
