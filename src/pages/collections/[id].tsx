@@ -21,7 +21,7 @@ export default function SeriesIdPage({
           <Typography variant="h1">{collection.title}</Typography>
           <Typography variant="h3">{collection.description}</Typography>
         </div>
-        <div className="ml-auto flex flex-col items-end pr-2">
+        <div className="ml-auto flex flex-col items-end pr-2 text-end">
           <Typography variant="h3">
             {new Date(collection.date).toLocaleDateString('en-us', {
               year: 'numeric',

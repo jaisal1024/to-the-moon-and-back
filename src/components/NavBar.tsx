@@ -27,6 +27,36 @@ import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
 import Link from './Link'
 import LoadingSpinner from './LoadingSpinner'
 
+/*
+if the slug and currentSlug are both equal, then its current route and underline it
+if isHome is passed and the currentSlug is undefined, then underline home route
+*/
+function CollectionListItem({
+  isHome,
+  slug,
+  title,
+  currentSlug,
+}: {
+  isHome?: boolean
+  slug?: string
+  title: string
+  currentSlug: string | string[]
+}) {
+  return (
+    <ListItem disablePadding>
+      <ListItemButton
+        href={isHome ? '/' : `/collections/${slug}`}
+        className={clsx(
+          (slug === currentSlug || (isHome && !currentSlug)) &&
+            'underline underline-offset-8'
+        )}
+      >
+        <Typography variant="body1">{title}</Typography>
+      </ListItemButton>
+    </ListItem>
+  )
+}
+
 function CollectionList({
   collectionData,
 }: {
@@ -37,17 +67,14 @@ function CollectionList({
   } = useRouter()
   return (
     <List>
+      <CollectionListItem title="Home" isHome currentSlug={currentSlug} />
       {collectionData.allCollections.map((collection, i) => (
-        <ListItem key={collection._id ?? i} disablePadding>
-          <ListItemButton
-            href={`/collections/${collection.slug.current}`}
-            className={clsx(
-              collection.slug.current === currentSlug && 'bg-gray-200'
-            )}
-          >
-            <Typography variant="body1">{collection.title}</Typography>
-          </ListItemButton>
-        </ListItem>
+        <CollectionListItem
+          key={collection._id ?? i}
+          title={collection.title}
+          slug={collection.slug.current}
+          currentSlug={currentSlug}
+        />
       ))}
     </List>
   )

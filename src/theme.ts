@@ -19,34 +19,34 @@ export const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: 'DM Sans, sans-serif',
-      fontSize: 14,
+      fontFamily: 'proxima-nova, sans-serif',
       h1: {
-        fontFamily: 'Graphik XCond Trial',
-        fontSize: 34,
+        fontSize: 36,
         fontWeight: 700,
-        lineHeight: 1.5,
+        fontStyle: 'normal',
         textTransform: 'uppercase',
       },
       h2: {
-        fontFamily: 'Graphik XCond Trial',
         fontSize: 30,
         lineHeight: 1.3,
-        fontWeight: 500,
+        fontWeight: 700,
+        fontStyle: 'normal',
         textTransform: 'uppercase',
       },
       h3: {
         fontSize: 24,
         lineHeight: 1.3,
+        fontStyle: 'normal',
         fontWeight: 400,
       },
       h4: {
         fontSize: 20,
         lineHeight: 1.3,
+        fontStyle: 'normal',
         fontWeight: 400,
       },
-      body1: { fontSize: 16 },
-      body2: { fontSize: 14 },
+      body1: { fontSize: 16, fontStyle: 'normal', fontWeight: 300 },
+      body2: { fontSize: 14, fontStyle: 'normal', fontWeight: 300 },
     },
   })
 )

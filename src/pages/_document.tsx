@@ -5,7 +5,9 @@ export default function Document() {
   const theme = useTheme()
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        <link rel="stylesheet" href="https://use.typekit.net/oug8zzb.css" />
+      </Head>
       <body style={{ backgroundColor: theme.palette.background.default }}>
         <Main />
         <NextScript />
