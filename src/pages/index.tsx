@@ -1,10 +1,8 @@
 import client from 'apollo-client'
 import { InferGetStaticPropsType } from 'next/types'
 import { useCallback } from 'react'
-import type { Image as SanityImage } from 'sanity'
 import ImageGrid from 'src/components/ImageGrid'
 import Layout from 'src/components/Layout'
-import NextImage from 'src/components/NextImage'
 import { SortOrder } from 'src/gql/graphql'
 import { GET_COLLECTIONS } from 'src/queries/GetCollections'
 

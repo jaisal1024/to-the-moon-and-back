@@ -25,6 +25,7 @@ import { GetNavBarCollectionsQuery } from 'src/gql/graphql'
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
 
 import Link from './Link'
+import LoadingSpinner from './LoadingSpinner'
 
 function CollectionList({
   collectionData,
@@ -114,11 +115,12 @@ export default function NavBar() {
             horizontal: 'left',
           }}
         >
-          <Paper sx={{ minWidth: 150 }}>
-            {!loading && collectionData ? (
-              <CollectionList collectionData={collectionData} />
-            ) : null}
+          <Paper sx={{ minWidth: 150, minHeight: 45 }}>
+            {loading && <LoadingSpinner />}
             {fetchError && <Typography>Failed to fetch collections</Typography>}
+            {collectionData && (
+              <CollectionList collectionData={collectionData} />
+            )}
           </Paper>
         </Popover>
         <IconButton
@@ -155,13 +157,14 @@ export default function NavBar() {
             <Typography variant="h4" className="font-bold">
               Collections
             </Typography>
-            {!loading && collectionData ? (
-              <CollectionList collectionData={collectionData} />
-            ) : null}
+            {loading && <LoadingSpinner />}
             {fetchError && (
               <Typography variant="body2">
                 Failed to fetch collections
               </Typography>
+            )}
+            {collectionData && (
+              <CollectionList collectionData={collectionData} />
             )}
           </DialogContent>
         </Dialog>
