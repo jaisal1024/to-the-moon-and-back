@@ -1,12 +1,12 @@
+import { Typography } from '@mui/material'
 import client from 'apollo-client'
 import {
   GetStaticPathsResult,
   GetStaticPropsContext,
   InferGetStaticPropsType,
 } from 'next'
-import type { Image as SanityImage } from 'sanity'
+import ImageGrid from 'src/components/ImageGrid'
 import Layout from 'src/components/Layout'
-import NextImage from 'src/components/NextImage'
 import { graphql } from 'src/gql/gql'
 import { GET_COLLECTION } from 'src/queries/GetCollection'
 
@@ -14,31 +14,24 @@ export default function SeriesIdPage({
   collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   console.debug(`CollectionId rendering: ${collection}`)
-  if (!collection) {
-    return (
-      <Layout>
-        <div>¯\_(ツ)_/¯</div>
-        <p>
-          Your data will show up here when you have configured everything
-          correctly
-        </p>
-        <pre>Unknown Error</pre>
-      </Layout>
-    )
-  }
   return (
     <Layout>
-      <h1>A Photo Series: </h1>
-      <div>
-        <h4>{collection.title}</h4>
-        <h6>{collection.description}</h6>
-        <div className="relative max-w-[200px]">
-          <NextImage
-            image={collection.photos[0].photo as SanityImage} // need to fix with a proper null guard on _type, _ref
-            alt={collection.title}
-          />
+      <div className="flex flex-row pb-4">
+        <div>
+          <Typography variant="h1">{collection.title}</Typography>
+          <Typography variant="h3">{collection.description}</Typography>
+        </div>
+        <div className="ml-auto flex flex-col items-end pr-2">
+          <Typography variant="h3">
+            {new Date(collection.date).toLocaleDateString('en-us', {
+              year: 'numeric',
+              month: 'long',
+            })}
+          </Typography>
+          <Typography variant="h3">{collection.location}</Typography>
         </div>
       </div>
+      <ImageGrid collectionImages={collection.photos} />
     </Layout>
   )
 }

@@ -12,7 +12,6 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemText,
   Paper,
   Popover,
   Toolbar,
@@ -45,7 +44,7 @@ function CollectionList({
               collection.slug.current === currentSlug && 'bg-gray-200'
             )}
           >
-            <ListItemText primary={collection.title} />
+            <Typography variant="body1">{collection.title}</Typography>
           </ListItemButton>
         </ListItem>
       ))}
@@ -85,7 +84,7 @@ export default function NavBar() {
     <AppBar position="static" color="transparent">
       <Toolbar variant="dense">
         <Link href="/" noLinkStyle className="cursor-pointer">
-          <Typography variant="h5" color="inherit">
+          <Typography variant="h3" color="inherit">
             Jaisal Friedman
           </Typography>
         </Link>
@@ -99,7 +98,7 @@ export default function NavBar() {
           ref={collectionAnchorRef}
         >
           <div className="flex flex-row items-center">
-            <Typography variant="h6" color="inherit">
+            <Typography variant="h4" color="inherit">
               Collections
             </Typography>
             <ArrowDropDownIcon />
@@ -153,13 +152,17 @@ export default function NavBar() {
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="h6" className="font-bold">
+            <Typography variant="h4" className="font-bold">
               Collections
             </Typography>
             {!loading && collectionData ? (
               <CollectionList collectionData={collectionData} />
             ) : null}
-            {fetchError && <Typography>Failed to fetch collections</Typography>}
+            {fetchError && (
+              <Typography variant="body2">
+                Failed to fetch collections
+              </Typography>
+            )}
           </DialogContent>
         </Dialog>
       </Toolbar>

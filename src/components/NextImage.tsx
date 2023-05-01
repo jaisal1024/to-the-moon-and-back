@@ -9,5 +9,5 @@ export default function NextImage({
   ...rest
 }: { image: SanityImage } & Omit<ImageProps, 'src'>) {
   const src = urlForImage(image).url() ?? ''
-  return <Image src={src} width={200} height={200} alt={rest.alt} {...rest} />
+  return <Image src={src} alt={rest.alt} {...rest} />
 }

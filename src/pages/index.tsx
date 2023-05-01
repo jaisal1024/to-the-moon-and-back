@@ -10,18 +10,6 @@ export default function IndexPage({
   data,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   console.debug(`IndexPage rendering: ${data}`)
-  if (!data) {
-    return (
-      <Layout>
-        <div>¯\_(ツ)_/¯</div>
-        <p>
-          Your data will show up here when you have configured everything
-          correctly
-        </p>
-        <pre>Unknown Error</pre>
-      </Layout>
-    )
-  }
   const { allCollections: collections } = data
   return (
     <Layout>
@@ -42,19 +30,13 @@ export default function IndexPage({
         </ul>
       )}
       {collections.length < 1 && <p>No collections to show</p>}
-      {collections.length > 0 && (
-        <div>
-          <pre>{JSON.stringify(collections, null, 2)}</pre>
-        </div>
-      )}
       {collections.length < 1 && (
-        <div>
+        <h1>
           <div>¯\_(ツ)_/¯</div>
-          <p>
-            Your data will show up here when you have configured everything
-            correctly
-          </p>
-        </div>
+          <h3>
+            Error encountered while loading all collections. Please try again.
+          </h3>
+        </h1>
       )}
     </Layout>
   )

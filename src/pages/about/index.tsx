@@ -3,7 +3,7 @@ import Layout from 'src/components/Layout'
 export default function AboutPage() {
   return (
     <Layout>
-      <h2> About me !? </h2>
+      <h1> About me !? </h1>
     </Layout>
   )
 }
