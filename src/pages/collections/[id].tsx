@@ -7,6 +7,7 @@ import {
 } from 'next'
 import ImageGrid from 'src/components/ImageGrid'
 import Layout from 'src/components/Layout'
+import PageTitle from 'src/components/PageTitle'
 import { graphql } from 'src/gql/gql'
 import { GET_COLLECTION } from 'src/queries/GetCollection'
 
@@ -15,24 +16,30 @@ export default function SeriesIdPage({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   console.debug(`CollectionId rendering: ${collection}`)
   return (
-    <Layout>
-      <div className="flex flex-row pb-4">
-        <div>
-          <Typography variant="h1">{collection.title}</Typography>
-          <Typography variant="h3">{collection.description}</Typography>
+    <>
+      <PageTitle
+        title={`Jaisal Friedman - ${collection.title}`}
+        description={`Learn more about Jaisal Friedman's photography collection ${collection.title}.`}
+      />
+      <Layout>
+        <div className="flex flex-row pb-4">
+          <div>
+            <Typography variant="h1">{collection.title}</Typography>
+            <Typography variant="h3">{collection.description}</Typography>
+          </div>
+          <div className="ml-auto flex flex-col items-end pr-2 text-end">
+            <Typography variant="h3">
+              {new Date(collection.date).toLocaleDateString('en-us', {
+                year: 'numeric',
+                month: 'long',
+              })}
+            </Typography>
+            <Typography variant="h3">{collection.location}</Typography>
+          </div>
         </div>
-        <div className="ml-auto flex flex-col items-end pr-2 text-end">
-          <Typography variant="h3">
-            {new Date(collection.date).toLocaleDateString('en-us', {
-              year: 'numeric',
-              month: 'long',
-            })}
-          </Typography>
-          <Typography variant="h3">{collection.location}</Typography>
-        </div>
-      </div>
-      <ImageGrid collection={collection.photos} />
-    </Layout>
+        <ImageGrid collection={collection.photos} />
+      </Layout>
+    </>
   )
 }
 

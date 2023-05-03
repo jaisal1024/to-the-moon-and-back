@@ -3,6 +3,7 @@ import { InferGetStaticPropsType } from 'next/types'
 import { useCallback } from 'react'
 import ImageGrid from 'src/components/ImageGrid'
 import Layout from 'src/components/Layout'
+import PageTitle from 'src/components/PageTitle'
 import { SortOrder } from 'src/gql/graphql'
 import { GET_COLLECTIONS } from 'src/queries/GetCollections'
 
@@ -25,12 +26,18 @@ export default function IndexPage({
     })
   }, [collections])
   return (
-    <Layout>
-      {collections.length > 0 && (
-        <ImageGrid collection={mapCollectionsToImageGrid()} />
-      )}
-      {collections.length < 1 && <h1>No collections to show.</h1>}
-    </Layout>
+    <>
+      <PageTitle
+        title="Jaisal Friedman - Collections"
+      description="Learn more about Jaisal Friedman's photography collections."
+      />
+      <Layout>
+        {collections.length > 0 && (
+          <ImageGrid collection={mapCollectionsToImageGrid()} />
+        )}
+        {collections.length < 1 && <h1>No collections to show.</h1>}
+      </Layout>
+    </>
   )
 }
 

@@ -22,11 +22,11 @@ import { useRef, useState } from 'react'
 import { graphql } from 'src/gql/gql'
 import { GetNavBarCollectionsQuery } from 'src/gql/graphql'
 import useCollectionSlug from 'src/hooks/useCollectionSlug'
+import useRoutePath from 'src/hooks/useRoutePath'
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
 
 import Link from './Link'
 import LoadingSpinner from './LoadingSpinner'
-import useRoutePath from 'src/hooks/useRoutePath'
 
 /*
 if the slug and currentSlug are both equal, then its current route and underline it
