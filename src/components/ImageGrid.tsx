@@ -34,32 +34,29 @@ export default function ImageGrid({ collection }: Props) {
       sx={{ width: 1, minHeight: 500, sm: { cols: 1 } }}
     >
       {collection.map((item, i) => (
-        <>
-          <ImageListItem
-            key={item.photo._key ?? i}
-            sx={{ minWidth: 1, minHeight: 500, position: 'relative' }}
-            component="div"
-          >
-            <NextImage
-              priority={i < 2}
-              image={item.photo}
-              alt={item.title ?? `item ${i + 1}`}
-              fill
-              objectFit="cover"
-            />
-            {item.button && (
-              <>
-                <ImageListItemBar title={item.button.title}></ImageListItemBar>
-                <Button
-                  href={item.button.href}
-                  className="absolute bottom-5 h-[50px] w-full cursor-pointer"
-                >
-                  <Typography variant="body1"></Typography>
-                </Button>
-              </>
-            )}
-          </ImageListItem>
-        </>
+        <ImageListItem
+          key={item.photo._key ?? i}
+          sx={{ minWidth: 1, minHeight: 500, position: 'relative' }}
+          component="div"
+        >
+          <NextImage
+            priority={i < 2}
+            image={item.photo}
+            alt={item.title ?? `item ${i + 1}`}
+            fill
+          />
+          {item.button && (
+            <>
+              <ImageListItemBar title={item.button.title}></ImageListItemBar>
+              <Button
+                href={item.button.href}
+                className="absolute bottom-5 h-[50px] w-full cursor-pointer"
+              >
+                <Typography variant="body1"></Typography>
+              </Button>
+            </>
+          )}
+        </ImageListItem>
       ))}
     </ImageList>
   )
