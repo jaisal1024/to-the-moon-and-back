@@ -45,6 +45,12 @@ export const theme = responsiveFontSizes(
         fontStyle: 'normal',
         fontWeight: 400,
       },
+      subtitle1: {
+        fontSize: 48,
+        lineHeight: 1.3,
+        fontStyle: 'normal',
+        fontWeight: 700,
+      },
       body1: { fontSize: 16, fontStyle: 'normal', fontWeight: 300 },
       body2: { fontSize: 14, fontStyle: 'normal', fontWeight: 300 },
     },

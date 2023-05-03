@@ -98,6 +98,7 @@ export default function Footer() {
         <div className="flex flex-row space-x-12 sm:flex-col sm:space-x-0">
           <SectionHeader title="Site Map" />
           <SectionContent title="Photography" href="/" />
+          <SectionContent title="About" href="/about" />
         </div>
       </div>
     </div>

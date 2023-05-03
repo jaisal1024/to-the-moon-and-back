@@ -26,6 +26,7 @@ import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
 
 import Link from './Link'
 import LoadingSpinner from './LoadingSpinner'
+import useRoutePath from 'src/hooks/useRoutePath'
 
 /*
 if the slug and currentSlug are both equal, then its current route and underline it
@@ -106,6 +107,9 @@ export default function NavBar() {
       },
     }
   )
+  const collectionSlug = useCollectionSlug()
+  const path = useRoutePath()
+
   return (
     <AppBar position="static" color="transparent">
       <Toolbar variant="dense">
@@ -116,7 +120,10 @@ export default function NavBar() {
         </Link>
         <Box sx={{ flexGrow: 1 }} />
         <div
-          className="hidden cursor-pointer p-1 underline underline-offset-8 sm:block"
+          className={clsx(
+            (collectionSlug || path === '/') && 'underline underline-offset-8',
+            'hidden cursor-pointer p-1 sm:block'
+          )}
           onClick={() => {
             setShowCollections(true)
             getNavBarCollections()
@@ -129,6 +136,18 @@ export default function NavBar() {
             </Typography>
             <ArrowDropDownIcon />
           </div>
+        </div>
+        <div
+          className={clsx(
+            path === '/about' && 'underline underline-offset-8',
+            'hidden cursor-pointer p-1 sm:block'
+          )}
+        >
+          <Link href="/about" noLinkStyle>
+            <Typography variant="h4" color="inherit">
+              About
+            </Typography>
+          </Link>
         </div>
         <Popover
           id={'collectionPopover'}
