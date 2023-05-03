@@ -18,10 +18,10 @@ import {
   Typography,
 } from '@mui/material'
 import clsx from 'clsx'
-import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { graphql } from 'src/gql/gql'
 import { GetNavBarCollectionsQuery } from 'src/gql/graphql'
+import useCollectionSlug from 'src/hooks/useCollectionSlug'
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
 
 import Link from './Link'
@@ -62,9 +62,7 @@ function CollectionList({
 }: {
   collectionData: GetNavBarCollectionsQuery
 }) {
-  const {
-    query: { id: currentSlug },
-  } = useRouter()
+  const currentSlug = useCollectionSlug()
   return (
     <List>
       <CollectionListItem title="Home" isHome currentSlug={currentSlug} />
