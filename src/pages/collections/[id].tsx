@@ -14,7 +14,7 @@ import { GET_COLLECTION } from 'src/queries/GetCollection';
 export default function SeriesIdPage({
   collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`CollectionId rendering: ${collection}`);
+  console.debug(`CollectionId rendering: ${JSON.stringify(collection, undefined, 2)}`);
   return (
     <>
       <PageTitle
@@ -59,7 +59,7 @@ export async function getStaticProps(context: GetStaticPropsContext) {
       )}`
     );
   }
-  console.log('running getStaticProps for collection id: ', context.params.id);
+  console.log('running getStaticProps for collection id:', context.params.id);
   const slug =
     typeof context.params.id === 'string'
       ? context.params.id
@@ -78,7 +78,6 @@ export async function getStaticProps(context: GetStaticPropsContext) {
       `getStaticProps empty return value for collection id: ${slug}`
     );
   }
-  console.debug(`getStaticProps for ${slug} data: ${JSON.stringify(data)}`);
   const collection = data.allCollections[0];
   return {
     props: {
@@ -88,6 +87,7 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  console.log('running getStaticPaths for collection id route');
   const { data } = await client
     .query({
       query: graphql(/* GraphQL */ `

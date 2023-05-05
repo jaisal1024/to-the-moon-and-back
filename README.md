@@ -37,3 +37,15 @@ TODO:
 ## Deployment
 
 Coming soon
+
+
+## Revalidation
+Since we are using Next.js static pages to generate the website at build time, changes made in the CMS need to trigger a re-build of the affected pages. We use Next incremental ISR feature for this with Sanity webhooks. 
+
+There are two webhooks I set up: 1 for development and 1 for production. The development hook uses ngrok to expose a local host site (localhost://3000) to the internet for sanity webhooks to trigger. You cannot use a webhook with localhost (obviously). To set it up: 
+
+1. Create a production build and start the next server: `yarn build && yarn start`
+2. Run: `yarn ngrok-start`
+3. Take that URL and add it to the Sanity webhook UI for the development mode
+4. Open `localhost:3000/studio` and make changes to a collection.
+5. Watch the static regeneration in the console and check the UI afterwards

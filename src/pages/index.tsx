@@ -10,7 +10,7 @@ import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 export default function IndexPage({
   data,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`IndexPage rendering: ${data}`);
+  console.debug(`IndexPage rendering: ${JSON.stringify(data, undefined, 2)}`);
   const { allCollections: collections } = data;
 
   const mapCollectionsToImageGrid = useCallback(() => {
@@ -42,6 +42,7 @@ export default function IndexPage({
 }
 
 export async function getStaticProps() {
+  console.log('running getStaticProps for / route');
   const { data } = await client
     .query({
       query: GET_COLLECTIONS,
@@ -55,7 +56,6 @@ export async function getStaticProps() {
       throw err;
     });
 
-  console.debug(`getStaticProps index.tsx data: ${data}`);
   return {
     props: {
       data,
