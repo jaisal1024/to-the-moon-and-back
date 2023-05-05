@@ -10,6 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL: ${{ secrets.NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL }}
+  NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+  NEXT_PUBLIC_SANITY_DATASET: 'development'
+  NEXT_PUBLIC_SANITY_API_VERSION: '2022-11-28'
+
 jobs:
   build:
     runs-on: ubuntu-latest
