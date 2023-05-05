@@ -18,39 +18,26 @@ import {
   Typography,
 } from '@mui/material';
 import clsx from 'clsx';
+import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { graphql } from 'src/gql/gql';
 import { GetNavBarCollectionsQuery } from 'src/gql/graphql';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
-import useRoutePath from 'src/hooks/useRoutePath';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 import Link from './Link';
 import LoadingSpinner from './LoadingSpinner';
 
 /*
-if the slug and currentSlug are both equal, then its current route and underline it
-if isHome is passed and the currentSlug is undefined, then underline home route
+if the href is equal to the router pathname then underline the text
 */
-function CollectionListItem({
-  isHome,
-  slug,
-  title,
-  currentSlug,
-}: {
-  isHome?: boolean;
-  slug?: string;
-  title: string;
-  currentSlug: string | string[];
-}) {
+function CollectionListItem({ title, href }: { href: string; title: string }) {
+  const { asPath } = useRouter();
   return (
     <ListItem disablePadding>
       <ListItemButton
-        href={isHome ? '/' : `/collections/${slug}`}
-        className={clsx(
-          (slug === currentSlug || (isHome && !currentSlug)) &&
-            'underline underline-offset-8'
-        )}
+        href={href}
+        className={clsx(href === asPath && 'underline underline-offset-8')}
       >
         <Typography variant="body1">{title}</Typography>
       </ListItemButton>
@@ -63,16 +50,14 @@ function CollectionList({
 }: {
   collectionData: GetNavBarCollectionsQuery;
 }) {
-  const currentSlug = useCollectionSlug();
   return (
     <List>
-      <CollectionListItem title="Home" isHome currentSlug={currentSlug} />
+      <CollectionListItem title="Home" href="/" />
       {collectionData.allCollections.map((collection, i) => (
         <CollectionListItem
           key={collection._id ?? i}
           title={collection.title}
-          slug={collection.slug.current}
-          currentSlug={currentSlug}
+          href={`/collections/${collection.slug.current}`}
         />
       ))}
     </List>
@@ -108,7 +93,7 @@ export default function NavBar() {
     }
   );
   const collectionSlug = useCollectionSlug();
-  const path = useRoutePath();
+  const { pathname } = useRouter();
 
   return (
     <AppBar position="static" color="transparent">
@@ -121,7 +106,8 @@ export default function NavBar() {
         <Box sx={{ flexGrow: 1 }} />
         <div
           className={clsx(
-            (collectionSlug || path === '/') && 'underline underline-offset-8',
+            (collectionSlug || pathname === '/') &&
+              'underline underline-offset-8',
             'hidden cursor-pointer p-1 sm:block'
           )}
           onClick={() => {
@@ -139,7 +125,7 @@ export default function NavBar() {
         </div>
         <div
           className={clsx(
-            path === '/about' && 'underline underline-offset-8',
+            pathname === '/about' && 'underline underline-offset-8',
             'hidden cursor-pointer p-1 sm:block'
           )}
         >
@@ -210,6 +196,10 @@ export default function NavBar() {
             {collectionData && (
               <CollectionList collectionData={collectionData} />
             )}
+            <Typography variant="h4" className="font-bold">
+              About
+            </Typography>
+            <CollectionListItem title="Home" href="/about" />
           </DialogContent>
         </Dialog>
       </Toolbar>

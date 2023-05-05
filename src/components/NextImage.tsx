@@ -1,5 +1,4 @@
 import Image, { ImageProps } from 'next/image';
-import React from 'react';
 import type { Image as SanityImage } from 'sanity';
 
 import { urlForImage } from '../sanity/lib/image';
