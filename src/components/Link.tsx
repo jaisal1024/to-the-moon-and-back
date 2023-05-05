@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
 import { useRouter } from 'next/router';
-import * as React from 'react';
+import React from 'react';
 
 // From Next-material UI GitHub example
 const Anchor = styled('a')({});

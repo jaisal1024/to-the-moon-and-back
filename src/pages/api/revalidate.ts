@@ -38,8 +38,9 @@ export default async function handler(
     switch (type) {
       case 'collections':
         // always revalidate homepage too since it uses collections data
-        console.log(`Updating routes: ${type} with slug ${slug} and homepage`);
+        console.log(`Updating routes: ${type} with slug ${slug}`);
         await res.revalidate(`/collections/${slug}`);
+        console.log('Updating homepage route');
         await res.revalidate('/');
         return res.json({
           message: `Revalidated "${type}" with slug "${slug}" and homepage`,

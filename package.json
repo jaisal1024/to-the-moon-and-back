@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "analyze": "ANALYZE=true next build",
     "build": "yarn generate && next build",
     "dev": "concurrently \"next dev -p 3333\" \"yarn generate --watch \"{components,pages}/**/*{.ts,.tsx}\"\"",
     "format": "npx prettier --write . --ignore-path .gitignore",
@@ -8,9 +9,9 @@
     "graphql-deploy": "sanity graphql deploy",
     "lint": "next lint -- --ignore-path .gitignore",
     "lint:fix": "npm run format && npm run lint -- --fix",
+    "ngrok-start": "ngrok http 3000",
     "start": "next start",
-    "type-check": "tsc --noEmit",
-    "ngrok-start": "ngrok http 3000"
+    "type-check": "tsc --noEmit"
   },
   "prettier": {
     "semi": true,
@@ -26,15 +27,12 @@
     "@sanity/image-url": "^1.0.2",
     "@sanity/vision": "^3.1.4",
     "@sanity/webhook": "^2.0.0",
-    "@tailwindcss/typography": "^0.5.9",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "clsx": "^1.2.1",
-    "concurrently": "^8.0.1",
     "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
     "next": "^13.1.1",
     "next-sanity": "^3.1.9",
-    "next-sanity-image": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sanity": "^3.1.4",
@@ -45,9 +43,11 @@
     "@graphql-codegen/cli": "^3.3.0",
     "@graphql-codegen/client-preset": "^3.0.0",
     "@graphql-codegen/introspection": "3.0.1",
+    "@next/bundle-analyzer": "^13.4.1",
     "@types/react": "^18.0.26",
     "@typescript-eslint/parser": "^5.59.0",
     "autoprefixer": "^10.4.14",
+    "concurrently": "^8.0.1",
     "eslint": "^8.38.0",
     "eslint-config-next": "13.0.8-canary.5",
     "eslint-config-prettier": "^8.8.0",

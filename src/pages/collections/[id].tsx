@@ -14,7 +14,9 @@ import { GET_COLLECTION } from 'src/queries/GetCollection';
 export default function SeriesIdPage({
   collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`CollectionId rendering: ${JSON.stringify(collection, undefined, 2)}`);
+  console.debug(
+    `CollectionId rendering: ${JSON.stringify(collection, undefined, 2)}`
+  );
   return (
     <>
       <PageTitle
