@@ -2,12 +2,15 @@ import * as colors from './src/colors';
 
 /** @type {import('tailwindcss').Config} */
 
-export const content = ['./src/**/*.{js,ts,jsx,tsx}'];
-export const theme = {
-  extend: {
-    colors: {
-      ...colors,
+module.exports = {
+  important: true,
+  content: ['./src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        ...colors,
+      },
     },
   },
+  plugins: [],
 };
-export const plugins = [];
