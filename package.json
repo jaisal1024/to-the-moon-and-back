@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "yarn generate && next build",
     "dev": "concurrently \"next dev -p 3333\" \"yarn generate --watch \"{components,pages}/**/*{.ts,.tsx}\"\"",
     "format": "npx prettier --write . --ignore-path .gitignore",
     "generate": "graphql-codegen --config codegen.ts",
@@ -36,6 +36,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sanity": "^3.1.4",
+    "sharp": "^0.32.1",
     "styled-components": "^5.3.6"
   },
   "devDependencies": {
