@@ -20,7 +20,6 @@ jobs:
           cache: yarn
           node-version: lts/*
       - run: yarn install --frozen-lockfile
+      - run: yarn generate
       - run: yarn run type-check
       - run: yarn run lint -- --max-warnings 0
-      - run: yarn build
-      - run: yarn start
