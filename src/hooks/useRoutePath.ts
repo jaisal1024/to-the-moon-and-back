@@ -1,6 +1,6 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 
 export default function useRoutePath() {
-  const { asPath } = useRouter()
-  return asPath
+  const { asPath } = useRouter();
+  return asPath;
 }

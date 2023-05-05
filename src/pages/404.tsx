@@ -1,4 +1,4 @@
-import Layout from 'src/components/Layout'
+import Layout from 'src/components/Layout';
 
 export default function NotFoundPage() {
   return (
@@ -7,5 +7,5 @@ export default function NotFoundPage() {
         <h1>404 Not Found</h1>
       </div>
     </Layout>
-  )
+  );
 }

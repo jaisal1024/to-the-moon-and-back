@@ -1,8 +1,9 @@
-import { Typography } from '@mui/material'
-import Image from 'next/image'
-import Layout from 'src/components/Layout'
-import Link from 'src/components/Link'
-import PageTitle from 'src/components/PageTitle'
+import { Typography } from '@mui/material';
+import Image from 'next/image';
+import AnimatedTypography from 'src/components/AnimatedSpan';
+import Layout from 'src/components/Layout';
+import Link from 'src/components/Link';
+import PageTitle from 'src/components/PageTitle';
 
 export default function AboutPage() {
   return (
@@ -18,11 +19,25 @@ export default function AboutPage() {
           </div>
           <div className="flex-1 text-center sm:text-left">
             <Typography variant="subtitle1"> Hi, I&#39;m Jaisal.</Typography>
-            <Typography variant="subtitle1" className="text-green-400">
-              {' '}
-              I&#39;m a software engineer
+            <Typography variant="subtitle1">
+              I&#39;m a{' '}
+              <AnimatedTypography
+                items={[
+                  'software engineer',
+                  'photographer',
+                  'product thinker',
+                  'data lover',
+                ]}
+                className="text-green-300"
+              />
             </Typography>
-            <Typography variant="subtitle1"> I love to surf</Typography>
+            <Typography variant="subtitle1">
+              I love to{' '}
+              <AnimatedTypography
+                items={['surf', 'read', 'learn spanish']}
+                className="text-blue-400"
+              />
+            </Typography>
             <br />
             <br />
             <Typography variant="subtitle1">
@@ -37,10 +52,7 @@ export default function AboutPage() {
                 Archive Resale
               </Link>
             </Typography>
-            <Typography variant="subtitle1">
-              {' '}
-              I live in New York City
-            </Typography>
+            <Typography variant="subtitle1">I live in New York City</Typography>
             <br />
             <br />
             <Typography variant="subtitle1">
@@ -59,11 +71,11 @@ export default function AboutPage() {
         </div>
       </Layout>
     </>
-  )
+  );
 }
 
 export async function getStaticProps() {
   return {
     props: {},
-  }
+  };
 }

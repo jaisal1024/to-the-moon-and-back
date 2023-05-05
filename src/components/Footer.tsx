@@ -1,15 +1,15 @@
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import { Typography } from '@mui/material'
-import Image from 'next/image'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Typography } from '@mui/material';
+import Image from 'next/image';
 
-import Link from './Link'
+import Link from './Link';
 
 function SectionHeader({ title }: { title: string }) {
   return (
     <Typography variant="body1" className="pb-1 font-bold">
       {title}
     </Typography>
-  )
+  );
 }
 
 function SectionContent({
@@ -19,19 +19,19 @@ function SectionContent({
   ...rest
 }:
   | {
-      title: string
-      href: string
-      target?: string
+      title: string;
+      href: string;
+      target?: string;
     }
   | {
-      title: string
-      href: string
-      target?: string
-      iconPath: string
-      iconAlt: string
+      title: string;
+      href: string;
+      target?: string;
+      iconPath: string;
+      iconAlt: string;
     }) {
-  const iconPath = 'iconPath' in rest ? rest.iconPath : null
-  const iconAlt = 'iconAlt' in rest ? rest.iconAlt : null
+  const iconPath = 'iconPath' in rest ? rest.iconPath : null;
+  const iconAlt = 'iconAlt' in rest ? rest.iconAlt : null;
   return (
     <Link
       noLinkStyle
@@ -45,7 +45,7 @@ function SectionContent({
       )}
       <Typography variant="body2">{title}</Typography>
     </Link>
-  )
+  );
 }
 
 export default function Footer() {
@@ -102,5 +102,5 @@ export default function Footer() {
         </div>
       </div>
     </div>
-  )
+  );
 }

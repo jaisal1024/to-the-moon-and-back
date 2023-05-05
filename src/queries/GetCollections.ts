@@ -1,4 +1,4 @@
-import { graphql } from 'src/gql/gql'
+import { graphql } from 'src/gql/gql';
 
 export const GET_COLLECTIONS = graphql(/* GraphQL */ `
   query GetCollections(
@@ -28,4 +28,4 @@ export const GET_COLLECTIONS = graphql(/* GraphQL */ `
       }
     }
   }
-`)
+`);

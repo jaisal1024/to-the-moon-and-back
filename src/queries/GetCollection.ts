@@ -1,4 +1,4 @@
-import { graphql } from 'src/gql/gql'
+import { graphql } from 'src/gql/gql';
 
 export const GET_COLLECTION = graphql(/* GraphQL */ `
   query GetCollection($slug_current: String!) {
@@ -27,4 +27,4 @@ export const GET_COLLECTION = graphql(/* GraphQL */ `
       }
     }
   }
-`)
+`);

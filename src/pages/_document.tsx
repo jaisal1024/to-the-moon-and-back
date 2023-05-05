@@ -1,8 +1,8 @@
-import { useTheme } from '@mui/material'
-import { Head, Html, Main, NextScript } from 'next/document'
+import { useTheme } from '@mui/material';
+import { Head, Html, Main, NextScript } from 'next/document';
 
 export default function Document() {
-  const theme = useTheme()
+  const theme = useTheme();
   return (
     <Html lang="en">
       <Head>
@@ -25,5 +25,5 @@ export default function Document() {
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }

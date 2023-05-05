@@ -1,20 +1,20 @@
-import { Typography } from '@mui/material'
-import client from 'apollo-client'
+import { Typography } from '@mui/material';
+import client from 'apollo-client';
 import {
   GetStaticPathsResult,
   GetStaticPropsContext,
   InferGetStaticPropsType,
-} from 'next'
-import ImageGrid from 'src/components/ImageGrid'
-import Layout from 'src/components/Layout'
-import PageTitle from 'src/components/PageTitle'
-import { graphql } from 'src/gql/gql'
-import { GET_COLLECTION } from 'src/queries/GetCollection'
+} from 'next';
+import ImageGrid from 'src/components/ImageGrid';
+import Layout from 'src/components/Layout';
+import PageTitle from 'src/components/PageTitle';
+import { graphql } from 'src/gql/gql';
+import { GET_COLLECTION } from 'src/queries/GetCollection';
 
 export default function SeriesIdPage({
   collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`CollectionId rendering: ${collection}`)
+  console.debug(`CollectionId rendering: ${collection}`);
   return (
     <>
       <PageTitle
@@ -40,7 +40,7 @@ export default function SeriesIdPage({
         <ImageGrid collection={collection.photos} />
       </Layout>
     </>
-  )
+  );
 }
 
 export async function getStaticProps(context: GetStaticPropsContext) {
@@ -57,34 +57,34 @@ export async function getStaticProps(context: GetStaticPropsContext) {
       `context.params.id missing in getStaticProps: ${JSON.stringify(
         context.params
       )}`
-    )
+    );
   }
-  console.log('running getStaticProps for collection id: ', context.params.id)
+  console.log('running getStaticProps for collection id: ', context.params.id);
   const slug =
     typeof context.params.id === 'string'
       ? context.params.id
-      : context.params.id[0]
+      : context.params.id[0];
   const { data } = await client
     .query({
       query: GET_COLLECTION,
       variables: { slug_current: slug },
     })
     .catch((err) => {
-      console.error('getStaticProps failed', err)
-      throw err
-    })
+      console.error('getStaticProps failed', err);
+      throw err;
+    });
   if (!data) {
     throw new Error(
       `getStaticProps empty return value for collection id: ${slug}`
-    )
+    );
   }
-  console.debug(`getStaticProps for ${slug} data: ${JSON.stringify(data)}`)
-  const collection = data.allCollections[0]
+  console.debug(`getStaticProps for ${slug} data: ${JSON.stringify(data)}`);
+  const collection = data.allCollections[0];
   return {
     props: {
       collection,
     },
-  }
+  };
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
@@ -101,11 +101,11 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
       `),
     })
     .catch((err) => {
-      console.error('getStaticPaths failed', err)
-      throw err
-    })
+      console.error('getStaticPaths failed', err);
+      throw err;
+    });
   if (!data) {
-    throw new Error('getStaticPaths empty return value')
+    throw new Error('getStaticPaths empty return value');
   }
 
   return {
@@ -113,5 +113,5 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
       params: { id: collection?.slug.current ?? '' }, // shouldn't happen could be bad if it starts null'ing out
     })),
     fallback: false,
-  }
+  };
 }

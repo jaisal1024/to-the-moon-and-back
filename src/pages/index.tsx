@@ -1,17 +1,17 @@
-import client from 'apollo-client'
-import { InferGetStaticPropsType } from 'next/types'
-import { useCallback } from 'react'
-import ImageGrid from 'src/components/ImageGrid'
-import Layout from 'src/components/Layout'
-import PageTitle from 'src/components/PageTitle'
-import { SortOrder } from 'src/gql/graphql'
-import { GET_COLLECTIONS } from 'src/queries/GetCollections'
+import client from 'apollo-client';
+import { InferGetStaticPropsType } from 'next/types';
+import { useCallback } from 'react';
+import ImageGrid from 'src/components/ImageGrid';
+import Layout from 'src/components/Layout';
+import PageTitle from 'src/components/PageTitle';
+import { SortOrder } from 'src/gql/graphql';
+import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 
 export default function IndexPage({
   data,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`IndexPage rendering: ${data}`)
-  const { allCollections: collections } = data
+  console.debug(`IndexPage rendering: ${data}`);
+  const { allCollections: collections } = data;
 
   const mapCollectionsToImageGrid = useCallback(() => {
     return collections.map((collection) => {
@@ -22,14 +22,14 @@ export default function IndexPage({
           title: collection.title,
           href: `/collections/${collection.slug.current}`,
         },
-      }
-    })
-  }, [collections])
+      };
+    });
+  }, [collections]);
   return (
     <>
       <PageTitle
         title="Jaisal Friedman - Collections"
-      description="Learn more about Jaisal Friedman's photography collections."
+        description="Learn more about Jaisal Friedman's photography collections."
       />
       <Layout>
         {collections.length > 0 && (
@@ -38,7 +38,7 @@ export default function IndexPage({
         {collections.length < 1 && <h1>No collections to show.</h1>}
       </Layout>
     </>
-  )
+  );
 }
 
 export async function getStaticProps() {
@@ -51,14 +51,14 @@ export async function getStaticProps() {
       },
     })
     .catch((err) => {
-      console.error('getStaticProps failed for index.tsx', err)
-      throw err
-    })
+      console.error('getStaticProps failed for index.tsx', err);
+      throw err;
+    });
 
-  console.debug(`getStaticProps index.tsx data: ${data}`)
+  console.debug(`getStaticProps index.tsx data: ${data}`);
   return {
     props: {
       data,
     },
-  }
+  };
 }

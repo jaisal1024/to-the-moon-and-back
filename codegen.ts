@@ -1,8 +1,8 @@
-import type { CodegenConfig } from '@graphql-codegen/cli'
-import * as dotenv from 'dotenv'
+import type { CodegenConfig } from '@graphql-codegen/cli';
+import * as dotenv from 'dotenv';
 
 // Load environment variables from .env file
-dotenv.config()
+dotenv.config();
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -14,6 +14,6 @@ const config: CodegenConfig = {
       plugins: [],
     },
   },
-}
+};
 
-export default config
+export default config;

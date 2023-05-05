@@ -1,7 +1,7 @@
-import { useLazyQuery } from '@apollo/client'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import CloseIcon from '@mui/icons-material/Close'
-import MenuIcon from '@mui/icons-material/Menu'
+import { useLazyQuery } from '@apollo/client';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CloseIcon from '@mui/icons-material/Close';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
@@ -16,17 +16,17 @@ import {
   Popover,
   Toolbar,
   Typography,
-} from '@mui/material'
-import clsx from 'clsx'
-import { useRef, useState } from 'react'
-import { graphql } from 'src/gql/gql'
-import { GetNavBarCollectionsQuery } from 'src/gql/graphql'
-import useCollectionSlug from 'src/hooks/useCollectionSlug'
-import useRoutePath from 'src/hooks/useRoutePath'
-import { GET_COLLECTIONS_SORT } from 'src/utils/constants'
+} from '@mui/material';
+import clsx from 'clsx';
+import { useRef, useState } from 'react';
+import { graphql } from 'src/gql/gql';
+import { GetNavBarCollectionsQuery } from 'src/gql/graphql';
+import useCollectionSlug from 'src/hooks/useCollectionSlug';
+import useRoutePath from 'src/hooks/useRoutePath';
+import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
-import Link from './Link'
-import LoadingSpinner from './LoadingSpinner'
+import Link from './Link';
+import LoadingSpinner from './LoadingSpinner';
 
 /*
 if the slug and currentSlug are both equal, then its current route and underline it
@@ -38,10 +38,10 @@ function CollectionListItem({
   title,
   currentSlug,
 }: {
-  isHome?: boolean
-  slug?: string
-  title: string
-  currentSlug: string | string[]
+  isHome?: boolean;
+  slug?: string;
+  title: string;
+  currentSlug: string | string[];
 }) {
   return (
     <ListItem disablePadding>
@@ -55,15 +55,15 @@ function CollectionListItem({
         <Typography variant="body1">{title}</Typography>
       </ListItemButton>
     </ListItem>
-  )
+  );
 }
 
 function CollectionList({
   collectionData,
 }: {
-  collectionData: GetNavBarCollectionsQuery
+  collectionData: GetNavBarCollectionsQuery;
 }) {
-  const currentSlug = useCollectionSlug()
+  const currentSlug = useCollectionSlug();
   return (
     <List>
       <CollectionListItem title="Home" isHome currentSlug={currentSlug} />
@@ -76,13 +76,13 @@ function CollectionList({
         />
       ))}
     </List>
-  )
+  );
 }
 
 export default function NavBar() {
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
-  const [showCollections, setShowCollections] = useState(false)
-  const collectionAnchorRef = useRef()
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [showCollections, setShowCollections] = useState(false);
+  const collectionAnchorRef = useRef();
   const [
     getNavBarCollections,
     { data: collectionData, error: fetchError, loading },
@@ -106,9 +106,9 @@ export default function NavBar() {
         sort: GET_COLLECTIONS_SORT,
       },
     }
-  )
-  const collectionSlug = useCollectionSlug()
-  const path = useRoutePath()
+  );
+  const collectionSlug = useCollectionSlug();
+  const path = useRoutePath();
 
   return (
     <AppBar position="static" color="transparent">
@@ -125,8 +125,8 @@ export default function NavBar() {
             'hidden cursor-pointer p-1 sm:block'
           )}
           onClick={() => {
-            setShowCollections(true)
-            getNavBarCollections()
+            setShowCollections(true);
+            getNavBarCollections();
           }}
           ref={collectionAnchorRef}
         >
@@ -172,8 +172,8 @@ export default function NavBar() {
           aria-label="menu"
           className="sm:hidden"
           onClick={() => {
-            setMobileDrawerOpen(true)
-            getNavBarCollections()
+            setMobileDrawerOpen(true);
+            getNavBarCollections();
           }}
         >
           <MenuIcon />
@@ -214,5 +214,5 @@ export default function NavBar() {
         </Dialog>
       </Toolbar>
     </AppBar>
-  )
+  );
 }

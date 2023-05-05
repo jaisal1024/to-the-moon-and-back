@@ -1,20 +1,20 @@
-import { Box, Button, Grid, Typography } from '@mui/material'
-import clsx from 'clsx'
-import router from 'next/router'
-import type { Image as SanityImage } from 'sanity'
+import { Box, Button, Grid, Typography } from '@mui/material';
+import clsx from 'clsx';
+import router from 'next/router';
+import type { Image as SanityImage } from 'sanity';
 
-import NextImage from './NextImage'
+import NextImage from './NextImage';
 
 type Props = {
   collection: {
-    title?: string
-    photo?: Partial<SanityImage['asset'] & Omit<SanityImage, 'asset'>> // bug in gql which makes photo, _type, _ref optional
+    title?: string;
+    photo?: Partial<SanityImage['asset'] & Omit<SanityImage, 'asset'>>; // bug in gql which makes photo, _type, _ref optional
     button?: {
-      title: string
-      href: string
-    }
-  }[]
-}
+      title: string;
+      href: string;
+    };
+  }[];
+};
 
 export default function ImageGrid({ collection }: Props) {
   return (
@@ -29,7 +29,7 @@ export default function ImageGrid({ collection }: Props) {
               )}
               onClick={() => {
                 if (item.button) {
-                  router.push(item.button.href)
+                  router.push(item.button.href);
                 }
               }}
             >
@@ -45,7 +45,7 @@ export default function ImageGrid({ collection }: Props) {
                   href={item.button.href}
                   variant="text"
                   color="secondary"
-                  className="my-auto self-center bg-slate-100 opacity-70"
+                  className="my-auto self-center bg-slate-100 opacity-70 hover:bg-slate-200"
                 >
                   <Typography variant="body1">{item.button.title}</Typography>
                 </Button>
@@ -55,5 +55,5 @@ export default function ImageGrid({ collection }: Props) {
         ))}
       </Grid>
     </Box>
-  )
+  );
 }

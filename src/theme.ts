@@ -1,6 +1,6 @@
-import { createTheme, responsiveFontSizes } from '@mui/material'
+import { createTheme, responsiveFontSizes } from '@mui/material';
 
-import { carbon, dangerRed, white } from './colors'
+import { carbon, dangerRed, white } from './colors';
 
 export const theme = responsiveFontSizes(
   createTheme({
@@ -55,6 +55,6 @@ export const theme = responsiveFontSizes(
       body2: { fontSize: 14, fontStyle: 'normal', fontWeight: 300 },
     },
   })
-)
+);
 
-export default theme
+export default theme;

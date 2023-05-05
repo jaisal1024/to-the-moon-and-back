@@ -1,4 +1,4 @@
-import { defineArrayMember, defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'collections',
@@ -44,4 +44,4 @@ export default defineType({
       title: 'Photos',
     }),
   ],
-})
+});

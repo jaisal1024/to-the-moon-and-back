@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit"
   },
   "prettier": {
-    "semi": false,
+    "semi": true,
     "singleQuote": true
   },
   "dependencies": {
