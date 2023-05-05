@@ -1,6 +1,11 @@
 # To The Moon and Back -- A fun little site
 
-This is my little headless CMS + Next baby for my photography and personal site
+This is my little headless CMS + Next baby for my photography and personal site.
+
+Visit either:
+
+- [jaisal.xyz](https://www.jaisal.xyz/)
+- [jaisalfriedman.com](https://www.jaisalfriedman.com/)
 
 ## Architecture
 
@@ -11,8 +16,9 @@ This is my little headless CMS + Next baby for my photography and personal site
 
 TODO:
 
-- Wrap calls to Sanity IO behind redis cache for paging, etc
-- Re-deploy Next pages on Edits in Sanity studio
+- Support browsing more pages in the home route. Currently only shows 10 collections match.
+- Re-deploy Next pages on Edits in Sanity studio.
+- Consider wrapping calls to sanity behind a redis cache to limit hits on Sanity APIs
 
 ## Weird things
 
@@ -36,4 +42,4 @@ TODO:
 
 ## Deployment
 
-Coming soon
+- Auto deploys to vercel on merge to main!
