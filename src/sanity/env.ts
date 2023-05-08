@@ -15,8 +15,7 @@ export const readToken = process.env.SANITY_API_READ_TOKEN;
 
 export const previewSecretDocumentId: `${string}.${string}` = 'preview.secret';
 
-// the goal here to use the CDN in the browser and not in the server so that browser calls are cached, but the server calls for incremental ISR are not
-export const useCdn = typeof window !== undefined ? true : false;
+export const useCdn = true
 
 function assertValue<T>(v: T | undefined, errorMessage: string): T {
   if (v === undefined) {
