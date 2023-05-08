@@ -14,9 +14,6 @@ import { GET_COLLECTION } from 'src/queries/GetCollection';
 export default function SeriesIdPage({
   collection,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(
-    `CollectionId rendering: ${JSON.stringify(collection, undefined, 2)}`
-  );
   return (
     <>
       <PageTitle
@@ -85,6 +82,7 @@ export async function getStaticProps(context: GetStaticPropsContext) {
     props: {
       collection,
     },
+    revalidate: 600, // 10-minutes in seconds
   };
 }
 

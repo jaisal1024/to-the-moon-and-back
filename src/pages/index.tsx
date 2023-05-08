@@ -10,7 +10,6 @@ import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 export default function IndexPage({
   data,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  console.debug(`IndexPage rendering: ${JSON.stringify(data, undefined, 2)}`);
   const { allCollections: collections } = data;
 
   const mapCollectionsToImageGrid = useCallback(() => {
@@ -60,5 +59,6 @@ export async function getStaticProps() {
     props: {
       data,
     },
+    revalidate: 600, // 10-minutes in seconds
   };
 }
