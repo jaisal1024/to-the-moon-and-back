@@ -42,9 +42,8 @@ export default async function handler(
         await res.revalidate(`/collections/${slug}`, {
           unstable_onlyGenerated: true,
         });
-        // this is hacky, but because of 10s timeouts, we need to call revalidate in another function
-        // so we make a curl request to the homepage revalidate endpoint. We purposely don't await this
-        revalidateHomeRoute(`https://${req.headers.host}`);
+        // revalidate homepage route too
+        await res.revalidate('/', { unstable_onlyGenerated: true });
         return res.json({
           message: `Revalidated "${type}" with slug "${slug}"`,
         });
@@ -53,14 +52,4 @@ export default async function handler(
     console.error(err);
     return res.status(500).json({ message: err.message });
   }
-}
-
-function revalidateHomeRoute(basePath: string) {
-  console.log(`Calling revalidate for ${basePath} route...`);
-  fetch(`${basePath}/api/revalidateHome`, {
-    method: 'POST',
-    headers: {
-      secret: process.env.SANITY_WEBHOOK_SECRET,
-    },
-  });
 }
