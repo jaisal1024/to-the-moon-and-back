@@ -105,6 +105,7 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
       throw err;
     });
   if (!data) {
+    // will invalidate all new builds and error out
     throw new Error('getStaticPaths empty return value');
   }
 
@@ -112,6 +113,6 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
     paths: data.allCollections.map((collection) => ({
       params: { id: collection?.slug.current ?? '' }, // shouldn't happen could be bad if it starts null'ing out
     })),
-    fallback: false,
+    fallback: 'blocking', // force a rebuild if the path doesn't exist
   };
 }
