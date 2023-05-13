@@ -100,7 +100,7 @@ export default function NavBar() {
       position="static"
       color="transparent"
       elevation={0}
-      sx={{ paddingY: 1 }}
+      sx={{ paddingTop: 1 }}
     >
       <Toolbar variant="dense">
         <Link href="/" noLinkStyle className="cursor-pointer">
