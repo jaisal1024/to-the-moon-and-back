@@ -19,40 +19,49 @@ export const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: 'proxima-nova, sans-serif',
+      fontFamily: 'futura-pt, sans-serif',
+      allVariants: {
+        color: carbon,
+        fontStyle: 'normal',
+      },
       h1: {
         fontSize: 36,
         fontWeight: 700,
-        fontStyle: 'normal',
         textTransform: 'uppercase',
       },
       h2: {
-        fontSize: 30,
+        fontSize: 28,
         lineHeight: 1.3,
-        fontWeight: 700,
-        fontStyle: 'normal',
+        fontWeight: 600,
         textTransform: 'uppercase',
       },
       h3: {
-        fontSize: 24,
+        fontFamily: 'proxima-nova, sans-serif',
+        fontSize: 22,
         lineHeight: 1.3,
-        fontStyle: 'normal',
         fontWeight: 400,
       },
       h4: {
+        fontFamily: 'proxima-nova, sans-serif',
         fontSize: 20,
         lineHeight: 1.3,
-        fontStyle: 'normal',
         fontWeight: 400,
       },
       subtitle1: {
         fontSize: 48,
         lineHeight: 1.3,
-        fontStyle: 'normal',
         fontWeight: 700,
       },
-      body1: { fontSize: 16, fontStyle: 'normal', fontWeight: 300 },
-      body2: { fontSize: 14, fontStyle: 'normal', fontWeight: 300 },
+      body1: {
+        fontFamily: 'proxima-nova, sans-serif',
+        fontSize: 16,
+        fontWeight: 300,
+      },
+      body2: {
+        fontFamily: 'proxima-nova, sans-serif',
+        fontSize: 14,
+        fontWeight: 300,
+      },
     },
   })
 );
