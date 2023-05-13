@@ -11,7 +11,8 @@
     "lint:fix": "npm run format && npm run lint -- --fix",
     "ngrok-start": "ngrok http 3000",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "revalidate": "ts-node-esm scripts/revalidate.ts"
   },
   "prettier": {
     "semi": true,
