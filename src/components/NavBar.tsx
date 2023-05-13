@@ -96,10 +96,15 @@ export default function NavBar() {
   const { pathname } = useRouter();
 
   return (
-    <AppBar position="static" color="transparent">
+    <AppBar
+      position="static"
+      color="transparent"
+      elevation={0}
+      sx={{ paddingY: 1 }}
+    >
       <Toolbar variant="dense">
         <Link href="/" noLinkStyle className="cursor-pointer">
-          <Typography variant="h3" color="inherit">
+          <Typography variant="h2" color="inherit">
             Jaisal Friedman
           </Typography>
         </Link>
@@ -147,7 +152,11 @@ export default function NavBar() {
         >
           <Paper sx={{ minWidth: 150, minHeight: 45 }}>
             {loading && <LoadingSpinner />}
-            {fetchError && <Typography>Failed to fetch collections</Typography>}
+            {fetchError && (
+              <Typography variant="body2" className="py-2 text-dangerRed">
+                Failed to fetch collections
+              </Typography>
+            )}
             {collectionData && (
               <CollectionList collectionData={collectionData} />
             )}
@@ -184,21 +193,17 @@ export default function NavBar() {
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="h4" className="font-bold">
-              Collections
-            </Typography>
+            <Typography variant="h3">Collections</Typography>
             {loading && <LoadingSpinner />}
             {fetchError && (
-              <Typography variant="body2">
+              <Typography variant="body2" className="py-2 text-dangerRed">
                 Failed to fetch collections
               </Typography>
             )}
             {collectionData && (
               <CollectionList collectionData={collectionData} />
             )}
-            <Typography variant="h4" className="font-bold">
-              About
-            </Typography>
+            <Typography variant="h3">About</Typography>
             <CollectionListItem title="Home" href="/about" />
           </DialogContent>
         </Dialog>
