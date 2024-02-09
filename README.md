@@ -55,3 +55,13 @@ There are two webhooks I set up: 1 for development and 1 for production. The dev
 3. Take that URL and add it to the Sanity webhook UI for the development mode
 4. Open `localhost:3000/studio` and make changes to a collection.
 5. Watch the static regeneration in the console and check the UI afterwards
+
+### On Prod to revalidate
+Run `yarn revalidate [slug]`
+
+
+## Ideas Backlog
+1. Home page navigation (pagination)
+2. Next/Prev. Collection
+3. Click to expand/focus image
+4. Fix ISR/SSG (figure out what the issue is)

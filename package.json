@@ -12,7 +12,7 @@
     "ngrok-start": "ngrok http 3000",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "revalidate": "ts-node-esm scripts/revalidate.ts"
+    "revalidate": "ts-node scripts/revalidate.ts"
   },
   "prettier": {
     "semi": true,
