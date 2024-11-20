@@ -19,6 +19,7 @@ export default function Document() {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
+        <link rel="canonical" href="https://www.jaisal.xyz" />
       </Head>
       <body style={{ backgroundColor: theme.palette.background.default }}>
         <Main />

@@ -28,7 +28,7 @@ export default function AboutPage() {
                   'product thinker',
                   'data lover',
                 ]}
-                className="text-green-300"
+                className="text-orange-500"
               />
             </Typography>
             <Typography variant="subtitle1">
@@ -43,20 +43,20 @@ export default function AboutPage() {
             <Typography variant="subtitle1">
               I currently work at{' '}
               <Link
-                href="https://www.archiveresale.co/"
+                href="https://www.counselhealth.com/"
                 target="_blank"
                 rel="noreferrer"
                 noLinkStyle
-                className="cursor-pointer text-orange-600 underline underline-offset-8"
+                className="cursor-pointer text-[#5ee5b6] underline underline-offset-8"
               >
-                Archive Resale
+                Counsel Health
               </Link>
             </Typography>
             <Typography variant="subtitle1">I live in New York City</Typography>
             <br />
             <br />
             <Typography variant="subtitle1">
-              If you are looking to know more check out{' '}
+              If you are looking to learn more check out{' '}
               <Link
                 href="https://docs.google.com/document/d/1CqVndJSUVgLqraMyI-7Ea9aWycshm-VyO18jwnO7r2Y/edit?usp=sharing"
                 target="_blank"
