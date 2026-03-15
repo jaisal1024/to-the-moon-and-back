@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useRef } from 'react';
 
 // DO NOT change without also changing the animation css duration. Needs to be half because its alternating.
@@ -11,7 +13,7 @@ export default function AnimatedSpan({
   items: string[];
 } & React.HTMLProps<HTMLSpanElement>) {
   const [current, setCurrent] = React.useState(0);
-  const ref = useRef<HTMLSpanElement>();
+  const ref = useRef<HTMLSpanElement>(null);
   if (items.length < 1) {
     throw new Error('AnimatedTypography must have at least one string');
   }

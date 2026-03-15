@@ -73,9 +73,3 @@ export default function AboutPage() {
     </>
   );
 }
-
-export async function getStaticProps() {
-  return {
-    props: {},
-  };
-}

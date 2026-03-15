@@ -1,18 +1,29 @@
 import client from 'apollo-client';
-import { InferGetStaticPropsType } from 'next/types';
-import { useCallback } from 'react';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
 import PageTitle from 'src/components/PageTitle';
 import { SortOrder } from 'src/gql/graphql';
 import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 
-export default function IndexPage({
-  data,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { allCollections: collections } = data;
+export const revalidate = 600; // 10-minutes in seconds
 
-  const mapCollectionsToImageGrid = useCallback(() => {
+export default async function IndexPage() {
+  const { data } = await client
+    .query({
+      query: GET_COLLECTIONS,
+      variables: {
+        offset: 0,
+        sort: { _createdAt: SortOrder.Desc },
+      },
+    })
+    .catch((err) => {
+      console.error('getStaticProps failed for index.tsx', err);
+      throw err;
+    });
+
+  const collections = data.allCollections;
+
+  const mapCollectionsToImageGrid = () => {
     return collections.map((collection) => {
       return {
         title: collection.title,
@@ -23,7 +34,8 @@ export default function IndexPage({
         },
       };
     });
-  }, [collections]);
+  };
+
   return (
     <>
       <PageTitle
@@ -38,27 +50,4 @@ export default function IndexPage({
       </Layout>
     </>
   );
-}
-
-export async function getStaticProps() {
-  console.log('running getStaticProps for / route');
-  const { data } = await client
-    .query({
-      query: GET_COLLECTIONS,
-      variables: {
-        offset: 0,
-        sort: { _createdAt: SortOrder.Desc },
-      },
-    })
-    .catch((err) => {
-      console.error('getStaticProps failed for index.tsx', err);
-      throw err;
-    });
-
-  return {
-    props: {
-      data,
-    },
-    revalidate: 600, // 10-minutes in seconds
-  };
 }

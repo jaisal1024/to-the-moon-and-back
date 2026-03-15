@@ -1,8 +1,10 @@
+"use client"
+
 import MuiLink, { LinkProps as MuiLinkProps } from '@mui/material/Link';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import NextLink, { LinkProps as NextLinkProps } from 'next/link';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 
 // From Next-material UI GitHub example
@@ -42,10 +44,9 @@ export const NextLinkComposed = React.forwardRef<
       replace={replace}
       scroll={scroll}
       shallow={shallow}
-      passHref
-      locale={locale}
-      legacyBehavior={legacyBehavior}
-    >
+      locale={locale}>
+      {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+      }
       <Anchor ref={ref} {...other} />
     </NextLink>
   );
@@ -82,10 +83,9 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
     ...other
   } = props;
 
-  const router = useRouter();
   const pathname = typeof href === 'string' ? href : href.pathname;
   const className = clsx(classNameProps, {
-    [activeClassName]: router.pathname === pathname && activeClassName,
+    [activeClassName]: usePathname() === pathname && activeClassName,
   });
 
   const isExternal =

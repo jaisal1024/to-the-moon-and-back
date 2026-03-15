@@ -1,8 +1,7 @@
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 
 export default function useCollectionSlug() {
-  const {
-    query: { id: currentSlug },
-  } = useRouter();
-  return currentSlug as string;
+  const params = useParams();
+  const currentSlug = params?.id;
+  return currentSlug?.toString() ?? '';
 }

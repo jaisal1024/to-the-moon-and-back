@@ -1,24 +1,21 @@
-import Head from 'next/head';
+'use client';
+
 import { NextStudio } from 'next-sanity/studio';
-import { NextStudioHead } from 'next-sanity/studio/head';
 import { StudioLayout, StudioProvider } from 'sanity';
 import config from 'sanity.config';
 import { createGlobalStyle } from 'styled-components';
 
-const GlobalStyle = createGlobalStyle(({ theme }) => ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const GlobalStyle = createGlobalStyle(({ theme }: { theme: any }) => ({
   html: { backgroundColor: theme.sanity.color.base.bg },
 }));
 
 export default function StudioPage() {
   return (
     <>
-      <Head>
-        <NextStudioHead favicons={false} />
-      </Head>
-
       <NextStudio config={config}>
         <StudioProvider config={config}>
-          <GlobalStyle />
+          <GlobalStyle theme={{} as any} />
           <StudioLayout />
         </StudioProvider>
       </NextStudio>

@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom color tokens matching original camelCase names */
+@theme {
+  --color-carbon: #242424;
+  --color-tangerine: #D67D53;
+  --color-tangerineLight: #E9A686;
+  --color-paleTangerine: #FDFAF8;
+  --color-infoGray: #BFBFBF;
+  --color-dangerRed: #FF0000;
+  --color-white: #FFFFFF;
+}

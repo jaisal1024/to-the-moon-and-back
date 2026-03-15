@@ -1,6 +1,8 @@
+"use client"
+
 import { Box, Button, Grid, Typography } from '@mui/material';
 import clsx from 'clsx';
-import router from 'next/router';
+import { usePathname, useRouter } from 'next/navigation';
 import type { Image as SanityImage } from 'sanity';
 
 import NextImage from './NextImage';
@@ -17,11 +19,12 @@ type Props = {
 };
 
 export default function ImageGrid({ collection }: Props) {
+  const router = useRouter();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container>
         {collection.map((item, i) => (
-          <Grid xs={12} lg={6} key={item.photo._key ?? i}>
+          <Grid size={{ xs: 12, lg: 6 }} key={item.photo._key ?? i}>
             <div
               className={clsx(
                 { 'cursor-pointer': !!item.button?.href },
