@@ -10,6 +10,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  security-events: write
+  id-token: write
+  contents: read
+
 env:
   NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL: ${{ secrets.NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL }}
   NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
