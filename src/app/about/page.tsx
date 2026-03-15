@@ -1,24 +1,28 @@
 import { Typography } from '@mui/material';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import AnimatedTypography from 'src/components/AnimatedSpan';
 import Layout from 'src/components/Layout';
 import Link from 'src/components/Link';
-import PageTitle from 'src/components/PageTitle';
+
+export const metadata: Metadata = {
+  title: 'Jaisal Friedman - About',
+  description: 'Learn more about Jaisal Friedman',
+};
 
 export default function AboutPage() {
   return (
     <>
-      <PageTitle
-        title="Jaisal Friedman - About"
-        description="Learn more about Jaisal Friedman"
-      />
       <Layout>
         <div className="flex flex-col space-x-4 py-8 sm:flex-row">
           <div className="relative m-auto mb-6 flex min-h-[300px] w-[300px] flex-1 sm:mb-auto sm:mt-0 sm:min-h-[500px] sm:w-[500px] lg:mt-auto">
             <Image src="/icons/jaisal.svg" alt="Picture of the author" fill />
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <Typography variant="subtitle1"> Hi, I&#39;m Jaisal.</Typography>
+            <Typography variant="subtitle1" data-testid="about-heading">
+              {' '}
+              Hi, I&#39;m Jaisal.
+            </Typography>
             <Typography variant="subtitle1">
               I&#39;m a{' '}
               <AnimatedTypography

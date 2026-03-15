@@ -27,6 +27,7 @@ Whenever you modify schema files in `src/sanity/schemas/`:
 ## Sanity GraphQL Quirks
 
 ### Use `allCollections` for slug filtering
+
 The Sanity GraphQL `collection` top-level query only accepts internal document IDs, not slugs. Always use `allCollections` with a `where` filter for slug-based lookup:
 
 ```graphql
@@ -42,9 +43,11 @@ query GetCollection($id: ID!) {
 ```
 
 ### No sub-query element limits
+
 Sanity's GraphQL API doesn't support `limit` on sub-query elements (e.g., you can't do `photos(limit: 1)` inside `allCollections`). If you only need the cover photo, you must fetch all photos and take the first in code.
 
 ### Array fields must be top-level document types
+
 Sanity requires array elements to be registered as top-level `document` types when using the GraphQL API. This is why `Shot` is defined as a `document` (even though it's only used as an embedded type in `Collection`).
 
 ---
@@ -62,10 +65,13 @@ Sanity requires array elements to be registered as top-level `document` types wh
 3. `graphql-codegen` will detect the query and generate typed hooks on next `yarn generate` or in watch mode during `yarn dev`
 
 ### Inline Queries
+
 For component-specific queries that aren't reused, define them inline in the component file (see `NavBar.tsx` for an example).
 
 ### Always Type Query Results
+
 Use the generated types from `src/gql/graphql.ts`:
+
 ```ts
 import { GetCollectionsQuery } from 'src/gql/graphql';
 function MyComponent({ data }: { data: GetCollectionsQuery }) { ... }
@@ -93,6 +99,7 @@ The `NextImage` component uses `@sanity/image-url` to build optimized CDN URLs f
 ## ISR Revalidation
 
 ### On-Demand Revalidation Flow
+
 ```
 Sanity edit → Webhook → POST /api/revalidate (with signature) → res.revalidate('/affected-path')
 ```
@@ -102,12 +109,16 @@ Sanity edit → Webhook → POST /api/revalidate (with signature) → res.revali
 - Without this, pages update on the next 10-minute ISR cycle
 
 ### Revalidation Route Logic
+
 The `revalidate.ts` API route (`src/pages/api/revalidate.ts`) determines which routes to revalidate based on the document type in the webhook payload. Collection updates trigger revalidation of:
+
 - `/` (homepage)
 - `/collections/[slug]` (specific collection page)
 
 ### Local ISR Testing
+
 You must run a **production build** to test ISR locally — `next dev` doesn't support ISR:
+
 ```bash
 yarn build && yarn start   # production server
 yarn ngrok-start           # expose to internet for webhook

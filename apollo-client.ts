@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 
 // Use the CDN network for client side requests
 const constructSanityGraphQLUrlCdn = () => {

@@ -5,8 +5,13 @@
 # dependencies
 /node_modules
 /studio/node_modules
-/.pnp
-.pnp.js
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # testing
 /coverage
@@ -52,3 +57,8 @@ studio/.env.development
 # generated code
 # - GQL
 src/gql/**
+
+# Playwright
+test-results/**
+playwright-report/**
+.playwright-cli/**

@@ -3,7 +3,6 @@ import client from 'apollo-client';
 import { Metadata } from 'next';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import PageTitle from 'src/components/PageTitle';
 import { graphql } from 'src/gql/gql';
 import { GET_COLLECTION } from 'src/queries/GetCollection';
 
@@ -56,7 +55,7 @@ export async function generateStaticParams() {
 
 export default async function SeriesIdPage({ params }: Props) {
   const { id } = await params;
-  
+
   const { data } = await client
     .query({
       query: GET_COLLECTION,
@@ -75,10 +74,6 @@ export default async function SeriesIdPage({ params }: Props) {
 
   return (
     <>
-      <PageTitle
-        title={`Jaisal Friedman - ${collection.title}`}
-        description={`Learn more about Jaisal Friedman's photography collection ${collection.title}.`}
-      />
       <Layout>
         <div className="flex flex-row pb-4">
           <div>

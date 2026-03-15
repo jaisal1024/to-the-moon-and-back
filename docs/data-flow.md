@@ -14,21 +14,21 @@ The Sanity project hosts two document types:
 
 #### `collections` (Primary content type)
 
-| Field | Type | Notes |
-|---|---|---|
-| `title` | `string` | Collection title, also used to generate `slug` |
-| `slug` | `slug` | Auto-generated from title; used as URL param |
-| `description` | `string` | Short blurb |
-| `date` | `date` | Shooting date |
-| `location` | `string` | Where it was shot |
-| `photos` | `shot[]` | Array of Shot documents |
+| Field         | Type     | Notes                                          |
+| ------------- | -------- | ---------------------------------------------- |
+| `title`       | `string` | Collection title, also used to generate `slug` |
+| `slug`        | `slug`   | Auto-generated from title; used as URL param   |
+| `description` | `string` | Short blurb                                    |
+| `date`        | `date`   | Shooting date                                  |
+| `location`    | `string` | Where it was shot                              |
+| `photos`      | `shot[]` | Array of Shot documents                        |
 
 #### `shot` (Sub-document, hidden in Studio)
 
-| Field | Type | Notes |
-|---|---|---|
-| `title` | `string` | Optional caption |
-| `photo` | `image` | Sanity image asset (CDN-hosted) |
+| Field   | Type     | Notes                           |
+| ------- | -------- | ------------------------------- |
+| `title` | `string` | Optional caption                |
+| `photo` | `image`  | Sanity image asset (CDN-hosted) |
 
 > ⚠️ Sanity's GraphQL API requires array elements to be top-level `document` types. That's why `Shot` exists as a named document type even though it isn't useful standalone.
 
@@ -37,28 +37,34 @@ The Sanity project hosts two document types:
 ## GraphQL Layer
 
 ### Schema Deployment
+
 The Sanity GraphQL API schema must be explicitly deployed:
+
 ```bash
 yarn graphql-deploy
 ```
+
 After deploying, **restart the dev server** for changes to be reflected.
 
 ### Code Generation
+
 TypeScript types are auto-generated from the live GraphQL schema using `graphql-codegen`:
+
 ```bash
 yarn generate  # one-time
 yarn dev       # also runs codegen in --watch mode
 ```
+
 Generated types are written to `src/gql/graphql.ts` and the helper `src/gql/gql.ts`.
 
 ### Queries
 
-| Query | File | Used In |
-|---|---|---|
-| `GetCollections` | `src/queries/GetCollections.ts` | `pages/index.tsx` (homepage) |
-| `GetCollection` | `src/queries/GetCollection.ts` | `pages/collections/[id].tsx` |
-| `GetNavBarCollections` | Inline in `src/components/NavBar.tsx` | NavBar dropdown |
-| `GetCollectionSlugs` | Inline in `pages/collections/[id].tsx` | `getStaticPaths` |
+| Query                  | File                                          | Used In                             |
+| ---------------------- | --------------------------------------------- | ----------------------------------- |
+| `GetCollections`       | `src/queries/GetCollections.ts`               | `src/app/page.tsx` (Home page)      |
+| `GetCollection`        | `src/queries/GetCollection.ts`                | `src/app/collections/[id]/page.tsx` |
+| `GetNavBarCollections` | Inline in `src/components/NavBar.tsx`         | NavBar dropdown                     |
+| `GetCollectionSlugs`   | Inline in `src/app/collections/[id]/page.tsx` | `generateStaticParams`              |
 
 > All queries use `allCollections` instead of `collection` because Sanity's GraphQL `collection` query requires the document ID, not a slug. Filtering by slug requires using `allCollections(where: { slug: { current: { eq: $slug } } })`.
 
@@ -70,10 +76,12 @@ Generated types are written to `src/gql/graphql.ts` and the helper `src/gql/gql.
 
 ```
 yarn build
-  → getStaticProps (index.tsx)  → Apollo query GetCollections → renders homepage
-  → getStaticPaths ([id].tsx)   → Apollo query GetCollectionSlugs → enumerate slugs
-  → getStaticProps ([id].tsx)   → Apollo query GetCollection (per slug)
-  → about.tsx                   → static, no data fetching
+  → IndexPage (src/app/page.tsx)  → Apollo query GetCollections → renders collections
+  → SeriesIdPage (src/app/collections/[id]/page.tsx)
+      → generateStaticParams → enumerate slugs
+      → generateMetadata → dynamic metadata
+      → Page Render → Apollo query GetCollection (per slug)
+  → about/page.tsx → static
 ```
 
 ### Runtime (ISR)
@@ -86,7 +94,7 @@ On-demand revalidation is triggered by Sanity webhooks:
 Sanity edit → Webhook POST → /api/revalidate → Next.js revalidates affected route(s)
 ```
 
-The `/api/revalidate` route validates the webhook signature using `REVALIDATE_SECRET` and calls `res.revalidate()` on the affected paths.
+The `/api/revalidate` route is built with Next.js App Router handlers and features strict TypeScript typing (`NextRequest`) and error handling for `unknown` types. It calls `revalidatePath()` or `revalidateTag()` on the affected paths.
 
 ---
 
@@ -95,6 +103,7 @@ The `/api/revalidate` route validates the webhook signature using `REVALIDATE_SE
 **File:** `apollo-client.ts` (root level)
 
 A singleton Apollo Client instance is created and exported. It is:
+
 - Provided app-wide via `<ApolloProvider>` in `_app.tsx`
 - Used directly in `getStaticProps` for SSG (the singleton ensures a single network call)
 - Used via `useLazyQuery` in `NavBar` for client-side lazy fetching
@@ -127,6 +136,7 @@ Local Sanity Studio (/studio route)
 ```
 
 Setup for local ISR verification:
+
 ```bash
 yarn build && yarn start    # 1. Build & start prod server
 yarn ngrok-start            # 2. Expose localhost to internet

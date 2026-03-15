@@ -17,7 +17,7 @@ Visit either:
 TODO:
 
 - Support browsing more pages in the home route. Currently only shows 10 collections match.
-- Re-deploy Next pages on Edits in Sanity studio.
+- Re-deploy Next app on Edits in Sanity studio.
 - Consider wrapping calls to sanity behind a redis cache to limit hits on Sanity APIs
 
 ## Weird things

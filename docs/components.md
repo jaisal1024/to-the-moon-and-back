@@ -11,6 +11,7 @@ All UI components live in `src/components/`. They are built using a combination 
 Wraps every page with a consistent shell: `NavBar` at the top, then a padded content area, and `Footer` at the bottom.
 
 **Usage:**
+
 ```tsx
 <Layout>
   <YourPageContent />
@@ -24,14 +25,17 @@ Wraps every page with a consistent shell: `NavBar` at the top, then a padded con
 **File:** `src/components/NavBar.tsx`
 
 Responsive top navigation bar. Features:
+
 - **Desktop**: Shows brand name (link to `/`), a **Collections** dropdown (lazy-loads collections via Apollo `useLazyQuery` on hover/click), and an **About** link
 - **Mobile**: Hamburger icon opens a fullscreen `Dialog` with Collections and About
 
 Key behaviors:
+
 - Active link detection via `useRouter().asPath` — active links get `underline` styling
 - Collections data is fetched lazily on demand to reduce initial load
 
 **Internal sub-components:**
+
 - `CollectionListItem` — single nav list item with active underline
 - `CollectionList` — renders all collections from the lazy query
 
@@ -42,10 +46,12 @@ Key behaviors:
 **File:** `src/components/ImageGrid.tsx`
 
 A responsive 2-column grid of photos with optional overlay buttons. Used on both:
+
 - `/` (homepage) — shows all collections, each with a cover photo and a link button
 - `/collections/[slug]` — shows all photos in a single collection
 
 **Props:**
+
 ```ts
 type Props = {
   collection: {
@@ -53,7 +59,7 @@ type Props = {
     photo?: Partial<SanityImage>;
     button?: { title: string; href: string };
   }[];
-}
+};
 ```
 
 - The first 2 images get `priority` loading for LCP optimization
@@ -69,16 +75,14 @@ A thin wrapper around `next/image` that handles **Sanity image URL transformatio
 
 ---
 
-## `PageTitle`
+## Metadata API
 
-**File:** `src/components/PageTitle.tsx`
+**Location:** `layout.tsx` (global) and individual `page.tsx` files.
 
-A wrapper around `next/head` that sets the `<title>` and `<meta name="description">` tags. Used at the top of every page.
+The project uses the native **Next.js Metadata API** for SEO and header management. This replaces the legacy `PageTitle` component and provides better integration with the App Router.
 
-**Props:**
-```ts
-{ title?: string; description?: string }
-```
+- **Static Metadata**: Defined via `export const metadata: Metadata` in page files.
+- **Dynamic Metadata**: Generated via `export async function generateMetadata()` for dynamic routes like `/collections/[slug]`.
 
 ---
 
@@ -89,6 +93,7 @@ A wrapper around `next/head` that sets the `<title>` and `<meta name="descriptio
 Cycles through an array of strings with a CSS fade animation. Used on the About page to animate alternating text (e.g., "software engineer", "photographer").
 
 **Props:**
+
 ```ts
 { items: string[] } & React.HTMLProps<HTMLSpanElement>
 ```

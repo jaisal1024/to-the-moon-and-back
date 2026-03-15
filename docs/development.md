@@ -17,10 +17,12 @@ cp .env.example .env  # fill in env variables
 ```
 
 Required `.env` values:
+
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`
 - `NEXT_PUBLIC_SANITY_DATASET`
-- `SANITY_API_TOKEN`
-- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`
+- `NEXT_PUBLIC_SANITY_API_VERSION`
+- `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`
+- `SANITY_API_TOKEN` (for revalidation)
 - `REVALIDATE_SECRET`
 
 ---
@@ -32,10 +34,12 @@ yarn dev
 ```
 
 This runs **two processes concurrently**:
+
 1. `next dev` on port `3333`
-2. `graphql-codegen --watch` on `src/components/**` and `src/pages/**`
+2. `graphql-codegen --watch` on `src/**/*.{ts,tsx}`
 
 Visit:
+
 - [http://localhost:3333](http://localhost:3333) — main site
 - [http://localhost:3333/studio](http://localhost:3333/studio) — embedded Sanity Studio
 
@@ -86,6 +90,7 @@ yarn ngrok-start
 ```
 
 Then:
+
 1. Copy the ngrok HTTPS URL
 2. Add it as a webhook in the [Sanity webhook UI](https://www.sanity.io/manage)
 3. Make an edit in Studio and watch the console for revalidation logs
@@ -94,11 +99,11 @@ Then:
 
 ## Code Quality
 
-| Command | What it does |
-|---|---|
-| `yarn lint` | Run ESLint |
-| `yarn lint:fix` | Fix ESLint issues + run Prettier |
-| `yarn format` | Run Prettier on all files |
+| Command           | What it does                            |
+| ----------------- | --------------------------------------- |
+| `yarn lint`       | Run ESLint directly (`eslint .`)        |
+| `yarn lint:fix`   | Fix ESLint issues + run Prettier        |
+| `yarn format`     | Run Prettier on all files               |
 | `yarn type-check` | Run `tsc --noEmit` (type checking only) |
 
 ---
@@ -110,7 +115,7 @@ yarn build    # builds the production Next.js app
 yarn start    # starts the production server locally
 ```
 
-**Deployment**: Pushing to `main` triggers an automatic deploy on Vercel.
+**Deployment**: Pushing to `main` triggers an automatic deploy on Vercel. CI is optimized with caching for `.next/cache` and Playwright browsers to ensure sub-5 minute build times.
 
 ---
 

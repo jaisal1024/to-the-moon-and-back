@@ -3,7 +3,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-module.exports = withBundleAnalyzer({
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -12,10 +13,13 @@ module.exports = withBundleAnalyzer({
       },
     ],
   },
-  transpilePackages: ['sanity', 'next-sanity', '@sanity/client', 'get-it', 'styled-components'],
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  transpilePackages: [
+    'sanity',
+    'next-sanity',
+    '@sanity/client',
+    'get-it',
+    'styled-components',
+  ],
   reactStrictMode: true,
   modularizeImports: {
     '@mui/icons-material': {
@@ -31,4 +35,6 @@ module.exports = withBundleAnalyzer({
         ? { exclude: ['error', 'warn', 'log'] }
         : false,
   },
-});
+};
+
+module.exports = withBundleAnalyzer(nextConfig);

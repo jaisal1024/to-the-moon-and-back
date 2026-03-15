@@ -4,12 +4,12 @@ This folder contains documentation for the **To the Moon and Back** project — 
 
 ## Contents
 
-| Document | Description |
-|---|---|
-| [architecture.md](./architecture.md) | Tech stack, high-level architecture diagram, rendering strategy, styling system, env variables, and key config files |
-| [components.md](./components.md) | Reference for every UI component in `src/components/`: props, usage, and behavior |
-| [data-flow.md](./data-flow.md) | Sanity CMS schemas, GraphQL queries, build-time vs. runtime rendering, ISR revalidation flow, Apollo Client setup |
-| [development.md](./development.md) | Setup guide, dev server, GraphQL workflow, ISR testing, code quality commands, known quirks & gotchas |
+| Document                             | Description                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| [architecture.md](./architecture.md) | Tech stack, high-level architecture, rendering strategy, styling system, **Agent-First Infra**, and **Environment Validation** |
+| [components.md](./components.md)     | Reference for UI components and **Metadata API** integration                                                                   |
+| [data-flow.md](./data-flow.md)       | Sanity CMS schemas, GraphQL queries, SSG/ISR rendering lifecycle, revalidation flow, and Apollo Client setup                   |
+| [development.md](./development.md)   | Setup guide, dev server, GraphQL workflow, ISR testing, **CI/CD caching**, and code quality commands                           |
 
 ## Quick Links
 

@@ -19,8 +19,8 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import clsx from 'clsx';
-import { usePathname, useRouter } from 'next/navigation';
+import { clsx } from 'clsx';
+import { usePathname } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { graphql } from 'src/gql/gql';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
@@ -39,6 +39,7 @@ function CollectionListItem({ title, href }: { href: string; title: string }) {
       <ListItemButton
         href={href}
         className={clsx(href === pathname && 'underline underline-offset-8')}
+        data-testid={`navbar-list-item-${title.toLowerCase().replace(/\s+/g, '-')}`}
       >
         <Typography variant="body1">{title}</Typography>
       </ListItemButton>
@@ -49,12 +50,14 @@ function CollectionListItem({ title, href }: { href: string; title: string }) {
 function CollectionList({
   collectionData,
 }: {
-  collectionData: any; // Bypassing deep partial strictness for NavBar
+  collectionData: unknown; // Bypassing deep partial strictness for NavBar
 }) {
   return (
     <List>
       <CollectionListItem title="Home" href="/" />
-      {collectionData?.allCollections?.map(
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      {(collectionData as any)?.allCollections?.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (collection: any, i: number) =>
           collection && (
             <CollectionListItem
@@ -62,7 +65,7 @@ function CollectionList({
               title={collection.title || 'Untitled'}
               href={`/collections/${collection.slug?.current || ''}`}
             />
-          )
+          ),
       )}
     </List>
   );
@@ -92,9 +95,11 @@ export default function NavBar() {
     `),
     {
       variables: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sort: GET_COLLECTIONS_SORT as any,
       },
-    } as any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
   );
   const collectionSlug = useCollectionSlug();
   const pathname = usePathname();
@@ -107,7 +112,12 @@ export default function NavBar() {
       sx={{ paddingTop: 1 }}
     >
       <Toolbar variant="dense">
-        <Link href="/" noLinkStyle className="cursor-pointer">
+        <Link
+          href="/"
+          noLinkStyle
+          className="cursor-pointer"
+          data-testid="navbar-home-link"
+        >
           <Typography variant="h2" color="inherit">
             Jaisal Friedman
           </Typography>
@@ -117,13 +127,14 @@ export default function NavBar() {
           className={clsx(
             (collectionSlug || pathname === '/') &&
               'underline underline-offset-8',
-            'hidden cursor-pointer p-1 sm:block'
+            'hidden cursor-pointer p-1 sm:block',
           )}
           onClick={() => {
             setShowCollections(true);
             getNavBarCollections();
           }}
           ref={collectionAnchorRef}
+          data-testid="navbar-collections-button"
         >
           <div className="flex flex-row items-center">
             <Typography variant="h4" color="inherit">
@@ -135,10 +146,10 @@ export default function NavBar() {
         <div
           className={clsx(
             pathname === '/about' && 'underline underline-offset-8',
-            'hidden cursor-pointer p-1 sm:block'
+            'hidden cursor-pointer p-1 sm:block',
           )}
         >
-          <Link href="/about" noLinkStyle>
+          <Link href="/about" noLinkStyle data-testid="navbar-about-link">
             <Typography variant="h4" color="inherit">
               About
             </Typography>
@@ -174,6 +185,7 @@ export default function NavBar() {
             setMobileDrawerOpen(true);
             getNavBarCollections();
           }}
+          data-testid="navbar-mobile-menu-button"
         >
           <MenuIcon />
         </IconButton>
@@ -192,12 +204,18 @@ export default function NavBar() {
                 top: 8,
                 color: (theme) => theme.palette.grey[500],
               }}
+              data-testid="navbar-mobile-close-button"
             >
               <CloseIcon />
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="h3">Collections</Typography>
+            <Typography
+              variant="h3"
+              data-testid="mobile-menu-collections-heading"
+            >
+              Collections
+            </Typography>
             {loading && <LoadingSpinner />}
             {fetchError && (
               <Typography variant="body2" className="py-2 text-dangerRed">
@@ -207,8 +225,10 @@ export default function NavBar() {
             {collectionData && (
               <CollectionList collectionData={collectionData} />
             )}
-            <Typography variant="h3">About</Typography>
-            <CollectionListItem title="Home" href="/about" />
+            <Typography variant="h3" data-testid="mobile-menu-about-heading">
+              About
+            </Typography>
+            <CollectionListItem title="About" href="/about" />
           </DialogContent>
         </Dialog>
       </Toolbar>

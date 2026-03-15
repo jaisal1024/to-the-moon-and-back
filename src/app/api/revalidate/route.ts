@@ -1,13 +1,14 @@
 import { revalidatePath } from 'next/cache';
+import { NextRequest } from 'next/server';
 import { parseBody } from 'next-sanity/webhook';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { isValidSignature, body } = await parseBody(
-      req as any,
-      process.env.SANITY_WEBHOOK_SECRET
+      req,
+      process.env.SANITY_WEBHOOK_SECRET,
     );
 
     if (!isValidSignature) {
@@ -30,17 +31,18 @@ export async function POST(req: Request) {
           JSON.stringify({
             message: `Revalidated "${type}" with slug "${slug}"`,
           }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
       default:
         return new Response(
           JSON.stringify({ message: `Ignored webhook for type: ${type}` }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
-    return new Response(JSON.stringify({ message: err.message }), {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return new Response(JSON.stringify({ message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

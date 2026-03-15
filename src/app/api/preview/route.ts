@@ -11,7 +11,9 @@ export async function GET(request: Request) {
   const slug = searchParams.get('slug');
 
   if (!readToken) {
-    return new Response('Misconfigured server: readToken required', { status: 500 });
+    return new Response('Misconfigured server: readToken required', {
+      status: 500,
+    });
   }
 
   if (!secret) {

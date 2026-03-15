@@ -1,9 +1,11 @@
+import 'src/styles/globals.css';
+import 'src/styles/animate.css';
+
 import { Metadata } from 'next';
 import Script from 'next/script';
 import { theme } from 'src/theme';
+
 import { Providers } from './Providers';
-import 'src/styles/globals.css';
-import 'src/styles/animate.css';
 
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 

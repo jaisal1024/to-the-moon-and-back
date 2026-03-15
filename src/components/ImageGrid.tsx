@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
 import { Box, Button, Grid, Typography } from '@mui/material';
-import clsx from 'clsx';
-import { usePathname, useRouter } from 'next/navigation';
+import { clsx } from 'clsx';
+import { useRouter } from 'next/navigation';
 import type { Image as SanityImage } from 'sanity';
 
 import NextImage from './NextImage';
@@ -28,7 +28,7 @@ export default function ImageGrid({ collection }: Props) {
             <div
               className={clsx(
                 { 'cursor-pointer': !!item.button?.href },
-                'relative mx-2 my-4 flex min-h-[300px] flex-col sm:min-h-[500px] xl:mx-6'
+                'relative mx-2 my-4 flex min-h-[300px] flex-col sm:min-h-[500px] xl:mx-6',
               )}
               onClick={() => {
                 if (item.button) {

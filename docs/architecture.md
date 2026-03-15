@@ -10,18 +10,18 @@
 
 ## Technology Stack
 
-| Layer | Technology | Version | Purpose |
-|---|---|---|---|
-| Framework | **Next.js** | ^13.1.1 | SSG + ISR rendering, routing, API routes |
-| Language | **TypeScript** | ^5.0.4 | Type safety across the full app |
-| CMS | **Sanity.io** | ^3.1.4 | Content management for photography collections |
-| Data Fetching | **Apollo Client** | ^3.7.12 | GraphQL client for querying Sanity's GraphQL API |
-| Type Generation | **graphql-codegen** | ^3.3.0 | Generates TypeScript types from GraphQL schema |
-| UI Library | **MUI (Material UI)** | ^5.12.1 | Component library for layout, typography, buttons |
-| Styling | **Tailwind CSS** | ^3.3.1 | Utility-first CSS for layout and spacing |
-| Styling (CSS-in-JS) | **Emotion** | ^11.10.6 | Underlying styled engine for MUI |
-| Deployment | **Vercel** | — | Auto-deploys on merge to `main` |
-| Analytics | **Google Analytics** | — | Via `gtag.js` in `_app.tsx` |
+| Layer           | Technology            | Version | Purpose                                           |
+| --------------- | --------------------- | ------- | ------------------------------------------------- |
+| Framework       | **Next.js**           | ^16.1.6 | SSG + ISR rendering, App Router, API routes       |
+| Language        | **TypeScript**        | ^5.9.3  | Type safety across the full app                   |
+| CMS             | **Sanity.io**         | ^5.16.0 | Content management for photography collections    |
+| Data Fetching   | **Apollo Client**     | ^4.1.6  | GraphQL client for querying Sanity's GraphQL API  |
+| Type Generation | **graphql-codegen**   | ^5.0.3  | Generates TypeScript types from GraphQL schema    |
+| UI Library      | **MUI (Material UI)** | ^7.3.9  | Component library for layout, typography, buttons |
+| Styling         | **Tailwind CSS**      | ^4.0.0  | Utility-first CSS for layout and spacing          |
+| Deployment      | **Vercel**            | —       | Auto-deploys on merge via GitHub Actions          |
+| Infrastructure  | **IaC**               | —       | Project defined via `vercel.json`                 |
+| Analytics       | **Google Analytics**  | —       | Via `gtag.js` in `_app.tsx`                       |
 
 ---
 
@@ -43,11 +43,11 @@
          │         Next.js App           │
          │  (SSG via getStaticProps)     │
          │                               │
-         │  Pages:                       │
-         │  / (index) → ImageGrid        │
-         │  /collections/[slug]          │
-         │  /about                       │
-         │  /studio (Sanity embedded)    │
+         │  Pages (App Router):          │
+│  / (index) → ImageGrid        │
+│  /collections/[slug]          │
+│  /about                       │
+│  /studio (Sanity embedded)    │
          └───────────────┬───────────────┘
                          │ ISR Webhook
                          ▼
@@ -62,9 +62,10 @@
 
 The site uses **Next.js Static Site Generation (SSG)** with **Incremental Static Regeneration (ISR)**:
 
-- Pages are pre-rendered at **build time** using `getStaticProps` and `getStaticPaths`
-- ISR is configured with a **10-minute revalidation window** (`revalidate: 600`)
-- Sanity webhooks trigger on-demand revalidation via `/api/revalidate` when content changes in the CMS
+- Pages are pre-rendered at **build time** (SSG)
+- ISR is configured with a **10-minute revalidation window** (`revalidate: 600`) via `revalidate` segment exports
+- Sanity webhooks trigger on-demand revalidation via `/api/revalidate`
+- SEO is managed via the **Next.js Metadata API** (replacing the legacy `PageTitle` component)
 
 ### ISR / Revalidation Flow
 
@@ -89,30 +90,38 @@ The site uses a **dual-styling approach**:
 
 ---
 
-## Environment Variables
+### Safety Guardrails (Environment Validation)
 
-See `.env.example` for required variables. Key variables:
+The project uses **Zod** for strict environment variable validation.
 
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID |
-| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset (e.g., `production`) |
-| `SANITY_API_TOKEN` | Server-side Sanity read token |
-| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` | Google Analytics measurement ID |
-| `REVALIDATE_SECRET` | Webhook secret for ISR revalidation |
+- **Source**: `src/env.schema.ts`
+- **Behavior**: The application will throw an error and fail to build or start if any required environment variables are missing or incorrectly formatted. This ensures operational safety for both humans and agents.
+
+| Variable                                | Purpose                                  |
+| --------------------------------------- | ---------------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`         | Sanity project ID                        |
+| `NEXT_PUBLIC_SANITY_DATASET`            | Sanity dataset (e.g., `production`)      |
+| `NEXT_PUBLIC_SANITY_API_VERSION`        | Sanity API version (e.g. `2022-11-28`)   |
+| `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL` | Sanity GraphQL endpoint                  |
+| `SANITY_API_TOKEN`                      | Server-side Sanity read token (optional) |
+| `REVALIDATE_SECRET`                     | Webhook secret for ISR revalidation      |
+| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`       | GA measurement ID (optional)             |
 
 ---
 
 ## Key Configuration Files
 
-| File | Purpose |
-|---|---|
-| `next.config.js` | Next.js config (bundle analyzer, image domains) |
-| `tailwind.config.js` | Tailwind CSS configuration |
-| `codegen.ts` | GraphQL codegen config — generates types to `src/gql/` |
-| `sanity.config.ts` | Sanity studio configuration |
-| `apollo-client.ts` | Apollo Client singleton setup |
-| `tsconfig.json` | TypeScript config with path aliases (`src/` → `@`) |
-| `.eslintrc.json` | ESLint rules (typescript, import sort, unused imports) |
-| `.prettierrc.json` | Prettier formatting config |
-| `renovate.json` | Automated dependency updates config |
+| File                 | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `next.config.js`     | Next.js config (bundle analyzer, image domains)        |
+| `vercel.json`        | Infrastructure as Code (routing, security headers)     |
+| `src/env.schema.ts`  | Strict environment variable validation                 |
+| `tailwind.config.js` | Tailwind CSS configuration                             |
+| `codegen.ts`         | GraphQL codegen config — generates types to `src/gql/` |
+| `sanity.config.ts`   | Sanity studio configuration                            |
+| `apollo-client.ts`   | Apollo Client singleton setup                          |
+| `tsconfig.json`      | TypeScript config with path aliases (`src/` → `@`)     |
+| `.eslintrc.json`     | ESLint rules (typescript, import sort, unused imports) |
+| `.prettierrc.json`   | Prettier formatting config                             |
+| `renovate.json`      | Automated dependency updates config                    |
+| `backlog/`           | Structured agent task queue                            |

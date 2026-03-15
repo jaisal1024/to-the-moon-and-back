@@ -1,9 +1,14 @@
 import client from 'apollo-client';
+import { Metadata } from 'next';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import PageTitle from 'src/components/PageTitle';
 import { SortOrder } from 'src/gql/graphql';
 import { GET_COLLECTIONS } from 'src/queries/GetCollections';
+
+export const metadata: Metadata = {
+  title: 'Jaisal Friedman - Collections',
+  description: "Learn more about Jaisal Friedman's photography collections.",
+};
 
 export const revalidate = 600; // 10-minutes in seconds
 
@@ -38,10 +43,6 @@ export default async function IndexPage() {
 
   return (
     <>
-      <PageTitle
-        title="Jaisal Friedman - Collections"
-        description="Learn more about Jaisal Friedman's photography collections."
-      />
       <Layout>
         {collections.length > 0 && (
           <ImageGrid collection={mapCollectionsToImageGrid()} />

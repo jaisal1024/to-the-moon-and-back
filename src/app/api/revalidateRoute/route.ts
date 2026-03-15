@@ -29,9 +29,10 @@ export async function POST(req: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
-    return new Response(JSON.stringify({ message: err.message }), {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return new Response(JSON.stringify({ message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
