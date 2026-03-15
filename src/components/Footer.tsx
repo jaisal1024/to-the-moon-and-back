@@ -39,6 +39,7 @@ function SectionContent({
       rel={target === '_blank' ? 'noreferrer' : null}
       target={target}
       className="flex flex-row space-x-2 pb-1"
+      data-testid={`footer-link-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
       {iconPath && (
         <Image src={iconPath} alt={iconAlt} height={14} width={14} />
@@ -62,7 +63,7 @@ export default function Footer() {
             </Typography>
             <ArrowDownwardIcon />
           </div>
-          <Typography variant="body2">
+          <Typography variant="body2" data-testid="footer-copyright">
             © Jaisal Friedman {new Date().getFullYear()}
           </Typography>
         </div>

@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 
 // Use the CDN network for client side requests
 const constructSanityGraphQLUrlCdn = () => {
@@ -8,10 +8,12 @@ const constructSanityGraphQLUrlCdn = () => {
 };
 
 const client = new ApolloClient({
-  uri:
-    typeof window !== undefined
-      ? constructSanityGraphQLUrlCdn()
-      : process.env.NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL,
+  link: new HttpLink({
+    uri:
+      typeof window !== 'undefined'
+        ? constructSanityGraphQLUrlCdn()
+        : process.env.NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL,
+  }),
   cache: new InMemoryCache(),
 });
 

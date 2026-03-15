@@ -24,7 +24,7 @@ const NEW_TYPE = 'collections';
 const fetchDocuments = () =>
   client.fetch(
     `*[_type == $oldType][0...10] {..., "incomingReferences": *[references(^._id)]{...}}`,
-    { oldType: OLD_TYPE }
+    { oldType: OLD_TYPE },
   );
 
 const buildMutations = (docs) => {

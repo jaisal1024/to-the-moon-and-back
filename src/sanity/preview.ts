@@ -1,13 +1,7 @@
-import { definePreview } from 'next-sanity/preview';
+import { definePreviewUrl } from '@sanity/preview-url-secret/define-preview-url';
 
-import { dataset, projectId } from './env';
+// no env needed
 
-function onPublicAccessOnly() {
-  throw new Error(`Unable to load preview as you're not logged in`);
-}
-
-export const usePreview = definePreview({
-  projectId,
-  dataset,
-  onPublicAccessOnly,
+export const usePreview = definePreviewUrl({
+  draftMode: { enable: '/api/draft' },
 });

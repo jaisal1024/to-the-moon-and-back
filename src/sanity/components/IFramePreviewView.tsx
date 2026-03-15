@@ -2,8 +2,8 @@ import { Box, Text } from '@sanity/ui';
 import { SanityClient } from 'next-sanity';
 import { ComponentProps, Suspense } from 'react';
 import { isRecord, isString, useClient } from 'sanity';
-import { UserViewComponent } from 'sanity/desk';
-import styled from 'styled-components';
+import { UserViewComponent } from 'sanity/structure';
+import { styled } from 'styled-components';
 import { suspend } from 'suspend-react';
 
 import { apiVersion, previewSecretDocumentId } from '../env';
@@ -66,7 +66,7 @@ function PagePreviewWithSecret(props: {
         createIfNotExists: true,
       }),
     ['getPreviewSecret', previewSecretDocumentId, FETCH_SECRET],
-    { lifespan: 60000 }
+    { lifespan: 60000 },
   );
 
   if (!secret) {

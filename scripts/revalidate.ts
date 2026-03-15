@@ -31,7 +31,7 @@ async function revalidateRoute(url: string, route: string) {
     console.log(`Revalidation successful for ${route}`);
   } else {
     console.error(
-      `Revalidation failed for ${route} on ${url} with status ${resp.status}`
+      `Revalidation failed for ${route} on ${url} with status ${resp.status}`,
     );
     throw new Error(await resp.text());
   }
@@ -43,7 +43,7 @@ async function revalidate() {
     baseUrlToRevalidate.map(async (url) => {
       await revalidateRoute(url, '/');
       await revalidateRoute(url, `/collections/${slug}`);
-    })
+    }),
   );
 }
 
