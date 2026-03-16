@@ -37,7 +37,7 @@ export default function ImageGrid({ collection }: Props) {
               }}
             >
               <NextImage
-                priority={i < 2}
+                preload={i < 2}
                 image={item.photo}
                 alt={item.title ?? `item ${i + 1}`}
                 fill
@@ -48,9 +48,25 @@ export default function ImageGrid({ collection }: Props) {
                   href={item.button.href}
                   variant="text"
                   color="secondary"
-                  className="my-auto self-center bg-slate-100 opacity-70 hover:bg-slate-200"
+                  className="my-auto self-center"
+                  sx={{
+                    textTransform: 'none',
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'light'
+                        ? 'rgba(36, 36, 36, 0.7)'
+                        : 'rgba(0, 0, 0, 0.7)',
+                    color: (theme) => theme.palette.common.white,
+                    '&:hover': {
+                      backgroundColor: (theme) =>
+                        theme.palette.mode === 'light'
+                          ? 'rgba(36, 36, 36, 0.85)'
+                          : 'rgba(0, 0, 0, 0.85)',
+                    },
+                  }}
                 >
-                  <Typography variant="body1">{item.button.title}</Typography>
+                  <Typography variant="body2" className="uppercase tracking-wider">
+                    {item.button.title}
+                  </Typography>
                 </Button>
               )}
             </div>

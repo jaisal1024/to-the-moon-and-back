@@ -1,7 +1,9 @@
+import { Typography } from '@mui/material';
+
 export default function NotFound() {
   return (
     <div className="flex h-screen w-full items-center justify-center">
-      <h1 className="text-2xl font-bold">404 - Page Not Found</h1>
+      <Typography variant="h2">404 - Page Not Found</Typography>
     </div>
   );
 }

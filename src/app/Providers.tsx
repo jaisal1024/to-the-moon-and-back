@@ -1,11 +1,42 @@
 'use client';
 
 import { ApolloProvider } from '@apollo/client/react';
-import { StyledEngineProvider, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import client from 'apollo-client';
-import { theme } from 'src/theme';
+import React, { useEffect, useMemo, useState } from 'react';
+import { createAppTheme } from 'src/theme';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+type ProvidersProps = {
+  children: React.ReactNode;
+};
+
+function ProvidersComponent({ children }: ProvidersProps) {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [modeOverride, setModeOverride] = useState<'light' | 'dark' | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const override = params.get('theme');
+
+    if (override === 'light' || override === 'dark') {
+      setModeOverride(override);
+    } else {
+      setModeOverride(null);
+    }
+  }, []);
+
+  const theme = useMemo(
+    () =>
+      createAppTheme(
+        modeOverride ?? (prefersDarkMode ? 'dark' : 'light'),
+      ),
+    [modeOverride, prefersDarkMode],
+  );
+
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
@@ -14,3 +45,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </StyledEngineProvider>
   );
 }
+
+export const Providers = React.memo(ProvidersComponent);

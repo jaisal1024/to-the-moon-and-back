@@ -2,16 +2,28 @@ import 'src/styles/globals.css';
 import 'src/styles/animate.css';
 
 import { Metadata } from 'next';
+import { Archivo_Black, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
-import { theme } from 'src/theme';
 
 import { Providers } from './Providers';
+
+const archivoBlack = Archivo_Black({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-archivo-black',
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-dm-sans',
+});
 
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman',
-  description: 'Jaisal Friedman - Photography and Software Engineering',
+  description: 'Jaisal Friedman - Home',
   icons: {
     icon: [
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -29,11 +41,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${archivoBlack.variable} ${dmSans.variable}`}>
       <head>
-        <link rel="stylesheet" href="https://use.typekit.net/oug8zzb.css" />
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var search = window.location.search || '';
+                  var params = new URLSearchParams(search);
+                  var override = params.get('theme');
+                  var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var theme = isDark ? 'dark' : 'light';
+
+                  if (override === 'light' || override === 'dark') {
+                    theme = override;
+                  }
+
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              })();
+            `,
+          }}
+        />
       </head>
-      <body style={{ backgroundColor: theme.palette.background.default }}>
+      <body>
         <Providers>
           {/* Google tag (gtag.js) */}
           {googleAnalyticsId && (

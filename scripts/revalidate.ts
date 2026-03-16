@@ -1,4 +1,4 @@
-// Usage: ts-node scripts/revalidate.ts <slug>
+// Usage: yarn run revalidate <slug>
 // Script revalidates all the routes for a given collection slug across different domains which next doesn't handle :(
 
 import * as dotenv from 'dotenv';
@@ -43,6 +43,7 @@ async function revalidate() {
     baseUrlToRevalidate.map(async (url) => {
       await revalidateRoute(url, '/');
       await revalidateRoute(url, `/collections/${slug}`);
+      await revalidateRoute(url, `/blog/`);
     }),
   );
 }

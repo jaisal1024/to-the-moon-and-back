@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { clsx } from 'clsx';
 import { usePathname } from 'next/navigation';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
@@ -67,7 +67,7 @@ function CollectionList({ collectionData }: { collectionData: unknown }) {
   );
 }
 
-export default function NavBar() {
+function NavBarComponent() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [showCollections, setShowCollections] = useState(false);
   const collectionAnchorRef = useRef<HTMLDivElement>(null);
@@ -113,7 +113,7 @@ export default function NavBar() {
           className="cursor-pointer"
           data-testid="navbar-home-link"
         >
-          <Typography variant="h2" color="inherit">
+          <Typography variant={pathname === '/' ? 'h1' : 'h2'} color="inherit">
             Jaisal Friedman
           </Typography>
         </Link>
@@ -246,3 +246,7 @@ export default function NavBar() {
     </AppBar>
   );
 }
+
+const NavBar = React.memo(NavBarComponent);
+
+export default NavBar;

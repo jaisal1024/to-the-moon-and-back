@@ -22,8 +22,9 @@ Required `.env` values:
 - `NEXT_PUBLIC_SANITY_DATASET`
 - `NEXT_PUBLIC_SANITY_API_VERSION`
 - `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`
-- `SANITY_API_TOKEN` (for revalidation)
-- `REVALIDATE_SECRET`
+- `SANITY_API_TOKEN` (for revalidation / local scripts)
+- `REVALIDATE_SECRET` (optional, used for local ISR scripts)
+- `SANITY_WEBHOOK_SECRET` (optional, used by `/api/revalidate`)
 
 ---
 
@@ -136,4 +137,6 @@ Opens a visual bundle analyzer to inspect client/server bundle sizes.
 3. **AnimatedSpan timing**: If you change the CSS animation duration in `src/styles/animate.css`, update `transitionTotal` in `AnimatedSpan.tsx` to match (it should be half the CSS duration since the animation alternates)
 4. **Sanity data migrations**: Renaming `_type` fields requires using the migration script at `scripts/migrateDocumentType.js`. Use with extreme caution
 5. **Sanity Image + NextImage**: Sanity image references need to go through `@sanity/image-url` before passing to `next/image`. See `NextImage.tsx` for the pattern
-6. **Font loading**: `futura-pt` and `proxima-nova` are served via Adobe Fonts. The script tag is in `src/pages/_document.tsx`. No self-hosted fallback
+6. **Font loading**: Fonts are loaded via `next/font` in `src/app/layout.tsx`:
+   - `Archivo Black` for the main hero heading
+   - `DM Sans` for all other headings and body text

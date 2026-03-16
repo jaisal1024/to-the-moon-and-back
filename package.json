@@ -7,6 +7,7 @@
     "format": "npx prettier --write . --ignore-path .gitignore",
     "generate": "npx graphql-codegen --config codegen.ts",
     "graphql-deploy": "sanity graphql deploy",
+    "graphql-deploy:prod": "sanity graphql deploy --dataset=${SANITY_DEPLOY_DATASET:-production} --force",
     "lint": "eslint .",
     "lint:fix": "yarn format && yarn lint --fix",
     "ngrok-start": "ngrok http 3000",

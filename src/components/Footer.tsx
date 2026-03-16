@@ -51,8 +51,8 @@ function SectionContent({
 
 export default function Footer() {
   return (
-    <div className="flex flex-col-reverse items-center divide-carbon border-t border-carbon sm:flex-row sm:divide-x">
-      <div className="my-2 flex w-full flex-1 flex-col items-center border-t border-carbon sm:items-start sm:border-t-0">
+    <div className="flex flex-col-reverse items-center divide-borderSubtle border-t border-borderSubtle sm:flex-row sm:divide-x">
+      <div className="my-2 flex w-full flex-1 flex-col items-center border-t border-borderSubtle sm:items-start sm:border-t-0">
         <div className="py-4 sm:pl-8">
           <Typography variant="body2" className="italic">
             designed and built
