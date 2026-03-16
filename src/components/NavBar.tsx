@@ -113,7 +113,7 @@ export default function NavBar() {
           className="cursor-pointer"
           data-testid="navbar-home-link"
         >
-          <Typography variant="h2" color="inherit">
+          <Typography variant={pathname === '/' ? 'h1' : 'h2'} color="inherit">
             Jaisal Friedman
           </Typography>
         </Link>

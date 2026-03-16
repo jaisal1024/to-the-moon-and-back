@@ -12,3 +12,7 @@
   --color-dangerRed: #ff0000;
   --color-white: #ffffff;
 }
+
+.portrait-glow {
+  filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.12));
+}

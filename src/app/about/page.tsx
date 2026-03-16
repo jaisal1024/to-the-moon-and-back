@@ -7,7 +7,7 @@ import Link from 'src/components/Link';
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - About',
-  description: 'Learn more about Jaisal Friedman',
+  description: 'Learn more about me!',
 };
 
 export default function AboutPage() {
@@ -15,8 +15,13 @@ export default function AboutPage() {
     <>
       <Layout>
         <div className="flex flex-col space-x-4 py-8 sm:flex-row">
-          <div className="relative m-auto mb-6 flex min-h-[300px] w-[300px] flex-1 sm:mb-auto sm:mt-0 sm:min-h-[500px] sm:w-[500px] lg:mt-auto">
-            <Image src="/icons/jaisal.svg" alt="Picture of the author" fill />
+          <div className="portrait-glow relative m-auto mb-6 flex min-h-[300px] w-[300px] flex-1 sm:mb-auto sm:mt-0 sm:min-h-[500px] sm:w-[500px] lg:mt-auto">
+            <Image
+              src="/images/me.png"
+              alt="Picture of the author"
+              fill
+              objectFit="contain"
+            />
           </div>
           <div className="flex-1 text-center sm:text-left">
             <Typography variant="subtitle1" data-testid="about-heading">
@@ -62,13 +67,13 @@ export default function AboutPage() {
             <Typography variant="subtitle1">
               If you are looking to learn more check out{' '}
               <Link
-                href="https://docs.google.com/document/d/1CqVndJSUVgLqraMyI-7Ea9aWycshm-VyO18jwnO7r2Y/edit?usp=sharing"
+                href="https://www.linkedin.com/in/jaisalfriedman/"
                 target="_blank"
                 rel="noreferrer"
                 noLinkStyle
                 className="cursor-pointer text-blue-500 underline underline-offset-8"
               >
-                my resume
+                my LinkedIn
               </Link>
             </Typography>
           </div>

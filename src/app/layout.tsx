@@ -2,16 +2,29 @@ import 'src/styles/globals.css';
 import 'src/styles/animate.css';
 
 import { Metadata } from 'next';
+import { Archivo_Black, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { theme } from 'src/theme';
 
 import { Providers } from './Providers';
 
+const archivoBlack = Archivo_Black({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-archivo-black',
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-dm-sans',
+});
+
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman',
-  description: 'Jaisal Friedman - Photography and Software Engineering',
+  description: 'Jaisal Friedman - Home',
   icons: {
     icon: [
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -29,10 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="stylesheet" href="https://use.typekit.net/oug8zzb.css" />
-      </head>
+    <html lang="en" className={`${archivoBlack.variable} ${dmSans.variable}`}>
+      <head />
       <body style={{ backgroundColor: theme.palette.background.default }}>
         <Providers>
           {/* Google tag (gtag.js) */}
