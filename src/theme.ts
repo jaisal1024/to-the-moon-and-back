@@ -86,8 +86,3 @@ export const createAppTheme = (mode: PaletteMode) =>
       typography: baseTypography,
     }),
   );
-
-export const themeLight = createAppTheme('light');
-export const themeDark = createAppTheme('dark');
-
-export default themeLight;
