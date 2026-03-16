@@ -1,9 +1,9 @@
+import { gql } from '@apollo/client';
 import { Typography } from '@mui/material';
 import client from 'apollo-client';
 import { Metadata } from 'next';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import { graphql } from 'src/gql/gql';
 import { GET_COLLECTION } from 'src/queries/GetCollection';
 
 export const revalidate = 600; // 10-minutes in seconds
@@ -30,8 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const { data } = await client
-    .query({
-      query: graphql(`
+    .query<{ allCollections: Array<{ slug?: { current?: string } }> }>({
+      query: gql`
         query GetCollectionSlugs {
           allCollections {
             slug {
@@ -39,7 +39,7 @@ export async function generateStaticParams() {
             }
           }
         }
-      `),
+      `,
     })
     .catch((err) => {
       console.error('generateStaticParams failed', err);
@@ -49,7 +49,7 @@ export async function generateStaticParams() {
   if (!data) return [];
 
   return data.allCollections.map((collection) => ({
-    id: collection?.slug.current ?? '',
+    id: collection?.slug?.current ?? '',
   }));
 }
 

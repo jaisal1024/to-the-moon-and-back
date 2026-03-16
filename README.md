@@ -31,8 +31,20 @@ TODO:
 ## Development
 
 - `yarn dev` starts the dev next server on port [3333](http://localhost:3333/) and runs graphql codegen in watch mode.
-- `yarn graphql-deploy` will deploy changes to the schame file to the graphql endpoint. You must do this and restart the server to see changes reflected.
+- `yarn graphql-deploy` will deploy changes to the schema file to the graphql endpoint. You must do this and restart the server to see changes reflected.
 - Visit `/studio` route to view the sanity admin panel where you can create a collection.
+
+## Deploying new sanity schemas
+
+1. ```bash
+   npx sanity login
+   ```
+2. ```bash
+   yarn graphql-deploy
+   ```
+3. ```bash
+   yarn dev
+   ```
 
 ## Site Map
 
