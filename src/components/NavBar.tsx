@@ -1,5 +1,6 @@
 'use client';
 
+import { gql } from '@apollo/client';
 import { useLazyQuery } from '@apollo/client/react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,7 +23,6 @@ import {
 import { clsx } from 'clsx';
 import { usePathname } from 'next/navigation';
 import { useRef, useState } from 'react';
-import { graphql } from 'src/gql/gql';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
@@ -47,11 +47,7 @@ function CollectionListItem({ title, href }: { href: string; title: string }) {
   );
 }
 
-function CollectionList({
-  collectionData,
-}: {
-  collectionData: unknown; // Bypassing deep partial strictness for NavBar
-}) {
+function CollectionList({ collectionData }: { collectionData: unknown }) {
   return (
     <List>
       <CollectionListItem title="Home" href="/" />
@@ -79,7 +75,7 @@ export default function NavBar() {
     getNavBarCollections,
     { data: collectionData, error: fetchError, loading },
   ] = useLazyQuery(
-    graphql(/* GraphQL */ `
+    gql`
       query GetNavBarCollections(
         $sort: [CollectionsSorting!]
         $limit: Int = 20
@@ -92,11 +88,10 @@ export default function NavBar() {
           }
         }
       }
-    `),
+    `,
     {
       variables: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sort: GET_COLLECTIONS_SORT as any,
+        sort: GET_COLLECTIONS_SORT,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
@@ -145,8 +140,20 @@ export default function NavBar() {
         </div>
         <div
           className={clsx(
-            pathname === '/about' && 'underline underline-offset-8',
+            pathname === '/blog' && 'underline underline-offset-8',
             'hidden cursor-pointer p-1 sm:block',
+          )}
+        >
+          <Link href="/blog" noLinkStyle data-testid="navbar-blog-link">
+            <Typography variant="h4" color="inherit">
+              Blog
+            </Typography>
+          </Link>
+        </div>
+        <div
+          className={clsx(
+            pathname === '/about' && 'underline underline-offset-8',
+            'hidden cursor-pointer p-1 ml-1 sm:block',
           )}
         >
           <Link href="/about" noLinkStyle data-testid="navbar-about-link">
@@ -225,6 +232,10 @@ export default function NavBar() {
             {collectionData && (
               <CollectionList collectionData={collectionData} />
             )}
+            <Typography variant="h3" data-testid="mobile-menu-blog-heading">
+              Blog
+            </Typography>
+            <CollectionListItem title="Blog" href="/blog" />
             <Typography variant="h3" data-testid="mobile-menu-about-heading">
               About
             </Typography>

@@ -5,7 +5,6 @@ import { expect, test, vi } from 'vitest';
 
 import NavBar from './NavBar';
 
-// Mock dependencies
 vi.mock('@apollo/client/react', () => ({
   useLazyQuery: vi.fn(),
 }));
@@ -17,10 +16,6 @@ vi.mock('next/navigation', () => ({
   })),
 }));
 
-vi.mock('src/gql/gql', () => ({
-  graphql: (s: string) => s,
-}));
-
 vi.mock('src/hooks/useCollectionSlug', () => ({
   default: vi.fn(),
 }));
@@ -28,11 +23,7 @@ vi.mock('src/hooks/useCollectionSlug', () => ({
 test('renders NavBar with logo and main links', () => {
   (
     useLazyQuery as unknown as { mockReturnValue: (v: unknown[]) => void }
-  ).mockReturnValue([
-    vi.fn(),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { data: null, error: null, loading: false } as any,
-  ]);
+  ).mockReturnValue([vi.fn(), { data: null, error: null, loading: false }]);
   (
     usePathname as unknown as { mockReturnValue: (v: string) => void }
   ).mockReturnValue('/');
@@ -42,6 +33,7 @@ test('renders NavBar with logo and main links', () => {
   expect(screen.getByText('Jaisal Friedman')).toBeInTheDocument();
   expect(screen.getByText('Collections')).toBeInTheDocument();
   expect(screen.getByText('About')).toBeInTheDocument();
+  expect(screen.getByText('Blog')).toBeInTheDocument();
 });
 
 test('opens collections popover on click', () => {
@@ -50,8 +42,7 @@ test('opens collections popover on click', () => {
     useLazyQuery as unknown as { mockReturnValue: (v: unknown[]) => void }
   ).mockReturnValue([
     getNavBarCollections,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { data: null, error: null, loading: false } as any,
+    { data: null, error: null, loading: false },
   ]);
   (
     usePathname as unknown as { mockReturnValue: (v: string) => void }

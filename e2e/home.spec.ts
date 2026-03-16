@@ -8,6 +8,16 @@ test('has title', async ({ page }) => {
   await expect(page).toHaveTitle(/Jaisal Friedman/);
 });
 
+test('navigation to blog page', async ({ page }) => {
+  await page.goto('/');
+
+  // Find a link with the test id "navbar-blog-link" and click it.
+  await page.getByTestId('navbar-blog-link').first().click();
+
+  // The new URL should contain "/blog".
+  await expect(page).toHaveURL(/.*blog/);
+});
+
 test('navigation to about page', async ({ page }) => {
   await page.goto('/');
 
@@ -23,6 +33,9 @@ test('navigation to about page', async ({ page }) => {
 
 test('footer is present on all pages', async ({ page }) => {
   await page.goto('/');
+  await expect(page.getByTestId('footer-copyright')).toBeVisible();
+
+  await page.goto('/blog');
   await expect(page.getByTestId('footer-copyright')).toBeVisible();
 
   await page.goto('/about');
