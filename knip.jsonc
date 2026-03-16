@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/knip@^5/schema.json",
+  "entry": [
+    "src/app/**/page.tsx",
+    "src/app/**/layout.tsx",
+    "src/components/**/*.{ts,tsx,js,jsx}",
+    "src/hooks/**/*.{ts,tsx,js,jsx}",
+    "scripts/**/*.{ts,tsx,js,jsx}",
+  ],
+  "project": [
+    "src/**/*.{ts,tsx,js,jsx}",
+    "e2e/**/*.{ts,tsx,js,jsx}",
+    "next.config.*",
+    "tailwind.config.*",
+    "postcss.config.*",
+  ],
+  "ignore": [
+    "src/env.schema.ts",
+    "src/sanity/components/IFramePreviewView.tsx",
+    "src/sanity/preview.ts",
+    "src/utils/helpers.ts",
+    "src/utils/types.ts",
+    "src/sanity/schema.ts",
+  ],
+  "ignoreDependencies": ["@sanity/preview-url-secret", "zod", "@sanity/code-input", "@sanity/vision", "suspend-react"],
+}
