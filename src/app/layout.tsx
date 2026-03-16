@@ -4,7 +4,6 @@ import 'src/styles/animate.css';
 import { Metadata } from 'next';
 import { Archivo_Black, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
-import { theme } from 'src/theme';
 
 import { Providers } from './Providers';
 
@@ -43,8 +42,33 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${archivoBlack.variable} ${dmSans.variable}`}>
-      <head />
-      <body style={{ backgroundColor: theme.palette.background.default }}>
+      <head>
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var search = window.location.search || '';
+                  var params = new URLSearchParams(search);
+                  var override = params.get('theme');
+                  var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var theme = isDark ? 'dark' : 'light';
+
+                  if (override === 'light' || override === 'dark') {
+                    theme = override;
+                  }
+
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body>
         <Providers>
           {/* Google tag (gtag.js) */}
           {googleAnalyticsId && (

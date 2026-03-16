@@ -34,17 +34,18 @@ export default function AboutPage() {
                 items={[
                   'software engineer',
                   'photographer',
+                  'technical leader',
                   'product thinker',
                   'data lover',
                 ]}
-                className="text-orange-500"
+                className="text-orange-600"
               />
             </Typography>
             <Typography variant="subtitle1">
               I love to{' '}
               <AnimatedTypography
                 items={['surf', 'read', 'learn spanish']}
-                className="text-blue-400"
+                className="text-blue-500"
               />
             </Typography>
             <br />
@@ -71,7 +72,7 @@ export default function AboutPage() {
                 target="_blank"
                 rel="noreferrer"
                 noLinkStyle
-                className="cursor-pointer text-blue-500 underline underline-offset-8"
+                className="cursor-pointer text-accentLink underline underline-offset-8"
               >
                 my LinkedIn
               </Link>
