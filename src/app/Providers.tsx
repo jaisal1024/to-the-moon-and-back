@@ -3,7 +3,7 @@
 import { ApolloProvider } from '@apollo/client/react';
 import { StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import client from 'apollo-client';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createAppTheme } from 'src/theme';
 
 type ProvidersProps = {
@@ -12,35 +12,22 @@ type ProvidersProps = {
 
 function ProvidersComponent({ children }: ProvidersProps) {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [modeOverride, setModeOverride] = useState<'light' | 'dark' | null>(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+  const [modeOverride] = useState<'light' | 'dark' | null>(() => {
+    if (typeof window === 'undefined') return null;
 
     const params = new URLSearchParams(window.location.search);
     const override = params.get('theme');
 
-    if (override === 'light' || override === 'dark') {
-      setModeOverride(override);
-      return;
-    }
+    if (override === 'light' || override === 'dark') return override;
 
     const attr = document.documentElement.getAttribute('data-theme');
+    if (attr === 'light' || attr === 'dark') return attr;
 
-    if (attr === 'light' || attr === 'dark') {
-      setModeOverride(attr);
-    } else {
-      setModeOverride(null);
-    }
-  }, []);
+    return null;
+  });
 
   const theme = useMemo(
-    () =>
-      createAppTheme(
-        modeOverride ?? (prefersDarkMode ? 'dark' : 'light'),
-      ),
+    () => createAppTheme(modeOverride ?? (prefersDarkMode ? 'dark' : 'light')),
     [modeOverride, prefersDarkMode],
   );
 
