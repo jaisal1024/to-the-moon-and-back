@@ -44,7 +44,6 @@ export default function RootLayout({
     <html lang="en" className={`${archivoBlack.variable} ${dmSans.variable}`}>
       <head>
         <script
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

@@ -18,7 +18,6 @@ vi.mock('next/link', () => ({
 }));
 
 test('renders internal link correctly', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (usePathname as any).mockReturnValue('/');
   render(<Link href="/about">About</Link>);
 
@@ -27,7 +26,6 @@ test('renders internal link correctly', () => {
 });
 
 test('renders external link correctly', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (usePathname as any).mockReturnValue('/');
   render(<Link href="https://google.com">Google</Link>);
 
