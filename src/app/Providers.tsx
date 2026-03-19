@@ -24,6 +24,13 @@ function ProvidersComponent({ children }: ProvidersProps) {
 
     if (override === 'light' || override === 'dark') {
       setModeOverride(override);
+      return;
+    }
+
+    const attr = document.documentElement.getAttribute('data-theme');
+
+    if (attr === 'light' || attr === 'dark') {
+      setModeOverride(attr);
     } else {
       setModeOverride(null);
     }

@@ -50,7 +50,7 @@ export default async function BlogPage() {
             {posts.map((post) => (
               <article
                 key={post._id}
-                className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm"
+                className="rounded-2xl border border-borderSubtle bg-surface p-6 shadow-sm"
               >
                 <div className="mb-3">
                   <Link

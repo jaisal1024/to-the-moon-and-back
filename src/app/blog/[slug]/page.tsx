@@ -46,7 +46,7 @@ const portableTextComponents = {
   },
   marks: {
     code: ({ children }: { children?: React.ReactNode }) => (
-      <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.9em]">
+      <code className="rounded bg-surfaceElevated px-1.5 py-0.5 font-mono text-[0.9em]">
         {children}
       </code>
     ),

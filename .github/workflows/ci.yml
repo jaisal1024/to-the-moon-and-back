@@ -22,22 +22,6 @@ env:
   NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: 'G-KL7CLHPFFB'
 
 jobs:
-  deploy-graphql:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
-      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
-      SANITY_DEPLOY_DATASET: ${{ secrets.SANITY_DEPLOY_DATASET }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.10
-      - run: bun install
-      - name: Deploy GraphQL schema to production
-        run: bun run graphql-deploy:prod
-
   build:
     runs-on: ubuntu-latest
     steps:

@@ -17,22 +17,6 @@
   color-scheme: light;
   --color-bg: var(--color-white);
   --color-fg: var(--color-carbon);
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --color-bg: var(--color-carbon);
-  --color-fg: var(--color-white);
-}
-
-.portrait-glow {
-  filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.12));
-}
-
-:root {
-  color-scheme: light;
-  --color-bg: var(--color-white);
-  --color-fg: var(--color-carbon);
   --color-border-subtle: rgba(36, 36, 36, 0.16);
   --color-border-strong: rgba(36, 36, 36, 0.32);
   --color-surface-default: var(--color-white);
@@ -61,3 +45,8 @@ body {
   background-color: var(--color-bg);
   color: var(--color-fg);
 }
+
+.portrait-glow {
+  filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.12));
+}
+
