@@ -1,0 +1,23 @@
+# Local services for development. Start with `bun run dev-local`.
+# Postgres is pinned to 18, the newest major version Neon supports (Neon: 14-18).
+services:
+  db:
+    image: postgres:18
+    container_name: to-the-moon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: to_the_moon
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d to_the_moon']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:

@@ -1,3 +1,78 @@
+# To the Moon and Back: agent guide
+
+Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router, MUI + Tailwind, deployed on Vercel. Content lives in Sanity today and is served through Sanity's hosted GraphQL API. A migration to Payload CMS on Neon Postgres is planned; see [docs/plans/sanity-to-payload-migration.md](docs/plans/sanity-to-payload-migration.md) and the target architecture in [docs/architecture/payload-cms.md](docs/architecture/payload-cms.md). Until that lands, the Postgres pieces below (Docker, `DATABASE_URL`) are unused by app code.
+
+## Toolchain
+
+| Tool | Pinned by                       | Version |
+| ---- | ------------------------------- | ------- |
+| Node | `.node-version`                 | 24      |
+| Bun  | `package.json` `packageManager` | 1.4.2   |
+
+- Install with `bun install --frozen-lockfile`. Never run a plain `bun install` with an older bun: it rewrites `bun.lock` to an older lockfile format and the diff is huge. If your global bun is older, `bun upgrade`, or use `npx -y bun@<version>` for one-off commands.
+- Git worktrees created by the Claude desktop app get a worktree-level `core.hooksPath` pointing at the main checkout's `.husky/_`, so they would run the main checkout's hook files. `bun install` runs `prepare`, which removes that override so the worktree runs its own hooks. Until install has run, the main checkout's hooks run instead; they bootstrap from the current checkout, so the result is the same.
+- The git hooks source [scripts/hook-env.sh](scripts/hook-env.sh), which activates the pinned node via nvm, falls back to the pinned bun via npx, installs dependencies, loads env, and generates `src/gql` if missing. If a hook fails, fix the environment it complains about rather than pushing with `--no-verify`.
+
+## Commands
+
+| Command                     | What it does                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `bun run dev`               | Next dev server on http://localhost:3333 plus GraphQL codegen in watch mode                   |
+| `bun run dev-local`         | Starts the local Postgres container (`docker compose up -d --wait db`), then `bun run dev`    |
+| `bun run dev-local:down`    | Stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it |
+| `bun run generate`          | GraphQL codegen into `src/gql/` (gitignored). Needs `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`   |
+| `bun run build`             | `generate` then `next build`                                                                  |
+| `bun run check`             | `lint` + `type-check` + `test` + `knip`. Run before opening a PR                              |
+| `bun run lint` / `lint:fix` | ESLint 10 flat config (`eslint.config.js`); `lint:fix` also runs Prettier                     |
+| `bun run type-check`        | `tsc --noEmit`                                                                                |
+| `bun run test`              | Vitest unit tests (`*.test.tsx` under `src/`)                                                 |
+| `bun run test:e2e`          | Playwright against a dev server (`e2e/`)                                                      |
+| `bun run knip`              | Unused files, exports, and dependencies                                                       |
+
+## Environment
+
+- Copy `.env.example` to `.env` and fill in the Sanity values. `.env` is gitignored.
+- Every env var is validated in [src/env.schema.ts](src/env.schema.ts). Adding a variable means adding it there, in `.env.example`, in `.github/workflows/ci.yml`, and in Vercel.
+- `src/gql/` is generated output, never edit it. Regenerate with `bun run generate` after schema or query changes.
+- Git worktrees have no `.env` and no `src/gql`. The hooks handle that for lint, type-check, and tests. To run the dev server in a worktree, symlink the main checkout's env file: `ln -s "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env`.
+
+## Containers
+
+[docker-compose.yml](docker-compose.yml) defines one service, `db`, running `postgres:18`. Neon supports Postgres 14 through 18, so 18 is the newest version that matches production. Credentials and database name are fixed for development:
+
+```
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/to_the_moon
+```
+
+Docker is available both on local machines and in Claude Code cloud sessions, so the setup is the same everywhere an agent runs:
+
+1. `bun run dev-local` starts the container, waits for its health check, then starts the dev server. The Next app runs on the host, not in a container.
+2. Point `DATABASE_URL` at the container using the value above. Never point a development or agent session at a Neon branch; Neon is only for Vercel deployments, where the Neon integration injects `DATABASE_URL`.
+3. `bun run dev-local:down` stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it.
+
+Sanity-backed pages do not need the database until the Payload migration lands.
+
+## Git and pull requests
+
+- Keep one commit per branch. Address review feedback and update the branch by amending that commit and rebasing on `main`, then `git push --force-with-lease`. Only keep multiple commits when a large change genuinely needs its history to be reviewable.
+- Branch from `main`. PR titles must be conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, ...); CI rejects others. release-please cuts releases from merged titles, so the prefix matters.
+- `pre-commit` runs lint-staged (ESLint `--fix` on staged TS). `pre-push` runs lint, type-check, and tests. Both bootstrap their own toolchain, see Toolchain above.
+- CI (`.github/workflows/ci.yml`) runs build, `check`, and Playwright. It uses the Sanity `development` dataset.
+- Deploys happen from release tags, not from every merge. See [RELEASING.md](RELEASING.md).
+
+## Code conventions
+
+- Prettier formatting, `simple-import-sort` import order, no unused imports. `bun run lint:fix` handles all three.
+- MUI for components and typography, Tailwind for layout and spacing. Semantic color tokens live in `src/styles/globals.css`; see [skills/ui-ux-mui-tailwind/SKILL.md](skills/ui-ux-mui-tailwind/SKILL.md).
+- Sanity schema and query workflow, including the GraphQL quirks, is in [skills/sanity-graphql/SKILL.md](skills/sanity-graphql/SKILL.md).
+- Pages are server components using ISR (`revalidate = 600`). Keep data fetching on the server.
+
+## Where to look
+
+- [docs/README.md](docs/README.md) indexes architecture, data flow, components, and development docs.
+- [docs/plans/](docs/plans/) holds implementation plans. [backlog/](backlog/) holds queued tasks in the format of `backlog/template.md`.
+- [skills/](skills/) holds reusable workflows for agents.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

@@ -1,1 +1,2 @@
+. scripts/hook-env.sh
 bunx lint-staged
