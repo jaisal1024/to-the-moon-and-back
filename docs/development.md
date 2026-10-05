@@ -28,6 +28,19 @@ Required `.env` values:
 
 ---
 
+## Local Database (Payload migration)
+
+The Payload CMS migration ([plan](./plans/sanity-to-payload-migration.md)) runs Postgres locally in Docker, pinned to `postgres:18` to match the newest major that Neon supports.
+
+```bash
+bun run dev-local        # docker compose up -d --wait db, then bun run dev
+bun run dev-local:down   # stop the container (data persists in the named volume)
+```
+
+Set `DATABASE_URL=postgres://postgres:postgres@localhost:5432/to_the_moon` in `.env`.
+
+---
+
 ## Development Server
 
 ```bash
@@ -95,6 +108,12 @@ Then:
 1. Copy the ngrok HTTPS URL
 2. Add it as a webhook in the [Sanity webhook UI](https://www.sanity.io/manage)
 3. Make an edit in Studio and watch the console for revalidation logs
+
+---
+
+## Git Hooks
+
+`pre-commit` runs lint-staged and `pre-push` runs lint, type-check, and tests. Both source [`scripts/hook-env.sh`](../scripts/hook-env.sh), which activates the node version from `.node-version` (via nvm), uses the bun version from `package.json` (via npx when the global bun differs), runs a frozen install, loads `.env` from the main checkout when the current checkout has none, and regenerates `src/gql` if missing. This makes the hooks work from git worktrees without manual setup.
 
 ---
 

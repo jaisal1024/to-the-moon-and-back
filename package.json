@@ -5,6 +5,8 @@
     "build": "bun run generate && bun run --bun next build",
     "dev": "concurrently \"bun run dev:next\" \"bun run dev:generate\"",
     "dev:next": "bun run --bun next dev -p 3333",
+    "dev-local": "docker compose up -d --wait db && bun run dev",
+    "dev-local:down": "docker compose down",
     "dev:generate": "bun run generate --watch",
     "format": "bunx prettier --write . --ignore-path .gitignore",
     "generate": "bunx graphql-codegen --config codegen.ts",
@@ -25,7 +27,7 @@
     "test:coverage": "vitest run --coverage",
     "check": "bun run lint && bun run type-check && bun run test && bun run knip",
     "deps:audit": "bunx npm-check-updates --target latest --reject typescript",
-    "prepare": "husky"
+    "prepare": "husky && (git config --worktree --unset core.hooksPath 2>/dev/null || true)"
   },
   "dependencies": {
     "@apollo/client": "^4.3.1",
