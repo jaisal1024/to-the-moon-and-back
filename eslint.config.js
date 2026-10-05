@@ -1,22 +1,28 @@
 // eslint.config.js
-// ESLint v9 flat config for this project.
+// ESLint flat config for this project.
 // Fully replaces the legacy `.eslintrc.json`.
 
+const { fixupConfigRules, fixupPluginRules } = require('@eslint/compat');
 const nextConfig = require('eslint-config-next');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
 const unusedImports = require('eslint-plugin-unused-imports');
+const tseslint = require('typescript-eslint');
 
-/** @type {import("eslint").Linter.FlatConfig[]} */
+/** @type {import("eslint").Linter.Config[]} */
 module.exports = [
   // Base Next.js + TypeScript config (includes @next/next, @typescript-eslint, import, etc.)
-  ...nextConfig,
+  ...fixupConfigRules(nextConfig),
 
   // Project-wide JS/TS rules layered on top of Next's config.
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],
+    languageOptions: {
+      parser: tseslint.parser,
+    },
     plugins: {
-      'simple-import-sort': simpleImportSort,
-      'unused-imports': unusedImports,
+      '@typescript-eslint': fixupPluginRules(tseslint.plugin),
+      'simple-import-sort': fixupPluginRules(simpleImportSort),
+      'unused-imports': fixupPluginRules(unusedImports),
     },
     rules: {
       'simple-import-sort/imports': 'error',
@@ -36,7 +42,7 @@ module.exports = [
 
   // TypeScript-specific override for unused vars.
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
@@ -44,6 +50,6 @@ module.exports = [
 
   // Project-specific ignores.
   {
-    ignores: ['dist/*', 'src/gql/*'],
+    ignores: ['.claude/**', '.cursor/**', 'dist/**', 'src/gql/**', 'playwright-report/**', 'test-results/**'],
   },
 ];

@@ -20,7 +20,7 @@ export type PortableTextCodeBlock = {
   filename?: string;
 };
 
-export type BlogPostDetail = BlogPostSummary & {
+type BlogPostDetail = BlogPostSummary & {
   bodyRaw?: Array<PortableTextBlock | PortableTextCodeBlock>;
 };
 

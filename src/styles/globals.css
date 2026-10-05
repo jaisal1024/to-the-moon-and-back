@@ -1,9 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' important source('../');
 
 /* Custom color tokens matching original camelCase names */
-@theme {
+@theme static {
   --color-carbon: #242424;
   --color-tangerine: #d67d53;
   --color-tangerineLight: #e9a686;
@@ -11,6 +9,17 @@
   --color-infoGray: #bfbfbf;
   --color-dangerRed: #ff0000;
   --color-white: #ffffff;
+}
+
+@theme inline {
+  --color-borderSubtle: var(--color-border-subtle);
+  --color-borderStrong: var(--color-border-strong);
+  --color-surface: var(--color-surface-default);
+  --color-surfaceElevated: var(--color-surface-elevated);
+  --color-textStrong: var(--color-text-strong);
+  --color-textMuted: var(--color-text-muted);
+  --color-accentPrimary: var(--color-accent-primary);
+  --color-accentLink: var(--color-accent-link);
 }
 
 :root {
@@ -49,4 +58,3 @@ body {
 .portrait-glow {
   filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.12));
 }
-

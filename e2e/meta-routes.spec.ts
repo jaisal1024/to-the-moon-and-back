@@ -36,7 +36,7 @@ test.describe('meta text and sitemap routes', () => {
     expect(response!.status()).toBe(200);
     expect(response!.headers()['content-type']).toContain('application/xml');
 
-    const xml = await page.content();
+    const xml = await response!.text();
     expect(xml).toContain('<urlset');
     expect(xml).toContain('<loc>https://www.jaisal.xyz/</loc>');
     expect(xml).toContain('<loc>https://www.jaisal.xyz/about</loc>');
@@ -44,4 +44,3 @@ test.describe('meta text and sitemap routes', () => {
     expect(xml).toContain('<loc>https://www.jaisal.xyz/collections</loc>');
   });
 });
-

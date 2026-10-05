@@ -2,8 +2,8 @@ import client from 'apollo-client';
 import { Metadata } from 'next';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import { SortOrder } from 'src/gql/graphql';
 import { GET_COLLECTIONS } from 'src/queries/GetCollections';
+import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - Collections',
@@ -18,7 +18,7 @@ export default async function IndexPage() {
       query: GET_COLLECTIONS,
       variables: {
         offset: 0,
-        sort: { _createdAt: SortOrder.Desc },
+        sort: GET_COLLECTIONS_SORT,
       },
     })
     .catch((err) => {
@@ -44,9 +44,7 @@ export default async function IndexPage() {
   return (
     <>
       <Layout>
-        {collections.length > 0 && (
-          <ImageGrid collection={mapCollectionsToImageGrid()} />
-        )}
+        {collections.length > 0 && <ImageGrid collection={mapCollectionsToImageGrid()} />}
         {collections.length < 1 && <h1>No collections to show.</h1>}
       </Layout>
     </>
