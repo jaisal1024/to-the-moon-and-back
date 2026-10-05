@@ -2,6 +2,11 @@
   "github": {
     "silent": true
   },
+  "git": {
+    "deploymentEnabled": {
+      "main": false
+    }
+  },
   "cleanUrls": true,
   "framework": "nextjs",
   "$schema": "https://openapi.vercel.sh/vercel.json",

@@ -58,7 +58,11 @@ Type checks use the TypeScript 7 compiler (`typescript-compiler`). TypeScript 6 
 
 ## Deployment
 
-- Auto deploys to vercel on merge to main!
+Production deploys to Vercel when a stable GitHub release is published. The deployment workflow builds and deploys the release's immutable version tag. Automatic Git deployments from `main` are disabled; other branches retain Vercel previews.
+
+Use Conventional Commit PR titles when squash merging into `main`: `feat:` proposes a minor release, `fix:` a patch, and `feat!:` a breaking release. Release-please maintains the version and changelog in a release PR. The dedicated release App enables auto-merge for verified, metadata-only release PRs once the normal required checks pass; no approval is required. After that merge, release-please publishes the tag and GitHub release, triggering production deployment.
+
+Before merging this setup, configure the Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` for the existing Vercel project. See [RELEASING.md](RELEASING.md) for secure credential setup, release App permissions, CI and tag protections, and deployment retries.
 
 ## Revalidation
 
