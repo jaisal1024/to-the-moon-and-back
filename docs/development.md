@@ -2,160 +2,90 @@
 
 ## Prerequisites
 
-- Node.js >= 18 (see `.nvmrc`)
-- Yarn (package manager)
-- Access to the Sanity project (ask Jaisal for credentials)
+- Node 24 (`.node-version`) and Bun 1.4.2 (`package.json` `packageManager`)
+- Docker, for the local Postgres container
 
 ---
 
 ## Setup
 
 ```bash
-nvm use          # switch to correct node version
-yarn install     # install dependencies
-cp .env.example .env  # fill in env variables
+bun install --frozen-lockfile
+cp .env.example .env        # values work as-is with dev-local
+bun run dev-local
 ```
 
-Required `.env` values:
+`dev-local` starts `postgres:18` from `docker-compose.yml`, applies migrations, seeds an empty database, and starts Next on [localhost:3333](http://localhost:3333). Create the first admin user at [localhost:3333/admin](http://localhost:3333/admin).
 
-- `NEXT_PUBLIC_SANITY_PROJECT_ID`
-- `NEXT_PUBLIC_SANITY_DATASET`
-- `NEXT_PUBLIC_SANITY_API_VERSION`
-- `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`
-- `SANITY_API_TOKEN` (for revalidation / local scripts)
-- `REVALIDATE_SECRET` (optional, used for local ISR scripts)
-- `SANITY_WEBHOOK_SECRET` (optional, used by `/api/revalidate`)
+The container's host port defaults to 54320 so it does not collide with other local Postgres containers. Set `POSTGRES_PORT` and update `DATABASE_URL` to change it. `bun run dev-local:down` stops the container; `docker compose down -v` also deletes its data.
 
 ---
 
-## Local Database (Payload migration)
+## Changing Content Models
 
-The Payload CMS migration ([plan](./plans/sanity-to-payload-migration.md)) runs Postgres locally in Docker, pinned to `postgres:18` to match the newest major that Neon supports.
+1. Edit a collection in `src/collections/`.
+2. `bun run payload:types` regenerates `src/payload-types.ts`.
+3. `bun run migrate:create -- <short_name>` writes a migration to `src/migrations/`.
+4. `bun run migrate` applies it locally.
+5. Commit the collection, generated types, and migration together.
+
+The [payload-cms skill](../skills/payload-cms/SKILL.md) covers data access, media, and revalidation conventions.
+
+---
+
+## Testing On-Demand Revalidation
+
+Revalidation runs inside the app, so no tunnel or webhook is needed:
 
 ```bash
-bun run dev-local        # docker compose up -d --wait db, then bun run dev
-bun run dev-local:down   # stop the container (data persists in the named volume)
+bun run build && bun run start
 ```
 
-Set `DATABASE_URL=postgres://postgres:postgres@localhost:54320/to_the_moon` in `.env`.
-
----
-
-## Development Server
-
-```bash
-yarn dev
-```
-
-This runs **two processes concurrently**:
-
-1. `next dev` on port `3333`
-2. `graphql-codegen --watch` on `src/**/*.{ts,tsx}`
-
-Visit:
-
-- [http://localhost:3333](http://localhost:3333) — main site
-- [http://localhost:3333/studio](http://localhost:3333/studio) — embedded Sanity Studio
-
----
-
-## GraphQL Workflow
-
-### Modifying the Sanity Schema
-
-1. Edit schema files in `src/sanity/schemas/`
-2. Deploy the schema to the hosted GraphQL endpoint:
-   ```bash
-   yarn graphql-deploy
-   ```
-3. Regenerate TypeScript types:
-   ```bash
-   yarn generate
-   ```
-4. Restart the dev server
-
-### Modifying GraphQL Queries
-
-1. Edit or add queries in `src/queries/`
-2. The `codegen --watch` process (running in `yarn dev`) auto-regenerates types
-3. Types appear in `src/gql/graphql.ts`
-
----
-
-## Adding or Updating Content
-
-1. Open the Studio at `/studio`
-2. Create or edit a **Collection**
-3. Add **Shots** (photos) to the collection
-4. If running locally with ISR: set up ngrok (see below)
-
----
-
-## ISR + Local Webhook Testing
-
-To test incremental static regeneration locally:
-
-```bash
-# Terminal 1 — production build (ISR requires a production server)
-yarn build && yarn start
-
-# Terminal 2 — expose localhost via ngrok
-yarn ngrok-start
-```
-
-Then:
-
-1. Copy the ngrok HTTPS URL
-2. Add it as a webhook in the [Sanity webhook UI](https://www.sanity.io/manage)
-3. Make an edit in Studio and watch the console for revalidation logs
+Then edit and publish a collection or post at `localhost:3000/admin` and reload the page. The server log prints `Revalidated <path>` for each path.
 
 ---
 
 ## Git Hooks
 
-`pre-commit` runs lint-staged and `pre-push` runs lint, type-check, and tests. Both source [`scripts/hook-env.sh`](../scripts/hook-env.sh), which activates the node version from `.node-version` (via nvm), uses the bun version from `package.json` (via npx when the global bun differs), runs a frozen install, loads `.env` from the main checkout when the current checkout has none, and regenerates `src/gql` if missing. This makes the hooks work from git worktrees without manual setup.
+`pre-commit` runs lint-staged and `pre-push` runs lint, type-check, and tests. Both source [`scripts/hook-env.sh`](../scripts/hook-env.sh), which activates the node version from `.node-version` (via nvm), uses the bun version from `package.json` (via npx when the global bun differs), runs a frozen install, and loads `.env` from the main checkout when the current checkout has none. This makes the hooks work from git worktrees without manual setup.
 
 ---
 
 ## Code Quality
 
-| Command           | What it does                            |
-| ----------------- | --------------------------------------- |
-| `yarn lint`       | Run ESLint directly (`eslint .`)        |
-| `yarn lint:fix`   | Fix ESLint issues + run Prettier        |
-| `yarn format`     | Run Prettier on all files               |
-| `yarn type-check` | Run `tsc --noEmit` (type checking only) |
+| Command              | What it does                                            |
+| -------------------- | ------------------------------------------------------- |
+| `bun run check`      | Lint, type-check, unit tests, and knip. Run before a PR |
+| `bun run lint`       | ESLint                                                  |
+| `bun run lint:fix`   | Prettier, then ESLint with fixes                        |
+| `bun run type-check` | `tsc --noEmit` with the TypeScript 7 compiler           |
+| `bun run test`       | Vitest unit tests                                       |
+| `bun run test:e2e`   | Playwright against a dev server                         |
 
 ---
 
 ## Build & Deploy
 
 ```bash
-yarn build    # builds the production Next.js app
-yarn start    # starts the production server locally
+bun run build    # applies migrations when DATABASE_URL is set, then next build
+bun run start    # serves the production build
 ```
 
-**Deployment**: Pushing to `main` triggers an automatic deploy on Vercel. CI is optimized with caching for `.next/cache` and Playwright browsers to ensure sub-5 minute build times.
+Deploys go out from release tags; see [RELEASING.md](../RELEASING.md). Vercel needs `DATABASE_URL` (from the Neon integration), `PAYLOAD_SECRET`, and `BLOB_READ_WRITE_TOKEN`.
 
 ---
 
 ## Bundle Analysis
 
 ```bash
-yarn analyze
+bun run analyze
 ```
-
-Opens a visual bundle analyzer to inspect client/server bundle sizes.
 
 ---
 
-## Known Quirks & Gotchas
+## Known Quirks
 
-1. **Sanity GraphQL limitations**: `allCollections` must be used instead of `collection` when filtering by slug, because Sanity's `collection` query only accepts document IDs
-2. **No per-photo limit in collection queries**: Sanity doesn't support sub-query element limits in GraphQL. The homepage fetches all photos for each collection (only uses the first photo for the cover image), which is expensive
-3. **AnimatedSpan timing**: If you change the CSS animation duration in `src/styles/animate.css`, update `transitionTotal` in `AnimatedSpan.tsx` to match (it should be half the CSS duration since the animation alternates)
-4. **Sanity data migrations**: Renaming `_type` fields requires using the migration script at `scripts/migrateDocumentType.js`. Use with extreme caution
-5. **Sanity Image + NextImage**: Sanity image references need to go through `@sanity/image-url` before passing to `next/image`. See `NextImage.tsx` for the pattern
-6. **Font loading**: Fonts are loaded via `next/font` in `src/app/layout.tsx`:
-   - `Archivo Black` for the main hero heading
-   - `DM Sans` for all other headings and body text
+1. **Next dev runs on Node, not Bun.** Bun cannot resolve the hashed external module names Turbopack uses for Payload's database adapter. Production `build` and `start` still use Bun.
+2. **Two root layouts.** `(site)` and `(payload)` each have their own `<html>`. Unmatched URLs render `src/app/global-not-found.tsx`, which reuses the site shell.
+3. **Slugs on Local API writes.** Payload's slug field generates slugs in the admin UI. Scripts that create published documents must pass `slug` explicitly.
+4. **AnimatedSpan timing.** If you change the animation duration in `src/styles/animate.css`, update `transitionTotal` in `AnimatedSpan.tsx` to half of it, since the animation alternates.

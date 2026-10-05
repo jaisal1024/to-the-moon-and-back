@@ -2,143 +2,90 @@
 
 ## Overview
 
-Content is authored in Sanity Studio and served via a **Sanity-hosted GraphQL API**. The Next.js app fetches this data at build time (SSG) and caches it with ISR. Client-side data fetching is used sparingly (e.g., NavBar lazy collection loading).
+Content is authored in the Payload admin at `/admin` and stored in Postgres, with photos in Vercel Blob. Pages read it in-process through Payload's Local API at build time (SSG) and serve it with ISR. There is no separate CMS service and no client-side data fetching.
 
 ---
 
-## Data Sources
+## Content Model
 
-### Sanity CMS
+Collections live in `src/collections/` and are registered in `src/payload.config.ts`. See [architecture.md](./architecture.md#content-model) for every field.
 
-The Sanity project hosts two document types:
+| Collection    | Holds                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------- |
+| `collections` | Photography series: title, slug, description, month, location, and an array of photos |
+| `posts`       | Blog posts: title, slug, publish date, and a Lexical rich text body with code blocks  |
+| `media`       | Uploaded photos, with four generated sizes                                            |
+| `users`       | Admin accounts                                                                        |
 
-#### `collections` (Primary content type)
-
-| Field         | Type     | Notes                                          |
-| ------------- | -------- | ---------------------------------------------- |
-| `title`       | `string` | Collection title, also used to generate `slug` |
-| `slug`        | `slug`   | Auto-generated from title; used as URL param   |
-| `description` | `string` | Short blurb                                    |
-| `date`        | `date`   | Shooting date                                  |
-| `location`    | `string` | Where it was shot                              |
-| `photos`      | `shot[]` | Array of Shot documents                        |
-
-#### `shot` (Sub-document, hidden in Studio)
-
-| Field   | Type     | Notes                           |
-| ------- | -------- | ------------------------------- |
-| `title` | `string` | Optional caption                |
-| `photo` | `image`  | Sanity image asset (CDN-hosted) |
-
-> ⚠️ Sanity's GraphQL API requires array elements to be top-level `document` types. That's why `Shot` exists as a named document type even though it isn't useful standalone.
+`collections` and `posts` have drafts. Their `access.read` rules let anonymous readers see published documents only.
 
 ---
 
-## GraphQL Layer
+## Reading Data
 
-### Schema Deployment
+Pages never call Payload directly. They use the typed functions in `src/cms/`:
 
-The Sanity GraphQL API schema must be explicitly deployed:
+| Function                         | Used by                                    |
+| -------------------------------- | ------------------------------------------ |
+| `listCollections`                | `/` (homepage grid)                        |
+| `listNavCollections`             | `Layout` → `NavBar` on every page          |
+| `getCollectionBySlug`            | `/collections/[id]` page and metadata      |
+| `listCollectionSlugs`            | `/collections/[id]` `generateStaticParams` |
+| `listPosts`                      | `/blog`                                    |
+| `getPostBySlug`, `listPostSlugs` | `/blog/[slug]`                             |
+| `mediaSource`                    | `NextImage`, to pick a generated size      |
 
-```bash
-yarn graphql-deploy
-```
-
-After deploying, **restart the dev server** for changes to be reflected.
-
-### Code Generation
-
-TypeScript types are auto-generated from the live GraphQL schema using `graphql-codegen`:
-
-```bash
-yarn generate  # one-time
-yarn dev       # also runs codegen in --watch mode
-```
-
-Generated types are written to `src/gql/graphql.ts` and the helper `src/gql/gql.ts`.
-
-### Queries
-
-| Query                  | File                                          | Used In                             |
-| ---------------------- | --------------------------------------------- | ----------------------------------- |
-| `GetCollections`       | `src/queries/GetCollections.ts`               | `src/app/page.tsx` (Home page)      |
-| `GetCollection`        | `src/queries/GetCollection.ts`                | `src/app/collections/[id]/page.tsx` |
-| `GetNavBarCollections` | Inline in `src/components/NavBar.tsx`         | NavBar dropdown                     |
-| `GetCollectionSlugs`   | Inline in `src/app/collections/[id]/page.tsx` | `generateStaticParams`              |
-
-> All queries use `allCollections` instead of `collection` because Sanity's GraphQL `collection` query requires the document ID, not a slug. Filtering by slug requires using `allCollections(where: { slug: { current: { eq: $slug } } })`.
+Every function passes `overrideAccess: false`, so the public site runs with anonymous access rules even though the Local API could bypass them. Types come from the generated `src/payload-types.ts`.
 
 ---
 
 ## Rendering Lifecycle
 
-### Build Time (SSG)
+### Build time
 
 ```
-yarn build
-  → IndexPage (src/app/page.tsx)  → Apollo query GetCollections → renders collections
-  → SeriesIdPage (src/app/collections/[id]/page.tsx)
-      → generateStaticParams → enumerate slugs
-      → generateMetadata → dynamic metadata
-      → Page Render → Apollo query GetCollection (per slug)
-  → about/page.tsx → static
+bun run build
+  → payload migrate (when DATABASE_URL is set)
+  → next build
+      → /                    listCollections → ImageGrid of cover photos
+      → /collections/[id]    generateStaticParams → listCollectionSlugs
+                             page → getCollectionBySlug
+      → /blog, /blog/[slug]  listPosts, listPostSlugs, getPostBySlug → PostBody (Lexical → JSX)
+      → every page           Layout → listNavCollections → NavBar
 ```
 
-### Runtime (ISR)
+### Runtime
 
-Pages are served from the static cache. Stale content is revalidated after **10 minutes** (`revalidate: 600`).
-
-On-demand revalidation is triggered by Sanity webhooks:
+Pages are served from the static cache and revalidate after **10 minutes** (`revalidate = 600`) as a safety net. Edits show up immediately through on-demand revalidation:
 
 ```
-Sanity edit → Webhook POST → /api/revalidate → Next.js revalidates affected route(s)
+Edit in /admin → Payload afterChange/afterDelete hook → revalidatePath(...) → next request regenerates
 ```
 
-The `/api/revalidate` route is built with Next.js App Router handlers and features strict TypeScript typing (`NextRequest`) and error handling for `unknown` types. It calls `revalidatePath()` or `revalidateTag()` on the affected paths.
+- Collections revalidate the whole site layout, because the nav lists them on every page.
+- Posts revalidate `/blog` and `/blog/<slug>`.
+- Saving a draft does not revalidate anything. Publishing, unpublishing, and slug changes do, including the old URL.
+
+`POST /api/revalidateRoute` with a `secret` header matching `REVALIDATE_SECRET` forces a path manually. `bun run revalidate <slug>` calls it for both production domains.
 
 ---
 
-## Apollo Client Setup
+## Images
 
-**File:** `apollo-client.ts` (root level)
-
-A singleton Apollo Client instance is created and exported. It is:
-
-- Provided app-wide via `<ApolloProvider>` in `_app.tsx`
-- Used directly in `getStaticProps` for SSG (the singleton ensures a single network call)
-- Used via `useLazyQuery` in `NavBar` for client-side lazy fetching
-
-```ts
-// apollo-client.ts
-const client = new ApolloClient({
-  uri: `https://${projectId}.api.sanity.io/v1/graphql/${dataset}/default`,
-  cache: new InMemoryCache(),
-});
-```
+1. An upload to `media` is stored in Vercel Blob, or in `./media` locally when no Blob token is set.
+2. sharp generates `thumbnail` (400px), `card` (800px), `large` (1600px), and `xl` (2400px), keeping the aspect ratio and never upscaling.
+3. `NextImage` takes a `Media` document, uses the requested size with its intrinsic dimensions, and lets `next/image` handle format and responsive variants.
 
 ---
 
-## Sanity Image URLs
-
-Sanity stores images as asset references (`_ref`, `_type`, `url`). The `NextImage` component uses `@sanity/image-url` to build a CDN-optimized URL from the asset reference before passing it to `next/image`.
-
----
-
-## Development Data Flow
+## Local Data
 
 ```
-Local Sanity Studio (/studio route)
-  → Edit collection in Studio
-  → Changes saved to Sanity cloud
-  → Sanity webhook fires to ngrok tunnel → localhost /api/revalidate
-  → ISR forces page regeneration
-  → Browser refreshes to see updated content
+bun run dev-local
+  → docker compose up postgres:18
+  → payload migrate
+  → seed (sample collections and a post, only into an empty database)
+  → next dev on http://localhost:3333
 ```
 
-Setup for local ISR verification:
-
-```bash
-yarn build && yarn start    # 1. Build & start prod server
-yarn ngrok-start            # 2. Expose localhost to internet
-# 3. Set ngrok URL in Sanity webhook settings
-```
+For real content, run `SANITY_DATASET=production bun run migrate:sanity` against the local database. It copies the original Sanity content and can be re-run safely.

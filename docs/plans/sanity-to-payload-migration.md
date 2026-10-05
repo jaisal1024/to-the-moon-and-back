@@ -7,24 +7,61 @@ todos:
     status: pending
   - id: scaffold-payload
     content: Install Payload + Postgres + Vercel Blob adapters, add payload.config.ts and the (payload) route group, move the public site into a (site) route group with its own root layout.
-    status: pending
+    status: completed
   - id: define-collections
     content: Define Media, Collections, and Posts collections with slugs, Lexical rich text + code block, image sizes, versions/drafts, and afterChange/afterDelete revalidation hooks.
-    status: pending
+    status: completed
   - id: rewrite-data-layer
     content: Replace Apollo/GraphQL/codegen with a thin src/cms module built on Payload's Local API and generated payload-types.ts; rewrite pages, NavBar, NextImage, and blog rendering.
-    status: pending
+    status: completed
   - id: migrate-content
     content: Write scripts/migrate-from-sanity.ts (Sanity export → Payload Local API, assets → blob, Portable Text → Lexical) and run it against the development DB, then production.
-    status: pending
+    status: in_progress
   - id: remove-sanity
     content: Delete Sanity files, deps, scripts, env vars, knip ignores, and the sanity-graphql skill; update CI, docs, README, and e2e tests.
-    status: pending
+    status: completed
   - id: cutover
     content: Content freeze, final migration run, verify parity, merge, watch ISR, decommission Sanity after a 30-day hold.
     status: pending
 isProject: false
 ---
+
+### Status
+
+Phases 1 through 3 and 5 are implemented as a stack of small PRs on top of this plan. The Phase 4 script is written and verified against production content in local Postgres and the Vercel Blob emulator. What remains needs account access.
+
+#### Environments
+
+Each Vercel environment pairs one database with its own Blob store, so files never cross between them:
+
+| Vercel environment | Neon branch                                                  | Vercel Blob store                               |
+| ------------------ | ------------------------------------------------------------ | ----------------------------------------------- |
+| Production         | `production`                                                 | production store (connected to Production only) |
+| Preview            | one branch per preview deployment, forked from `development` | preview store (connected to Preview only)       |
+
+Previews get their own database branch, so their migrations never touch another PR's schema, and they read content copied from `development`, whose files live in the preview store. All previews share the preview store; production files are never reachable from a preview.
+
+#### Cutover runbook
+
+1. **Blob stores.** In Vercel, create two Blob stores. Connect one to Production only and the other to Preview only, so each environment gets its own `BLOB_READ_WRITE_TOKEN`.
+2. **Neon.** Install the Neon integration on the Vercel project. Point Production at the `production` branch, and enable a branch per preview deployment with `development` as the parent.
+3. **Secrets.** Add `PAYLOAD_SECRET` (a different value per environment) and `REVALIDATE_SECRET` in Vercel. Keep Vercel Deployment Protection on for Preview.
+4. **Load content, preview pair first.** From a shell that has only these variables (never your local `.env`; the script refuses emulator settings pointed at a remote database):
+
+   ```bash
+   export DATABASE_URL='<Neon development branch URL>'
+   export BLOB_READ_WRITE_TOKEN='<preview store token>'
+   export PAYLOAD_SECRET='<any value; only used to boot Payload>'
+   bun run migrate
+   SANITY_DATASET=development bun run migrate:sanity
+   ADMIN_EMAIL='<you>' ADMIN_PASSWORD='<password>' bun run create-admin
+   ```
+
+5. **Load content, production pair.** Repeat step 4 with the Neon `production` branch URL, the production store token, and `SANITY_DATASET=production`. Create the admin here too: deployed sites reject public first-user signup, so the admin must exist before the first deploy.
+6. **Release.** Merge the stack and publish a release; production deploys from the release tag (see `RELEASING.md`). Then follow Phase 6.
+7. **After the 30-day hold.** Delete the Sanity project, `scripts/migrate-from-sanity.ts`, `scripts/lib/`, and the `sanityId` fields (with a migration).
+
+Deviations from the plan below: the migration reads Sanity's public HTTP API instead of an export tarball; collection and photo edits revalidate the whole site layout because the nav lists collections on every page; Next dev runs on Node because Bun cannot resolve Turbopack's externals for Payload's database adapter; each environment has its own Blob store; and on Vercel, admins are created with `bun run create-admin` instead of the public first-user form.
 
 ### Recommendation
 
@@ -156,7 +193,7 @@ Run order: development dataset → Neon `development` branch, iterate until the 
 
 ### Phase 5: Remove Sanity and update tooling (half a day)
 
-- Delete `src/sanity/`, `sanity.config.ts`, `sanity.cli.ts`, `src/app/studio/`, `src/app/api/preview/`, `src/app/api/exit-preview/`, `src/app/api/revalidate/`, `scripts/migrateDocumentType.js`, `scripts/revalidate.ts`, `skills/sanity-graphql/`.
+- Delete `src/sanity/`, `sanity.config.ts`, `sanity.cli.ts`, `src/app/studio/`, `src/app/api/preview/`, `src/app/api/exit-preview/`, `src/app/api/revalidate/`, `scripts/migrateDocumentType.js`, `skills/sanity-graphql/`. Keep `scripts/revalidate.ts`, which now authenticates with `REVALIDATE_SECRET`.
 - Remove the dependencies and `resolutions` listed above. Remove `transpilePackages` for Sanity packages and `styled-components` from `next.config.js`.
 - `src/app/api/revalidateRoute/route.ts`: read `REVALIDATE_SECRET` instead of `SANITY_WEBHOOK_SECRET`. Update `e2e/api.spec.ts` to match and drop the webhook-signature test.
 - `e2e/studio.spec.ts` → `e2e/admin.spec.ts`: assert `/admin` renders the Payload login form.
@@ -169,7 +206,7 @@ Run order: development dataset → Neon `development` branch, iterate until the 
 
 1. Announce a content freeze (one person, so: stop editing in Studio).
 2. Run the migration against the Neon `production` branch. Run the verification diff.
-3. Merge the branch. Vercel build runs `payload migrate` then `next build`. Confirm `/`, `/collections/[slug]`, `/blog`, `/blog/[slug]`, `/admin` on both domains.
+3. Merge the stack and publish a release. The release-tag deploy runs `payload migrate` then `next build`. Confirm `/`, `/collections/[slug]`, `/blog`, `/blog/[slug]`, `/admin` on both domains.
 4. Edit one collection in `/admin`, confirm the page updates within seconds without a webhook.
 5. Keep the Sanity project and the export tarball untouched for 30 days, then delete the project and cancel billing. Delete `scripts/migrate-from-sanity.ts` and the `sanityId` fields in a follow-up.
 
