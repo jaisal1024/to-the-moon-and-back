@@ -1,4 +1,6 @@
-import react from '@vitejs/plugin-react-swc';
+import { fileURLToPath } from 'node:url';
+
+import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
@@ -8,7 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setup-tests.ts'],
     globals: true,
-    exclude: ['**/node_modules/**', '**/e2e/**'],
+    exclude: ['**/node_modules/**', '**/e2e/**', '**/.claude/**', '**/.next/**'],
     env: {
       NEXT_PUBLIC_SANITY_DATASET: 'development',
       NEXT_PUBLIC_SANITY_API_VERSION: '2022-11-28',
@@ -17,8 +19,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      src: path.resolve(__dirname, './src'),
+      'apollo-client': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './apollo-client.ts'),
+      '@': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './src'),
+      'src': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './src'),
     },
   },
 });

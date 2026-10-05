@@ -12,14 +12,11 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('next/link', () => ({
   __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactElement }) => {
-    return React.cloneElement(children, props);
-  },
+  default: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props}>{children}</a>,
 }));
 
 test('renders internal link correctly', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (usePathname as any).mockReturnValue('/');
+  vi.mocked(usePathname).mockReturnValue('/');
   render(<Link href="/about">About</Link>);
 
   const link = screen.getByRole('link', { name: 'About' });
@@ -27,8 +24,7 @@ test('renders internal link correctly', () => {
 });
 
 test('renders external link correctly', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (usePathname as any).mockReturnValue('/');
+  vi.mocked(usePathname).mockReturnValue('/');
   render(<Link href="https://google.com">Google</Link>);
 
   const link = screen.getByRole('link', { name: 'Google' });
@@ -36,9 +32,7 @@ test('renders external link correctly', () => {
 });
 
 test('applies active class when href matches pathname', () => {
-  (
-    usePathname as unknown as { mockReturnValue: (v: string) => void }
-  ).mockReturnValue('/about');
+  vi.mocked(usePathname).mockReturnValue('/about');
   render(
     <Link href="/about" activeClassName="custom-active">
       About

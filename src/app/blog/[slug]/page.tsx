@@ -46,17 +46,9 @@ const portableTextComponents = {
   },
   marks: {
     code: ({ children }: { children?: React.ReactNode }) => (
-      <code className="rounded bg-surfaceElevated px-1.5 py-0.5 font-mono text-[0.9em]">
-        {children}
-      </code>
+      <code className="rounded bg-surfaceElevated px-1.5 py-0.5 font-mono text-[0.9em]">{children}</code>
     ),
-    link: ({
-      value,
-      children,
-    }: {
-      value?: { href: string };
-      children: React.ReactNode;
-    }) => {
+    link: ({ value, children }: { value?: { href: string }; children: React.ReactNode }) => {
       const href = value?.href ?? '';
       return (
         <a
@@ -73,25 +65,15 @@ const portableTextComponents = {
   types: {
     code: ({ value }: { value: PortableTextCodeBlock }) => (
       <figure className="my-4">
-        {value.filename && (
-          <figcaption className="mb-2 text-sm uppercase text-slate-500">
-            {value.filename}
-          </figcaption>
-        )}
+        {value.filename && <figcaption className="mb-2 text-sm uppercase text-slate-500">{value.filename}</figcaption>}
         <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
-          <code className="font-mono whitespace-pre-wrap">
-            {value.code ?? ''}
-          </code>
+          <code className="font-mono whitespace-pre-wrap">{value.code ?? ''}</code>
         </pre>
       </figure>
     ),
     codeBlock: ({ value }: { value: PortableTextCodeBlock }) => (
       <figure className="my-4">
-        {value.filename && (
-          <figcaption className="mb-2 text-sm uppercase text-slate-500">
-            {value.filename}
-          </figcaption>
-        )}
+        {value.filename && <figcaption className="mb-2 text-sm uppercase text-slate-500">{value.filename}</figcaption>}
         <div className="overflow-hidden rounded-2xl">
           <SyntaxHighlighter
             language={value.language || 'typescript'}
@@ -171,18 +153,12 @@ export default async function BlogPostPage({ params }: Props) {
         <header className="flex flex-col gap-3">
           <Typography variant="h1">{post.title}</Typography>
           <Typography variant="body2" className="uppercase">
-            {post.publishedAt
-              ? formatPublishDate(post.publishedAt)
-              : 'Unpublished'}
+            {post.publishedAt ? formatPublishDate(post.publishedAt) : 'Unpublished'}
           </Typography>
         </header>
         <section className="flex flex-col gap-4">
           <PortableText
-            value={
-              (post.bodyRaw ?? []) as Array<
-                PortableTextBlock | PortableTextCodeBlock
-              >
-            }
+            value={(post.bodyRaw ?? []) as Array<PortableTextBlock | PortableTextCodeBlock>}
             components={portableTextComponents}
           />
         </section>

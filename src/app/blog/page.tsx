@@ -3,10 +3,7 @@ import client from 'apollo-client';
 import { Metadata } from 'next';
 import Layout from 'src/components/Layout';
 import Link from 'src/components/Link';
-import {
-  GET_BLOG_POSTS,
-  type GetBlogPostsData,
-} from 'src/queries/GetBlogPosts';
+import { GET_BLOG_POSTS, type GetBlogPostsData } from 'src/queries/GetBlogPosts';
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - Blog',
@@ -42,28 +39,17 @@ export default async function BlogPage() {
           <Typography variant="h1">Blog</Typography>
         </div>
         {posts.length === 0 ? (
-          <Typography variant="body1">
-            No blog posts yet. Add one in Sanity Studio to populate this page.
-          </Typography>
+          <Typography variant="body1">No blog posts yet. Add one in Sanity Studio to populate this page.</Typography>
         ) : (
           <div className="flex flex-col gap-6">
             {posts.map((post) => (
-              <article
-                key={post._id}
-                className="rounded-2xl border border-borderSubtle bg-surface p-6 shadow-sm"
-              >
+              <article key={post._id} className="rounded-2xl border border-borderSubtle bg-surface p-6 shadow-xs">
                 <div className="mb-3">
-                  <Link
-                    href={`/blog/${post.slug.current}`}
-                    noLinkStyle
-                    className="inline-block"
-                  >
+                  <Link href={`/blog/${post.slug.current}`} noLinkStyle className="inline-block">
                     <Typography variant="h3">{post.title}</Typography>
                   </Link>
                   <Typography variant="body2" className="mt-1 uppercase">
-                    {post?.publishedAt
-                      ? formatPublishDate(post.publishedAt)
-                      : 'Unpublished'}
+                    {post?.publishedAt ? formatPublishDate(post.publishedAt) : 'Unpublished'}
                   </Typography>
                 </div>
                 <Link

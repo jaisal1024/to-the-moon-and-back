@@ -13,9 +13,7 @@ Install a dedicated GitHub App on `jaisal1024/to-the-moon-and-back`, with **Cont
 
 The app token allows release PRs and merges to trigger the normal CI workflow. No application environment variables are needed for release automation. The workflow actions use the same commit pins as the `skills` template.
 
-CI needs the existing `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL` Actions secrets to generate real GraphQL types and exercise the site. Both app jobs select Node 24 and Bun 1.3.10 and install from the frozen lockfile. The E2E job generates types before starting the development server; the build script generates them before the production build. Release configuration is validated against the upstream schema, and the manifest must match `version.txt`. These metadata checks run for every CI invocation and before release-please runs.
-
-OpenSSF Scorecard runs separately on pushes to `main` and weekly. Its publication job has the required OIDC permission and no workflow-level environment variables, as required by Scorecard. It publishes a security posture report and retains the SARIF artifact; it is not a PR release gate or an enforced vulnerability threshold.
+CI needs the existing `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL` Actions secrets to generate real GraphQL types and exercise the site. Both app jobs select Node 24 and the Bun version declared in `package.json` and install from the frozen lockfile. The E2E job generates types before starting the development server; the build script generates them before the production build. Release configuration is validated against the upstream schema, and the manifest must match `version.txt`. These metadata checks run for every CI invocation and before release-please runs.
 
 ## Workflow
 

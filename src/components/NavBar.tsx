@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { clsx } from 'clsx';
 import { usePathname } from 'next/navigation';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
@@ -51,9 +51,7 @@ function CollectionList({ collectionData }: { collectionData: unknown }) {
   return (
     <List>
       <CollectionListItem title="Home" href="/" />
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {(collectionData as any)?.allCollections?.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (collection: any, i: number) =>
           collection && (
             <CollectionListItem
@@ -70,7 +68,7 @@ function CollectionList({ collectionData }: { collectionData: unknown }) {
 function NavBarComponent() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [showCollections, setShowCollections] = useState(false);
-  const collectionAnchorRef = useRef<HTMLDivElement>(null);
+  const [collectionAnchorEl, setCollectionAnchorEl] = useState<HTMLElement | null>(null);
   const [
     getNavBarCollections,
     { data: collectionData, error: fetchError, loading },
@@ -93,7 +91,6 @@ function NavBarComponent() {
       variables: {
         sort: GET_COLLECTIONS_SORT,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
   );
   const collectionSlug = useCollectionSlug();
@@ -128,7 +125,7 @@ function NavBarComponent() {
             setShowCollections(true);
             getNavBarCollections();
           }}
-          ref={collectionAnchorRef}
+          ref={(node) => setCollectionAnchorEl(node)}
           data-testid="navbar-collections-button"
         >
           <div className="flex flex-row items-center">
@@ -165,7 +162,7 @@ function NavBarComponent() {
         <Popover
           id={'collectionPopover'}
           open={showCollections}
-          anchorEl={collectionAnchorRef.current}
+          anchorEl={collectionAnchorEl}
           onClose={() => setShowCollections(false)}
           anchorOrigin={{
             vertical: 'bottom',

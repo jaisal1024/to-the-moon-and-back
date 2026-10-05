@@ -8,21 +8,27 @@ test('has title', async ({ page }) => {
   await expect(page).toHaveTitle(/Jaisal Friedman/);
 });
 
-test('navigation to blog page', async ({ page }) => {
+test('navigation to blog page', async ({ page, isMobile }) => {
   await page.goto('/');
 
   // Find a link with the test id "navbar-blog-link" and click it.
-  await page.getByTestId('navbar-blog-link').first().click();
+  if (isMobile) {
+    await page.getByTestId('navbar-mobile-menu-button').click();
+  }
+  await page.getByTestId(isMobile ? 'navbar-list-item-blog' : 'navbar-blog-link').click();
 
   // The new URL should contain "/blog".
   await expect(page).toHaveURL(/.*blog/);
 });
 
-test('navigation to about page', async ({ page }) => {
+test('navigation to about page', async ({ page, isMobile }) => {
   await page.goto('/');
 
   // Find a link with the test id "navbar-about-link" and click it.
-  await page.getByTestId('navbar-about-link').first().click();
+  if (isMobile) {
+    await page.getByTestId('navbar-mobile-menu-button').click();
+  }
+  await page.getByTestId(isMobile ? 'navbar-list-item-about' : 'navbar-about-link').click();
 
   // The new URL should contain "/about".
   await expect(page).toHaveURL(/.*about/);
@@ -52,13 +58,9 @@ test('mobile navigation menu works', async ({ page }) => {
 
   // Check if "Collections" is visible in the mobile menu (Dialog)
   // Adjusted based on NavBar.tsx implementation
-  await expect(
-    page.getByTestId('mobile-menu-collections-heading'),
-  ).toBeVisible();
+  await expect(page.getByTestId('mobile-menu-collections-heading')).toBeVisible();
 
   // Close the menu
   await page.getByTestId('navbar-mobile-close-button').click();
-  await expect(
-    page.getByTestId('mobile-menu-collections-heading'),
-  ).not.toBeVisible();
+  await expect(page.getByTestId('mobile-menu-collections-heading')).not.toBeVisible();
 });

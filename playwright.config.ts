@@ -9,7 +9,8 @@ import * as path from 'path';
 // Set environment variables for E2E tests
 process.env.NEXT_PUBLIC_SANITY_DATASET = 'development';
 process.env.NEXT_PUBLIC_SANITY_API_VERSION = '2022-11-28';
-process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = 'G-KL7CLHPFFB';
+// Keep browser tests independent of analytics requests.
+process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = '';
 process.env.SANITY_WEBHOOK_SECRET = 'super-not-secret-webhook';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
@@ -58,7 +59,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: 'bun run dev',
     url: 'http://localhost:3333',
     reuseExistingServer: !process.env.CI,
   },
