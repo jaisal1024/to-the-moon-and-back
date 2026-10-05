@@ -37,7 +37,7 @@ bun run dev-local        # docker compose up -d --wait db, then bun run dev
 bun run dev-local:down   # stop the container (data persists in the named volume)
 ```
 
-Set `DATABASE_URL=postgres://postgres:postgres@localhost:5432/to_the_moon` in `.env`.
+Set `DATABASE_URL=postgres://postgres:postgres@localhost:54320/to_the_moon` in `.env`.
 
 ---
 

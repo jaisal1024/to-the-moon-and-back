@@ -12,7 +12,7 @@ process.env.NEXT_PUBLIC_SANITY_API_VERSION = '2022-11-28';
 // Keep browser tests independent of analytics requests.
 process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = '';
 process.env.SANITY_WEBHOOK_SECRET = 'super-not-secret-webhook';
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(import.meta.dirname, '.env') });
 
 /**
  * See https://playwright.dev/docs/test-configuration.

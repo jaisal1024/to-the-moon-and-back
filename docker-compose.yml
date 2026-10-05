@@ -10,7 +10,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: to_the_moon
     ports:
-      - '5432:5432'
+      # Host port is configurable so it does not collide with other local Postgres containers.
+      # Bound to localhost only: the credentials are fixed and public.
+      - '127.0.0.1:${POSTGRES_PORT:-54320}:5432'
     volumes:
       - db-data:/var/lib/postgresql
     healthcheck:
