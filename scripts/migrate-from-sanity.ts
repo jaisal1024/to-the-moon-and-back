@@ -44,8 +44,9 @@ type SanityPost = {
   body?: PortableTextNode[];
 };
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.SANITY_DATASET ?? process.env.NEXT_PUBLIC_SANITY_DATASET;
+// Public Sanity project for this site; override with SANITY_PROJECT_ID.
+const projectId = process.env.SANITY_PROJECT_ID ?? '6qd0txmw';
+const dataset = process.env.SANITY_DATASET;
 const token = process.env.SANITY_API_TOKEN;
 const dryRun = process.env.DRY_RUN === '1';
 const API_VERSION = '2023-01-01';
@@ -132,7 +133,7 @@ async function upsert<T extends Upsertable>(
 }
 
 async function main() {
-  if (!projectId || !dataset) throw new Error('Set NEXT_PUBLIC_SANITY_PROJECT_ID and SANITY_DATASET.');
+  if (!projectId || !dataset) throw new Error('Set SANITY_DATASET (production or development).');
   console.log(`Sanity ${projectId}/${dataset} -> Payload${dryRun ? ' (dry run, no writes)' : ''}`);
 
   const [collections, posts] = await Promise.all([

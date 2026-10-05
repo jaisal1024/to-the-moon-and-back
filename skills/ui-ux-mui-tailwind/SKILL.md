@@ -116,13 +116,13 @@ className = 'cursor-pointer opacity-70 hover:opacity-100';
 
 ## Images
 
-Always use the `NextImage` wrapper component (not bare `next/image`) when rendering Sanity photos. It handles the Sanity → CDN URL transformation.
+Always use the `NextImage` wrapper component (not bare `next/image`) when rendering CMS photos. It picks a generated size from the Payload `Media` document and passes its intrinsic dimensions.
 
 ```tsx
 // ✅ Correct
-<NextImage image={photo} alt={title} fill />
+<NextImage media={photo} size="xl" alt={title} fill sizes="(min-width: 1200px) 50vw, 100vw" />
 
-// ❌ Incorrect - bypasses Sanity URL transform
+// ❌ Incorrect - skips size selection and alt text from the Media document
 <Image src={photo.url} alt={title} fill />
 ```
 

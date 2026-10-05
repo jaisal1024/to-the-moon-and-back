@@ -13,7 +13,7 @@ Install a dedicated GitHub App on `jaisal1024/to-the-moon-and-back`, with **Cont
 
 The App token creates release PRs and enables squash auto-merge so normal CI runs and the eventual merge triggers the next push-to-main publication run. `GITHUB_TOKEN` stays read-only; no PR approval permission, status exemptions, check bypasses, or publication dispatch is needed. No application environment variables are needed for release automation. Release App authentication and release-please retain the commit pins used by the `skills` template.
 
-CI needs the existing `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL` Actions secrets to generate real GraphQL types and exercise the site. Both app jobs select Node 24 and the Bun version declared in `package.json` and install from the frozen lockfile. The E2E job generates types before starting the development server; the build script generates them before the production build. Release configuration is validated against the upstream schema, and the manifest must match `version.txt`. These metadata checks run for every CI invocation and before release-please runs.
+CI needs no application secrets: both app jobs run a throwaway `postgres:18` service container for Payload. Both select Node 24 and the Bun version declared in `package.json` and install from the frozen lockfile. The build script applies Payload migrations before the production build; the E2E job migrates and seeds the database before starting the development server. Release configuration is validated against the upstream schema, and the manifest must match `version.txt`. These metadata checks run for every CI invocation and before release-please runs.
 
 ## Workflow
 
