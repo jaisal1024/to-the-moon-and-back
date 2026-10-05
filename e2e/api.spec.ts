@@ -1,18 +1,14 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Revalidation API', () => {
-  test('revalidateRoute endpoint handles unauthorized requests', async ({
-    request,
-  }) => {
+  test('revalidateRoute endpoint handles unauthorized requests', async ({ request }) => {
     const response = await request.post('/api/revalidateRoute', {
       headers: { secret: 'wrong-secret', route: '/' },
     });
     expect(response.ok()).toBe(false);
   });
 
-  test('revalidateRoute endpoint handles valid requests', async ({
-    request,
-  }) => {
+  test('revalidateRoute endpoint handles valid requests', async ({ request }) => {
     const response = await request.post('/api/revalidateRoute', {
       headers: {
         secret: process.env.SANITY_WEBHOOK_SECRET || '',
@@ -25,9 +21,7 @@ test.describe('Revalidation API', () => {
     expect(body.message).toBe('Revalidated /');
   });
 
-  test('revalidate (webhook) endpoint rejects invalid signatures', async ({
-    request,
-  }) => {
+  test('revalidate (webhook) endpoint rejects invalid signatures', async ({ request }) => {
     const response = await request.post('/api/revalidate', {
       data: { type: 'collections', slug: 'test' },
       headers: { 'x-sanity-signature': 'invalid' },
