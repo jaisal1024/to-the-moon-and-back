@@ -12,6 +12,7 @@ const envSchema = z.object({
   // Payload CMS. Optional until the site reads content from Payload.
   DATABASE_URL: z.string().url().optional(),
   PAYLOAD_SECRET: z.string().min(1).optional(),
+  BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
 });
 
 export const env = envSchema.parse({
@@ -25,4 +26,5 @@ export const env = envSchema.parse({
   NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID,
   DATABASE_URL: process.env.DATABASE_URL,
   PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
+  BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
 });
