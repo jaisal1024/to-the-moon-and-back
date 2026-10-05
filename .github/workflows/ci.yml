@@ -121,8 +121,6 @@ jobs:
             ${{ runner.os }}-bun-
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Generate GraphQL types
-        run: bun run generate
       - name: Run Payload migrations
         run: bun run migrate
       - name: Seed sample content
