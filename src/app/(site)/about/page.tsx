@@ -16,12 +16,7 @@ export default function AboutPage() {
       <Layout>
         <div className="flex flex-col space-x-4 py-8 sm:flex-row">
           <div className="portrait-glow relative m-auto mb-6 flex min-h-[300px] w-[300px] flex-1 sm:mb-auto sm:mt-0 sm:min-h-[500px] sm:w-[500px] lg:mt-auto">
-            <Image
-              src="/images/me.png"
-              alt="Picture of the author"
-              fill
-              objectFit="contain"
-            />
+            <Image src="/images/me.png" alt="Picture of the author" fill objectFit="contain" />
           </div>
           <div className="flex-1 text-center sm:text-left">
             <Typography variant="subtitle1" data-testid="about-heading">
@@ -31,22 +26,12 @@ export default function AboutPage() {
             <Typography variant="subtitle1">
               I&#39;m a{' '}
               <AnimatedTypography
-                items={[
-                  'software engineer',
-                  'photographer',
-                  'technical leader',
-                  'product thinker',
-                  'data lover',
-                ]}
+                items={['software engineer', 'photographer', 'technical leader', 'product thinker', 'data lover']}
                 className="text-orange-600"
               />
             </Typography>
             <Typography variant="subtitle1">
-              I love to{' '}
-              <AnimatedTypography
-                items={['surf', 'read', 'learn spanish']}
-                className="text-blue-500"
-              />
+              I love to <AnimatedTypography items={['surf', 'read', 'learn spanish']} className="text-blue-500" />
             </Typography>
             <br />
             <br />
