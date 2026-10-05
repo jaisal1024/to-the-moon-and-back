@@ -23,4 +23,17 @@ CI needs the existing `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_GR
 4. GitHub waits for the real required CI gate, code-quality and security checks, and an up-to-date branch before merging. Vercel previews continue running normally; they are not listed as required checks in the current ruleset. No manual approval is required. Unexpected files, renames, deletions, changed heads, conflicts, and unmet requirements block automation. The script never marks checks successful or uses administrator bypass.
 5. The release App merge triggers the normal push to `main`; release-please then creates the version tag and GitHub release. Unlike the Skills workflow, this repository keeps its application checks and uses an App-token merge instead of `GITHUB_TOKEN` check exemptions and explicit publication dispatch.
 
-Use **Run workflow** on `main` to retry after correcting configuration or access failures. Do not manually bump version files or move published tags. Vercel continues deploying merges to `main`; GitHub releases do not deploy the site or publish an npm package.
+Use **Run workflow** on `main` to retry after correcting configuration or access failures. Do not manually bump version files or move published tags. GitHub releases do not publish an npm package.
+
+## Production deployments
+
+Vercel production deployment follows a published, non-prerelease GitHub release. **Deploy release to Vercel** checks out that release's immutable `vMAJOR.MINOR.PATCH` tag, checks that it matches `version.txt` and belongs to `main` history, pulls the existing Vercel production settings and environment, builds once, then deploys the prebuilt output with `--prod`. Deployments are serialized and use the existing GitHub `production` environment protections. A missing credential or invalid release source fails before deployment.
+
+`vercel.json` disables automatic Git deployments from `main`. Other branches retain their existing Vercel previews. Merging a PR does not deploy production; the release App's published release triggers it. These routing changes take effect when this configuration is merged.
+
+Before merging, securely configure these repository Actions secrets:
+
+- `VERCEL_TOKEN`: a Vercel token authorized for the existing project's team. Generate it in the Vercel account settings and enter it directly in GitHub Actions settings, or run `gh secret set VERCEL_TOKEN --repo jaisal1024/to-the-moon-and-back` and use its hidden prompt. Never paste the token into chat or commit it.
+- `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`: the existing project's IDs. Use `vercel login` and `vercel link` in a local checkout to obtain `.vercel/project.json`, or find them in the Vercel project/team settings, then enter them as Actions secrets. Preserve the existing project and its production environment variables; do not create a replacement project.
+
+After a release deployment fails, correct its configuration and rerun that same Actions run so it deploys the original release tag. Do not move the tag or fall back to deploying the current main branch. See [Vercel Git configuration](https://vercel.com/docs/project-configuration/git-configuration) and [Vercel's GitHub Actions deployment guide](https://vercel.com/kb/guide/how-can-i-use-github-actions-with-vercel).
