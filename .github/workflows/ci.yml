@@ -2,6 +2,7 @@ name: CI
 
 on:
   pull_request:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
@@ -21,6 +22,24 @@ env:
   NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: 'G-KL7CLHPFFB'
 
 jobs:
+  title:
+    name: Validate PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        with:
+          validateSingleCommit: 'false'
+          validateSingleCommitMatchesPrTitle: 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-config:
+    name: Validate release configuration
+    uses: ./.github/workflows/validate-release.yml
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -71,6 +90,8 @@ jobs:
             ${{ runner.os }}-bun-
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Generate GraphQL types
+        run: bun run generate
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(bunx playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
@@ -96,3 +117,25 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 15
+  gate:
+    name: CI - gate
+    if: always()
+    needs: [title, release-config, build, test-e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful checks
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TITLE_RESULT: ${{ needs.title.result }}
+          RELEASE_CONFIG_RESULT: ${{ needs.release-config.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          E2E_RESULT: ${{ needs.test-e2e.result }}
+        run: |
+          if [ "$EVENT_NAME" = pull_request ]; then
+            test "$TITLE_RESULT" = success
+          else
+            test "$TITLE_RESULT" = skipped
+          fi
+          test "$RELEASE_CONFIG_RESULT" = success
+          test "$BUILD_RESULT" = success
+          test "$E2E_RESULT" = success
