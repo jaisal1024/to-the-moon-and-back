@@ -5,6 +5,16 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
+// When media is served by the local Vercel Blob emulator (docker-compose `blob`),
+// allow next/image to fetch it. Next 16 refuses to optimize images from private
+// IPs by default, so this is enabled only for a localhost emulator, never on Vercel.
+const blobEmulator = (() => {
+  const base = process.env.STORAGE_VERCEL_BLOB_BASE_URL;
+  if (!base) return null;
+  const url = new URL(base);
+  return ['localhost', '127.0.0.1'].includes(url.hostname) ? url : null;
+})();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -14,7 +24,17 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.public.blob.vercel-storage.com',
       },
+      ...(blobEmulator
+        ? [
+            {
+              protocol: blobEmulator.protocol.replace(':', ''),
+              hostname: blobEmulator.hostname,
+              port: blobEmulator.port,
+            },
+          ]
+        : []),
     ],
+    dangerouslyAllowLocalIP: Boolean(blobEmulator),
   },
   reactStrictMode: true,
   experimental: {

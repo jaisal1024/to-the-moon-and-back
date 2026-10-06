@@ -5,7 +5,7 @@ description: How to change content models, read CMS data, handle media, and keep
 
 # Payload CMS Workflow
 
-Payload runs inside this Next.js app. The admin UI is `/admin`, content lives in Postgres (Docker locally, Neon on Vercel), and uploads live in Vercel Blob (local `./media` when `BLOB_READ_WRITE_TOKEN` is unset).
+Payload runs inside this Next.js app. The admin UI is `/admin`, content lives in Postgres (Docker locally, Neon on Vercel), and uploads live in Vercel Blob (the Docker Blob emulator locally and in CI).
 
 ## Changing a collection
 
@@ -39,4 +39,4 @@ Render images with `src/components/NextImage.tsx`, which takes a `Media` documen
 
 ## Local data
 
-`bun run dev-local` starts Postgres, migrates, and seeds an empty database with `scripts/seed.ts`. `bun run migrate:sanity` copies the real Sanity content instead (`SANITY_DATASET=production`); it is kept until Sanity is decommissioned.
+`bun run dev-local` starts Postgres and the Vercel Blob emulator, migrates, and seeds an empty database with `scripts/seed.ts`. `bun run dev-local:reset` wipes both. Scripts that write through the Local API must pass a fresh `context` object per call; Payload stores upload state on it, and reusing one makes later uploads skip storage. `bun run migrate:sanity` copies the real Sanity content instead (`SANITY_DATASET=production`); it is kept until Sanity is decommissioned.

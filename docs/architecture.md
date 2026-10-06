@@ -168,7 +168,7 @@ bun run build
 
 Schema changes follow: edit `src/collections/*` → `bun run payload:types` → `bun run migrate:create` → commit the collection, types, and migration together. Production never uses Payload's `push` mode.
 
-Production deploys from release tags, not from merges to `main` (see `RELEASING.md`). Payload connects with the plain `pg` driver via `@payloadcms/db-postgres`; nothing Neon-specific is in the code. Each Vercel environment pairs its own database with its own Blob store: Production uses the Neon `production` branch and the production Blob store; each preview deployment gets a Neon branch forked from `development` and uses the preview Blob store. The Neon integration injects `DATABASE_URL` (pooled), and each store's connection injects `BLOB_READ_WRITE_TOKEN`. CI does not use Neon: each job runs a `postgres:18` service container and points `DATABASE_URL` at it. Locally and in Claude Code cloud sessions, `bun run dev-local` starts a `postgres:18` container from `docker-compose.yml` (the newest major Neon supports) and then the dev server.
+Production deploys from release tags, not from merges to `main` (see `RELEASING.md`). Payload connects with the plain `pg` driver via `@payloadcms/db-postgres`; nothing Neon-specific is in the code. Each Vercel environment pairs its own database with its own Blob store: Production uses the Neon `production` branch and the production Blob store; each preview deployment gets a Neon branch forked from `development` and uses the preview Blob store. The Neon integration injects `DATABASE_URL` (pooled), and each store's connection injects `BLOB_READ_WRITE_TOKEN`. CI does not use Neon or Vercel Blob: each job runs `postgres:18` and the Blob emulator as service containers. Locally and in Claude Code cloud sessions, `bun run dev-local` starts the same two containers from `docker-compose.
 
 ---
 
@@ -187,13 +187,14 @@ Payload's admin has its own root layout and styles, so neither MUI nor Tailwind 
 
 Validated in `src/env.schema.ts`.
 
-| Variable                          | Scope  | Purpose                                                                           |
-| --------------------------------- | ------ | --------------------------------------------------------------------------------- |
-| `DATABASE_URL`                    | server | Postgres connection string: Neon pooled URL on Vercel, local Docker URL in `.env` |
-| `PAYLOAD_SECRET`                  | server | Signs admin sessions. Never exposed to the client.                                |
-| `BLOB_READ_WRITE_TOKEN`           | server | Vercel Blob access for uploads; a different store per environment                 |
-| `REVALIDATE_SECRET`               | server | Auth for `/api/revalidateRoute` and `bun run revalidate`                          |
-| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` | public | Google Analytics measurement ID (optional)                                        |
+| Variable                                                                                 | Scope    | Purpose                                                                             |
+| ---------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                                           | server   | Postgres connection string: Neon pooled URL on Vercel, local Docker URL in `.env`   |
+| `PAYLOAD_SECRET`                                                                         | server   | Signs admin sessions. Never exposed to the client.                                  |
+| `BLOB_READ_WRITE_TOKEN`                                                                  | server   | Vercel Blob access for uploads; a different store per environment                   |
+| `VERCEL_BLOB_API_URL`, `NEXT_PUBLIC_VERCEL_BLOB_API_URL`, `STORAGE_VERCEL_BLOB_BASE_URL` | local/CI | Point the Blob SDK, browser uploads, and file URLs at the emulator. Unset on Vercel |
+| `REVALIDATE_SECRET`                                                                      | server   | Auth for `/api/revalidateRoute` and `bun run revalidate`                            |
+| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`                                                        | public   | Google Analytics measurement ID (optional)                                          |
 
 `DATABASE_URL` and `PAYLOAD_SECRET` are required everywhere the app runs. CI sets throwaway values for its service container.
 
@@ -201,16 +202,16 @@ Validated in `src/env.schema.ts`.
 
 ## Key Configuration Files
 
-| File                    | Purpose                                                     |
-| ----------------------- | ----------------------------------------------------------- |
-| `src/payload.config.ts` | Collections, DB adapter, storage plugin, editor, admin      |
-| `src/collections/*.ts`  | Content models and revalidation hooks                       |
-| `src/migrations/*`      | Generated SQL migrations, committed                         |
-| `src/payload-types.ts`  | Generated types, committed                                  |
-| `src/cms/*`             | Typed data-access layer used by pages                       |
-| `next.config.mjs`       | `withPayload(...)`, Blob `remotePatterns`, `globalNotFound` |
-| `src/env.schema.ts`     | Env validation                                              |
-| `docker-compose.yml`    | Local `postgres:18` for `bun run dev-local`                 |
+| File                    | Purpose                                                              |
+| ----------------------- | -------------------------------------------------------------------- |
+| `src/payload.config.ts` | Collections, DB adapter, storage plugin, editor, admin               |
+| `src/collections/*.ts`  | Content models and revalidation hooks                                |
+| `src/migrations/*`      | Generated SQL migrations, committed                                  |
+| `src/payload-types.ts`  | Generated types, committed                                           |
+| `src/cms/*`             | Typed data-access layer used by pages                                |
+| `next.config.mjs`       | `withPayload(...)`, Blob `remotePatterns`, `globalNotFound`          |
+| `src/env.schema.ts`     | Env validation                                                       |
+| `docker-compose.yml`    | Local `postgres:18` and Vercel Blob emulator for `bun run dev-local` |
 
 ---
 
