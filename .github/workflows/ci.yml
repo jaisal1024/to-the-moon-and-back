@@ -125,6 +125,8 @@ jobs:
         run: bun run generate
       - name: Run Payload migrations
         run: bun run migrate
+      - name: Seed sample content
+        run: bun run seed
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(bunx playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT

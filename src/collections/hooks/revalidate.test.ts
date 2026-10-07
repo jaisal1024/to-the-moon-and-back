@@ -84,6 +84,30 @@ describe('revalidateAfterChange', () => {
   });
 });
 
+describe('layout revalidation', () => {
+  beforeEach(resetRevalidate);
+
+  it('passes the layout type through to revalidatePath', () => {
+    call(
+      revalidateAfterChange(() => ['/'], { type: 'layout' }),
+      { doc: { id: 1, slug: 'a', _status: 'published' } },
+    );
+    expect(vi.mocked(revalidatePath).mock.calls).toEqual([['/', 'layout']]);
+  });
+});
+
+describe('onCreate: false', () => {
+  beforeEach(resetRevalidate);
+
+  it('skips creates but still revalidates updates', () => {
+    const hook = revalidateAfterChange(() => ['/'], { type: 'layout', onCreate: false });
+    call(hook, { operation: 'create', doc: { id: 1, slug: 'a' }, previousDoc: {} });
+    expect(revalidated()).toEqual([]);
+    call(hook, { operation: 'update', doc: { id: 1, slug: 'a' }, previousDoc: { id: 1, slug: 'a' } });
+    expect(revalidated()).toEqual(['/']);
+  });
+});
+
 describe('revalidateAfterDelete', () => {
   beforeEach(resetRevalidate);
 

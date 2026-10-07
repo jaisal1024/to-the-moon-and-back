@@ -10,10 +10,6 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-      },
-      {
         // Payload media stored in Vercel Blob.
         protocol: 'https',
         hostname: '*.public.blob.vercel-storage.com',

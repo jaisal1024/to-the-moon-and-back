@@ -1,10 +1,9 @@
-import { gql } from '@apollo/client';
 import { Typography } from '@mui/material';
-import client from 'apollo-client';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getCollectionBySlug, listCollectionSlugs } from 'src/cms/collections';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import { GET_COLLECTION } from 'src/queries/GetCollection';
 
 export const revalidate = 600; // 10-minutes in seconds
 
@@ -12,15 +11,13 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-// Next.js App Router dynamic metadata generation
+// Dates are stored as UTC midnight; format in UTC so the month never shifts.
+const formatMonth = (date: string) =>
+  new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' });
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const { data } = await client.query({
-    query: GET_COLLECTION,
-    variables: { slug_current: id },
-  });
-
-  const collection = data?.allCollections?.[0];
+  const collection = await getCollectionBySlug(id);
 
   return {
     title: `Jaisal Friedman - ${collection?.title ?? 'Collection'}`,
@@ -29,69 +26,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const { data } = await client
-    .query<{ allCollections: Array<{ slug?: { current?: string } }> }>({
-      query: gql`
-        query GetCollectionSlugs {
-          allCollections {
-            slug {
-              current
-            }
-          }
-        }
-      `,
-    })
-    .catch((err) => {
-      console.error('generateStaticParams failed', err);
-      return { data: null };
-    });
-
-  if (!data) return [];
-
-  return data.allCollections.map((collection) => ({
-    id: collection?.slug?.current ?? '',
-  }));
+  const slugs = await listCollectionSlugs();
+  return slugs.map((id) => ({ id }));
 }
 
 export default async function SeriesIdPage({ params }: Props) {
   const { id } = await params;
+  const collection = await getCollectionBySlug(id);
 
-  const { data } = await client
-    .query({
-      query: GET_COLLECTION,
-      variables: { slug_current: id },
-    })
-    .catch((err) => {
-      console.error('Data fetch failed', err);
-      throw err;
-    });
-
-  if (!data?.allCollections?.length) {
-    throw new Error(`Data fetch empty return value for collection id: ${id}`);
+  if (!collection) {
+    notFound();
   }
 
-  const collection = data.allCollections[0];
+  const photos = (collection.photos ?? []).map((row, i) => ({
+    key: row.id ?? i,
+    title: row.title,
+    photo: row.photo,
+  }));
 
   return (
-    <>
-      <Layout>
-        <div className="flex flex-row pb-4">
-          <div>
-            <Typography variant="h1">{collection.title}</Typography>
-            <Typography variant="h3">{collection.description}</Typography>
-          </div>
-          <div className="ml-auto flex flex-col items-end pr-2 text-end">
-            <Typography variant="h3">
-              {new Date(collection.date).toLocaleDateString('en-us', {
-                year: 'numeric',
-                month: 'long',
-              })}
-            </Typography>
-            <Typography variant="h3">{collection.location}</Typography>
-          </div>
+    <Layout>
+      <div className="flex flex-row pb-4">
+        <div>
+          <Typography variant="h1">{collection.title}</Typography>
+          <Typography variant="h3">{collection.description}</Typography>
         </div>
-        <ImageGrid collection={collection.photos} />
-      </Layout>
-    </>
+        <div className="ml-auto flex flex-col items-end pr-2 text-end">
+          {collection.date && <Typography variant="h3">{formatMonth(collection.date)}</Typography>}
+          <Typography variant="h3">{collection.location}</Typography>
+        </div>
+      </div>
+      <ImageGrid collection={photos} />
+    </Layout>
   );
 }

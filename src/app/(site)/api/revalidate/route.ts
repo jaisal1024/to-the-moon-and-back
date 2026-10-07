@@ -6,10 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { isValidSignature, body } = await parseBody(
-      req,
-      process.env.SANITY_WEBHOOK_SECRET,
-    );
+    const { isValidSignature, body } = await parseBody(req, process.env.SANITY_WEBHOOK_SECRET);
 
     if (!isValidSignature) {
       const message = 'Invalid signature';
@@ -34,10 +31,10 @@ export async function POST(req: NextRequest) {
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
       default:
-        return new Response(
-          JSON.stringify({ message: `Ignored webhook for type: ${type}` }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } },
-        );
+        return new Response(JSON.stringify({ message: `Ignored webhook for type: ${type}` }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
     }
   } catch (err: unknown) {
     console.error(err);

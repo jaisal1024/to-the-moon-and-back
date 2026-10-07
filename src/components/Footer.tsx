@@ -41,9 +41,7 @@ function SectionContent({
       className="flex flex-row space-x-2 pb-1"
       data-testid={`footer-link-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
-      {iconPath && (
-        <Image src={iconPath} alt={iconAlt} height={14} width={14} />
-      )}
+      {iconPath && <Image src={iconPath} alt={iconAlt} height={14} width={14} />}
       <Typography variant="body2">{title}</Typography>
     </Link>
   );

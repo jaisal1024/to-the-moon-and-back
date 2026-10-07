@@ -3,14 +3,15 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
-import type { Image as SanityImage } from 'sanity';
+import type { Media } from 'src/payload-types';
 
 import NextImage from './NextImage';
 
 type Props = {
   collection: {
-    title?: string;
-    photo?: Partial<SanityImage['asset'] & Omit<SanityImage, 'asset'>>; // bug in gql which makes photo, _type, _ref optional
+    key: string | number;
+    title?: string | null;
+    photo: Media | number;
     button?: {
       title: string;
       href: string;
@@ -24,7 +25,7 @@ export default function ImageGrid({ collection }: Props) {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container>
         {collection.map((item, i) => (
-          <Grid size={{ xs: 12, lg: 6 }} key={item.photo._key ?? i}>
+          <Grid size={{ xs: 12, lg: 6 }} key={item.key}>
             <div
               className={clsx(
                 { 'cursor-pointer': !!item.button?.href },
@@ -38,9 +39,10 @@ export default function ImageGrid({ collection }: Props) {
             >
               <NextImage
                 preload={i < 2}
-                image={item.photo}
-                alt={item.title ?? `item ${i + 1}`}
+                media={item.photo}
+                alt={item.title ?? undefined}
                 fill
+                sizes="(min-width: 1200px) 50vw, 100vw"
                 style={{ objectFit: 'contain', objectPosition: 'center' }}
               />
               {item.button && (
@@ -50,17 +52,13 @@ export default function ImageGrid({ collection }: Props) {
                   color="secondary"
                   className="my-auto self-center"
                   sx={{
-                    textTransform: 'none',
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'light'
-                        ? 'rgba(36, 36, 36, 0.7)'
-                        : 'rgba(0, 0, 0, 0.7)',
-                    color: (theme) => theme.palette.common.white,
+                    'textTransform': 'none',
+                    'backgroundColor': (theme) =>
+                      theme.palette.mode === 'light' ? 'rgba(36, 36, 36, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                    'color': (theme) => theme.palette.common.white,
                     '&:hover': {
                       backgroundColor: (theme) =>
-                        theme.palette.mode === 'light'
-                          ? 'rgba(36, 36, 36, 0.85)'
-                          : 'rgba(0, 0, 0, 0.85)',
+                        theme.palette.mode === 'light' ? 'rgba(36, 36, 36, 0.85)' : 'rgba(0, 0, 0, 0.85)',
                     },
                   }}
                 >
