@@ -15,9 +15,16 @@ cp .env.example .env        # values work as-is with dev-local
 bun run dev-local
 ```
 
-`dev-local` starts `postgres:18` from `docker-compose.yml`, applies migrations, seeds an empty database, and starts Next on [localhost:3333](http://localhost:3333). Create the first admin user at [localhost:3333/admin](http://localhost:3333/admin).
+`dev-local` starts `postgres:18` and a Vercel Blob emulator from `docker-compose.yml`, applies migrations, seeds an empty database with sample collections and a post, and starts Next on [localhost:3333](http://localhost:3333). Create the first admin user at [localhost:3333/admin](http://localhost:3333/admin).
 
-The container's host port defaults to 54320 so it does not collide with other local Postgres containers. Set `POSTGRES_PORT` and update `DATABASE_URL` to change it. `bun run dev-local:down` stops the container; `docker compose down -v` also deletes its data.
+Nothing talks to a hosted service: Postgres stands in for Neon, and [Payload's Vercel Blob emulator](https://github.com/payloadcms/vercel-blob-emulator) stands in for Vercel Blob, including the browser's direct uploads from the admin. Host ports default to 54320 (Postgres) and 3100 (Blob) so they do not collide with other containers; override them with `POSTGRES_PORT` and `BLOB_EMULATOR_PORT` and update the URLs in `.env` to match.
+
+| Command                                            | Effect                                                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `bun run dev-local:down`                           | Stop the containers, keeping data                                                          |
+| `bun run dev-local:reset`                          | Delete the database and blob volumes; the next `dev-local` migrates and seeds from scratch |
+| `bun run seed`                                     | Add sample content to an empty database                                                    |
+| `SANITY_DATASET=production bun run migrate:sanity` | Load the real site content into the local database and emulator                            |
 
 ---
 

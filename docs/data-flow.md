@@ -72,7 +72,7 @@ Edit in /admin → Payload afterChange/afterDelete hook → revalidatePath(...) 
 
 ## Images
 
-1. An upload to `media` is stored in Vercel Blob, or in `./media` locally when no Blob token is set.
+1. An upload to `media` is stored in Vercel Blob. Locally and in CI that is the Blob emulator container; with no Blob token at all, Payload falls back to `./media` on disk.
 2. sharp generates `thumbnail` (400px), `card` (800px), `large` (1600px), and `xl` (2400px), keeping the aspect ratio and never upscaling.
 3. `NextImage` takes a `Media` document, uses the requested size with its intrinsic dimensions, and lets `next/image` handle format and responsive variants.
 
@@ -82,7 +82,7 @@ Edit in /admin → Payload afterChange/afterDelete hook → revalidatePath(...) 
 
 ```
 bun run dev-local
-  → docker compose up postgres:18
+  → docker compose up postgres:18 + Vercel Blob emulator
   → payload migrate
   → seed (sample collections and a post, only into an empty database)
   → next dev on http://localhost:3333
