@@ -8,12 +8,6 @@
     "scripts/**/*.{ts,tsx,js,jsx}",
   ],
   "project": ["src/**/*.{ts,tsx,js,jsx,css}", "e2e/**/*.{ts,tsx,js,jsx}", "next.config.*", "postcss.config.*"],
-  "ignore": [
-    "src/env.schema.ts",
-    "src/sanity/components/IFramePreviewView.tsx",
-    "src/sanity/preview.ts",
-    "src/utils/helpers.ts",
-    "src/utils/types.ts",
-  ],
-  "ignoreDependencies": ["@sanity/preview-url-secret", "zod", "suspend-react", "typescript-compiler"],
+  "ignore": ["src/utils/helpers.ts", "src/utils/types.ts"],
+  "ignoreDependencies": ["zod", "typescript-compiler"],
 }

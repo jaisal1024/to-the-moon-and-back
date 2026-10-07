@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const secret = req.headers.get('secret');
-    if (secret !== process.env.SANITY_WEBHOOK_SECRET) {
+    if (secret !== process.env.REVALIDATE_SECRET) {
       console.warn('Invalid token');
       return new Response(JSON.stringify({ message: 'Invalid token' }), {
         status: 401,
