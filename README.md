@@ -30,12 +30,14 @@ TODO:
 
 ## Development
 
-Use Node.js 24 or newer and Bun 1.4.2. Install dependencies with `bun install --frozen-lockfile`.
+Use Node.js 24 or newer and pnpm 12 (pinned in `package.json`; `corepack enable` picks it up). Install dependencies with `pnpm install --frozen-lockfile`.
+
+`pnpm-workspace.yaml` enforces a 3-day `minimumReleaseAge` and blocks all dependency install scripts. If an install fails because a version is too new, wait or pick an older one; if a new dependency wants to run a build script, add it to `allowBuilds` (as `false` unless it truly needs the script).
 
 Type checks use the TypeScript 7 compiler (`typescript-compiler`). TypeScript 6 remains installed for tools that need the JavaScript compiler API, including Next.js, ESLint, and GraphQL code generation.
 
-- `bun run dev` starts the dev next server on port [3333](http://localhost:3333/) and runs graphql codegen in watch mode.
-- `bun run graphql-deploy` will deploy changes to the schema file to the graphql endpoint. You must do this and restart the server to see changes reflected.
+- `pnpm run dev` starts the dev next server on port [3333](http://localhost:3333/) and runs graphql codegen in watch mode.
+- `pnpm run graphql-deploy` will deploy changes to the schema file to the graphql endpoint. You must do this and restart the server to see changes reflected.
 - Visit `/studio` route to view the sanity admin panel where you can create a collection.
 
 ## Deploying new sanity schemas
@@ -44,10 +46,10 @@ Type checks use the TypeScript 7 compiler (`typescript-compiler`). TypeScript 6 
    npx sanity login
    ```
 2. ```bash
-   bun run graphql-deploy
+   pnpm run graphql-deploy
    ```
 3. ```bash
-   bun run dev
+   pnpm run dev
    ```
 
 ## Site Map
@@ -70,8 +72,8 @@ Since we are using Next.js static pages to generate the website at build time, c
 
 There are two webhooks I set up: 1 for development and 1 for production. The development hook uses ngrok to expose a local host site (localhost://3000) to the internet for sanity webhooks to trigger. You cannot use a webhook with localhost (obviously). To set it up:
 
-1. Create a production build and start the next server: `bun run build && bun run start`
-2. Run: `bun run ngrok-start`
+1. Create a production build and start the next server: `pnpm run build && pnpm run start`
+2. Install the ngrok CLI (the npm package's binary download is blocked by the no-install-scripts policy), then run: `pnpm run ngrok-start`
 3. Take that URL and add it to the Sanity webhook UI for the development mode
 4. Open `localhost:3000/studio` and make changes to a collection.
 5. Watch the static regeneration in the console and check the UI afterwards

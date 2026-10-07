@@ -44,57 +44,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
-          package-manager-cache: false
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
-      - name: Restore Bun install cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-      - run: bun install --frozen-lockfile
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Restore Next.js cache
         uses: actions/cache@v6
         with:
           path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('bun.lock') }}-${{ hashFiles('src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('bun.lock') }}-
-      - run: bun run build
-      - run: bun run check
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+      - run: pnpm run build
+      - run: pnpm run check
 
   test-e2e:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
-          package-manager-cache: false
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: package.json
-      - name: Restore Bun install cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+          cache: pnpm
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Generate GraphQL types
-        run: bun run generate
+        run: pnpm run generate
       - name: Get Playwright version
         id: playwright-version
-        run: echo "version=$(bunx playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+        run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
       - name: Cache Playwright Browsers
         uses: actions/cache@v6
         id: playwright-cache
@@ -105,12 +87,12 @@ jobs:
             ${{ runner.os }}-playwright-
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: bunx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
       - name: Install Playwright Dependencies (if cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: bunx playwright install-deps
+        run: pnpm exec playwright install-deps
       - name: Run Playwright tests
-        run: bun run test:e2e
+        run: pnpm run test:e2e
       - uses: actions/upload-artifact@v7
         if: always()
         with:

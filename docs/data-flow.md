@@ -41,7 +41,7 @@ The Sanity project hosts two document types:
 The Sanity GraphQL API schema must be explicitly deployed:
 
 ```bash
-yarn graphql-deploy
+pnpm run graphql-deploy
 ```
 
 After deploying, **restart the dev server** for changes to be reflected.
