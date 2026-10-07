@@ -1,0 +1,26 @@
+# Only install versions that have been on the registry for at least 3 days
+# (value is in minutes), to give the ecosystem time to catch compromised releases.
+minimumReleaseAge: 4320
+
+# Never run dependency lifecycle scripts (preinstall/install/postinstall).
+# Fail the install if a dependency asks to build instead of silently skipping it,
+# and deny each one explicitly in allowBuilds below.
+strictDepBuilds: true
+allowBuilds:
+  '@parcel/watcher': false # uses prebuilt optional binaries
+  esbuild: false # uses prebuilt optional binaries
+  ngrok: false # postinstall downloads the ngrok binary; use a system ngrok instead
+  unrs-resolver: false # uses prebuilt optional binaries
+
+overrides:
+  '@sanity/client': ^8.9.0
+  '@codemirror/state': 6.7.6
+  '@codemirror/view': 6.43.13
+  '@codemirror/language': 6.12.4
+  fsevents: 2.3.3
+  minimatch@^3.0.4: 3.1.5
+  minimatch@^3.0.5: 3.1.5
+  minimatch@^3.1.2: 3.1.5
+  '@types/react': 19.3.0
+  '@types/react-dom': 19.3.0
+  typescript-eslint: ^8.71.0
