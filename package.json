@@ -21,6 +21,7 @@
     "migrate": "payload migrate",
     "create-admin": "payload run scripts/create-admin.ts",
     "migrate:create": "payload migrate:create",
+    "migrate:sanity": "payload run scripts/migrate-from-sanity.ts",
     "migrate:if-configured": "if [ -n \"$DATABASE_URL\" ]; then payload migrate; else echo 'DATABASE_URL not set, skipping payload migrate'; fi",
     "ngrok-start": "ngrok http 3000",
     "start": "bun --bun next start",

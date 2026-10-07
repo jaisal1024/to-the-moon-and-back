@@ -153,6 +153,7 @@ export interface User {
  */
 export interface Media {
   id: number;
+  sanityId?: string | null;
   alt: string;
   prefix?: string | null;
   _objectKey?: string | null;
@@ -208,6 +209,7 @@ export interface Media {
  */
 export interface Collection {
   id: number;
+  sanityId?: string | null;
   title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -234,6 +236,7 @@ export interface Collection {
  */
 export interface Post {
   id: number;
+  sanityId?: string | null;
   title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -370,6 +373,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  sanityId?: T;
   alt?: T;
   prefix?: T;
   _objectKey?: T;
@@ -434,6 +438,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "collections_select".
  */
 export interface CollectionsSelect<T extends boolean = true> {
+  sanityId?: T;
   title?: T;
   generateSlug?: T;
   slug?: T;
@@ -456,6 +461,7 @@ export interface CollectionsSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  sanityId?: T;
   title?: T;
   generateSlug?: T;
   slug?: T;

@@ -8,6 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical';
 import { type CollectionConfig, slugField } from 'payload';
 
+import { sanityIdField } from '../fields/sanityId';
 import type { Post } from '../payload-types';
 import { revalidateAfterChange, revalidateAfterDelete } from './hooks/revalidate';
 
@@ -48,6 +49,7 @@ export const Posts: CollectionConfig = {
     drafts: true,
   },
   fields: [
+    sanityIdField,
     {
       name: 'title',
       type: 'text',
