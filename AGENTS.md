@@ -37,7 +37,7 @@ Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router,
 ## Environment
 
 - Copy `.env.example` to `.env` and fill in the Sanity values. `.env` is gitignored.
-- Payload needs `DATABASE_URL` and `PAYLOAD_SECRET`; `.env.example` has working local values.
+- Payload needs `DATABASE_URL` and `PAYLOAD_SECRET`; `.env.example` has working local values. Leave `BLOB_READ_WRITE_TOKEN` unset locally so uploads go to `./media` (gitignored); Vercel sets it for deployments.
 - Every env var is validated in [src/env.schema.ts](src/env.schema.ts). Adding a variable means adding it there, in `.env.example`, in `.github/workflows/ci.yml`, and in Vercel.
 - `src/gql/` is generated output, never edit it. Regenerate with `bun run generate` after schema or query changes.
 - Git worktrees have no `.env` and no `src/gql`. The hooks handle that for lint, type-check, and tests. To run the dev server in a worktree, symlink the main checkout's env file: `ln -s "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env`.

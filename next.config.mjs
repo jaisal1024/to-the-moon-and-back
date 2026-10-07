@@ -13,6 +13,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'cdn.sanity.io',
       },
+      {
+        // Payload media stored in Vercel Blob.
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
     ],
   },
   transpilePackages: ['sanity', 'next-sanity', '@sanity/client', 'get-it', 'styled-components'],

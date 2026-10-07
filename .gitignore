@@ -62,3 +62,5 @@ src/gql/**
 test-results/**
 playwright-report/**
 .playwright-cli/**
+# Payload local uploads (dev only; production uses Vercel Blob)
+/media
