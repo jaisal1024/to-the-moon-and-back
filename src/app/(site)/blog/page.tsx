@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material';
-import client from 'apollo-client';
 import { Metadata } from 'next';
+import { listPosts } from 'src/cms/posts';
 import Layout from 'src/components/Layout';
 import Link from 'src/components/Link';
-import { GET_BLOG_POSTS, type GetBlogPostsData } from 'src/queries/GetBlogPosts';
+import { formatPublishDate } from 'src/utils/formatPublishDate';
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - Blog',
@@ -12,25 +12,8 @@ export const metadata: Metadata = {
 
 export const revalidate = 600;
 
-function formatPublishDate(publishedAt: string) {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(publishedAt));
-}
-
 export default async function BlogPage() {
-  const { data } = await client
-    .query<GetBlogPostsData>({
-      query: GET_BLOG_POSTS,
-    })
-    .catch((err) => {
-      console.error('Blog page data fetch failed', err);
-      throw err;
-    });
-
-  const posts = data.allBlogPost;
+  const posts = await listPosts();
 
   return (
     <Layout>
@@ -39,21 +22,21 @@ export default async function BlogPage() {
           <Typography variant="h1">Blog</Typography>
         </div>
         {posts.length === 0 ? (
-          <Typography variant="body1">No blog posts yet. Add one in Sanity Studio to populate this page.</Typography>
+          <Typography variant="body1">No blog posts yet. Add one in the admin to populate this page.</Typography>
         ) : (
           <div className="flex flex-col gap-6">
             {posts.map((post) => (
-              <article key={post._id} className="rounded-2xl border border-borderSubtle bg-surface p-6 shadow-xs">
+              <article key={post.id} className="rounded-2xl border border-borderSubtle bg-surface p-6 shadow-xs">
                 <div className="mb-3">
-                  <Link href={`/blog/${post.slug.current}`} noLinkStyle className="inline-block">
+                  <Link href={`/blog/${post.slug}`} noLinkStyle className="inline-block">
                     <Typography variant="h3">{post.title}</Typography>
                   </Link>
                   <Typography variant="body2" className="mt-1 uppercase">
-                    {post?.publishedAt ? formatPublishDate(post.publishedAt) : 'Unpublished'}
+                    {formatPublishDate(post.publishedAt)}
                   </Typography>
                 </div>
                 <Link
-                  href={`/blog/${post.slug.current}`}
+                  href={`/blog/${post.slug}`}
                   noLinkStyle
                   className="mt-4 inline-block underline underline-offset-4"
                 >

@@ -3,6 +3,7 @@
  *
  *   bun run seed               # no-op when content already exists
  *
+ * Seeds collections and posts independently, each only when that collection is empty.
  * Images are generated placeholders, so no network or Sanity access is needed.
  * For real content locally, use `bun run migrate:sanity` instead.
  */
@@ -13,6 +14,8 @@ import path from 'node:path';
 import config from '@payload-config';
 import { getPayload, type Payload } from 'payload';
 import sharp from 'sharp';
+
+import { type PortableTextNode, portableTextToLexical } from './lib/portableTextToLexical';
 
 // Payload uses this object as req.context and stashes upload state on it, so every
 // call needs a fresh one; a shared object makes later uploads silently skip storage.
@@ -82,18 +85,65 @@ async function seedCollections(payload: Payload, dir: string) {
   }
 }
 
+const span = (text: string, marks: string[] = []) => ({ _type: 'span' as const, text, marks });
+
+// Exercises every node the blog renderer handles: headings, links, inline code, lists, code blocks.
+const SEED_POST_BODY: PortableTextNode[] = [
+  { _type: 'block', style: 'normal', markDefs: [], children: [span('A sample post seeded for local development.')] },
+  { _type: 'block', style: 'h2', markDefs: [], children: [span('Seed heading')] },
+  {
+    _type: 'block',
+    style: 'normal',
+    markDefs: [{ _key: 'docs', _type: 'link', href: 'https://payloadcms.com/docs' }],
+    children: [span('Read the '), span('Payload docs', ['docs']), span(' and run '), span('bun run seed', ['code'])],
+  },
+  {
+    _type: 'block',
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    markDefs: [],
+    children: [span('First point', ['strong'])],
+  },
+  { _type: 'block', style: 'normal', listItem: 'bullet', level: 1, markDefs: [], children: [span('Second point')] },
+  { _type: 'codeBlock', _key: 'seedcode', language: 'typescript', code: 'export const seeded = true;' },
+];
+
+async function seedPosts(payload: Payload) {
+  await payload.create({
+    collection: 'posts',
+    data: {
+      title: 'Seed Post',
+      slug: 'seed-post',
+      publishedAt: '2025-01-15T12:00:00.000Z',
+      body: portableTextToLexical(SEED_POST_BODY),
+      _status: 'published',
+    },
+    context: context(),
+  });
+  console.log('Seeded post "Seed Post"');
+}
+
 async function main() {
   const payload = await getPayload({ config });
-  const { totalDocs } = await payload.count({ collection: 'collections' });
-  if (totalDocs > 0) {
-    console.log(`Database already has ${totalDocs} collections; skipping seed.`);
-    return;
+
+  const collections = await payload.count({ collection: 'collections' });
+  if (collections.totalDocs > 0) {
+    console.log(`Database already has ${collections.totalDocs} collections; skipping collections.`);
+  } else {
+    const dir = await mkdtemp(path.join(tmpdir(), 'payload-seed-'));
+    try {
+      await seedCollections(payload, dir);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   }
-  const dir = await mkdtemp(path.join(tmpdir(), 'payload-seed-'));
-  try {
-    await seedCollections(payload, dir);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
+
+  const posts = await payload.count({ collection: 'posts' });
+  if (posts.totalDocs > 0) {
+    console.log(`Database already has ${posts.totalDocs} posts; skipping posts.`);
+  } else {
+    await seedPosts(payload);
   }
 }
 

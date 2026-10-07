@@ -49,7 +49,6 @@
     "@payloadcms/next": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
     "@payloadcms/storage-vercel-blob": "3.90.2",
-    "@portabletext/react": "^8.0.1",
     "@sanity/client": "^8.9.0",
     "@sanity/code-input": "^7.3.9",
     "@sanity/preview-url-secret": "^4.1.5",
