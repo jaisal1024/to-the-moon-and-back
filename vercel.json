@@ -10,7 +10,6 @@
   "cleanUrls": true,
   "framework": "nextjs",
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "bunVersion": "1.4.x",
   "headers": [
     {
       "source": "/(.*)",

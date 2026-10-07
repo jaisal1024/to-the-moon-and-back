@@ -15,5 +15,5 @@
     "src/utils/helpers.ts",
     "src/utils/types.ts",
   ],
-  "ignoreDependencies": ["@sanity/preview-url-secret", "zod", "suspend-react", "typescript-compiler"],
+  "ignoreDependencies": ["@sanity/preview-url-secret", "@sanity/ui", "zod", "suspend-react"],
 }
