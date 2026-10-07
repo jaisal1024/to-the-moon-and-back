@@ -20,6 +20,9 @@ env:
   NEXT_PUBLIC_SANITY_API_VERSION: '2022-11-28'
   # Test Google Analytics ID
   NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: 'G-KL7CLHPFFB'
+  # Payload CMS runs against a throwaway postgres:18 service container per job; CI never touches Neon.
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/to_the_moon
+  PAYLOAD_SECRET: ci-only-payload-secret
 
 jobs:
   title:
@@ -42,6 +45,20 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: to_the_moon
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d to_the_moon"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -72,6 +89,20 @@ jobs:
   test-e2e:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: to_the_moon
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d to_the_moon"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -92,6 +123,8 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Generate GraphQL types
         run: bun run generate
+      - name: Run Payload migrations
+        run: bun run migrate
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(bunx playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
