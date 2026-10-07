@@ -1,7 +1,7 @@
 #!/bin/sh
 # Sourced by the husky hooks in .husky/. Makes the repo's pinned toolchain work
 # from any checkout, including git worktrees (for example .claude/worktrees/*),
-# where there is no node_modules, no .env, no generated src/gql, and the login
+# where there is no node_modules and no .env, and the login
 # shell's node/bun may not match .node-version / package.json "packageManager".
 #
 # Everything here is idempotent and fast when the checkout is already set up.
@@ -48,13 +48,4 @@ if [ ! -f .env ]; then
     . "$MAIN_CHECKOUT/.env"
     set +a
   fi
-fi
-
-# 5. Generated GraphQL types: type-check needs src/gql, which is gitignored.
-if [ ! -f src/gql/graphql.ts ]; then
-  if [ -z "$NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL" ]; then
-    echo "hook-env: src/gql is missing and NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL is unset; create .env from .env.example first." >&2
-    exit 1
-  fi
-  bun run generate >/dev/null
 fi
