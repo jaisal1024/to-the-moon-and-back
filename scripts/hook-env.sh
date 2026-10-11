@@ -37,13 +37,31 @@ pnpm install --frozen-lockfile >/dev/null
 
 # 4. Env: a worktree has no .env (it is gitignored). Load the main checkout's .env
 #    into this process only; nothing is written to disk.
+#    The file is read as dotenv data, not sourced: a value such as a Postgres URL
+#    with `?a=1&b=2`, or one containing spaces or `$`, is not valid shell.
+load_env_file() {
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line#export }"
+    case "$line" in
+      '' | '#'* | [!A-Za-z_]*) continue ;;
+      *=*) ;;
+      *) continue ;;
+    esac
+    key="${line%%=*}"
+    value="${line#*=}"
+    case "$key" in *[!A-Za-z0-9_]*) continue ;; esac
+    case "$value" in
+      \"*\") value="${value#\"}"; value="${value%\"}" ;;
+      \'*\') value="${value#\'}"; value="${value%\'}" ;;
+      *) value="${value%% #*}" ;; # unquoted: drop a trailing comment
+    esac
+    export "$key=$value"
+  done < "$1"
+}
 if [ ! -f .env ]; then
   MAIN_CHECKOUT="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")"
   if [ -f "$MAIN_CHECKOUT/.env" ]; then
-    set -a
-    # shellcheck disable=SC1091
-    . "$MAIN_CHECKOUT/.env"
-    set +a
+    load_env_file "$MAIN_CHECKOUT/.env"
   fi
 fi
 

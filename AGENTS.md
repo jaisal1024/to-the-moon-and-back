@@ -15,40 +15,47 @@ Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router,
 
 ## Commands
 
-| Command                     | What it does                                                                                  |
-| --------------------------- | --------------------------------------------------------------------------------------------- |
-| `pnpm run dev`               | Next dev server on http://localhost:3333 plus GraphQL codegen in watch mode                   |
-| `pnpm run dev-local`         | Starts the local Postgres container (`docker compose up -d --wait db`), then `pnpm run dev`    |
-| `pnpm run dev-local:down`    | Stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it |
-| `pnpm run generate`          | GraphQL codegen into `src/gql/` (gitignored). Needs `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`   |
-| `pnpm run build`             | `generate` then `next build`                                                                  |
-| `pnpm run check`             | `lint` + `type-check` + `test` + `knip`. Run before opening a PR                              |
-| `pnpm run lint` / `lint:fix` | ESLint 10 flat config (`eslint.config.js`); `lint:fix` also runs Prettier                     |
-| `pnpm run type-check`        | `tsc --noEmit`                                                                                |
-| `pnpm run test`              | Vitest unit tests (`*.test.tsx` under `src/`)                                                 |
-| `pnpm run test:e2e`          | Playwright against a dev server (`e2e/`)                                                      |
-| `pnpm run knip`              | Unused files, exports, and dependencies                                                       |
+| Command                     | What it does                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pnpm run dev`               | Next dev server on http://localhost:3333 plus GraphQL codegen in watch mode                                  |
+| `pnpm run dev-local`         | Starts the Postgres container, applies migrations, then runs `pnpm run dev`                                   |
+| `pnpm run dev-local:down`    | Stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it                |
+| `pnpm run payload:types`     | Regenerate `src/payload-types.ts` after changing a collection                                                |
+| `pnpm run payload:importmap` | Regenerate the admin import map after adding custom admin components                                         |
+| `pnpm run create-admin`      | Create or update an admin from `ADMIN_EMAIL`/`ADMIN_PASSWORD`. Deployed sites block public first-user signup |
+| `pnpm run migrate:create`    | Generate a SQL migration in `src/migrations/` from collection changes. Commit it                             |
+| `pnpm run migrate`           | Apply pending migrations to `DATABASE_URL`. `build` runs this when `DATABASE_URL` is set                     |
+| `pnpm run generate`          | GraphQL codegen into `src/gql/` (gitignored). Needs `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`                  |
+| `pnpm run build`             | `generate` then `next build`                                                                                 |
+| `pnpm run check`             | `lint` + `type-check` + `test` + `knip`. Run before opening a PR                                             |
+| `pnpm run lint` / `lint:fix` | ESLint 10 flat config (`eslint.config.cjs`); `lint:fix` also runs Prettier                                   |
+| `pnpm run type-check`        | `tsc --noEmit`                                                                                               |
+| `pnpm run test`              | Vitest unit tests (`*.test.tsx` under `src/`)                                                                |
+| `pnpm run test:e2e`          | Playwright against a dev server (`e2e/`)                                                                     |
+| `pnpm run knip`              | Unused files, exports, and dependencies                                                                      |
 
 ## Environment
 
 - Copy `.env.example` to `.env` and fill in the Sanity values. `.env` is gitignored.
+- Payload needs `DATABASE_URL` and `PAYLOAD_SECRET`; `.env.example` has working local values.
 - Every env var is validated in [src/env.schema.ts](src/env.schema.ts). Adding a variable means adding it there, in `.env.example`, in `.github/workflows/ci.yml`, and in Vercel.
 - `src/gql/` is generated output, never edit it. Regenerate with `pnpm run generate` after schema or query changes.
 - Git worktrees have no `.env` and no `src/gql`. The hooks handle that for lint, type-check, and tests. To run the dev server in a worktree, symlink the main checkout's env file: `ln -s "$(git rev-parse --path-format=absolute --git-common-dir)/../.env" .env`.
 
 ## Containers
 
-[docker-compose.yml](docker-compose.yml) defines one service, `db`, running `postgres:18`. Neon supports Postgres 14 through 18, so 18 is the newest version that matches production. Credentials and database name are fixed for development:
+[docker-compose.yml](docker-compose.yml) defines one service, `db`, running `postgres:18`. Neon supports Postgres 14 through 18, so 18 is the newest version that matches production. Credentials and database name are fixed for development. The host port defaults to 54320 to avoid colliding with other local Postgres containers; override it with `POSTGRES_PORT` and adjust `DATABASE_URL` to match:
 
 ```
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/to_the_moon
+DATABASE_URL=postgres://postgres:postgres@localhost:54320/to_the_moon
 ```
 
 Docker is available both on local machines and in Claude Code cloud sessions, so the setup is the same everywhere an agent runs:
 
 1. `pnpm run dev-local` starts the container, waits for its health check, then starts the dev server. The Next app runs on the host, not in a container.
 2. Point `DATABASE_URL` at the container using the value above. Never point a development or agent session at a Neon branch; Neon is only for Vercel deployments, where the Neon integration injects `DATABASE_URL`.
-3. `pnpm run dev-local:down` stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it.
+3. The admin UI is at http://localhost:3333/admin. `dev-local` applies pending migrations before starting Next; create the first user in the browser.
+4. `pnpm run dev-local:down` stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it.
 
 Sanity-backed pages do not need the database until the Payload migration lands.
 
