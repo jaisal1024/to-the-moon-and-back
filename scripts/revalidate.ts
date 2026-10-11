@@ -13,26 +13,21 @@ if (!slug) {
   process.exit(1);
 }
 
-const baseUrlToRevalidate = [
-  'https://www.jaisalfriedman.com',
-  'https://jaisal.xyz',
-];
+const baseUrlToRevalidate = ['https://www.jaisalfriedman.com', 'https://jaisal.xyz'];
 
 async function revalidateRoute(url: string, route: string) {
   const resp = await fetch(`${url}/api/revalidateRoute`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      secret: process.env.SANITY_WEBHOOK_SECRET ?? '',
-      route: route,
+      'secret': process.env.REVALIDATE_SECRET ?? '',
+      'route': route,
     },
   });
   if (resp.status === 200) {
     console.log(`Revalidation successful for ${route}`);
   } else {
-    console.error(
-      `Revalidation failed for ${route} on ${url} with status ${resp.status}`,
-    );
+    console.error(`Revalidation failed for ${route} on ${url} with status ${resp.status}`);
     throw new Error(await resp.text());
   }
 }

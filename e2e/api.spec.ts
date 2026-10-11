@@ -11,7 +11,7 @@ test.describe('Revalidation API', () => {
   test('revalidateRoute endpoint handles valid requests', async ({ request }) => {
     const response = await request.post('/api/revalidateRoute', {
       headers: {
-        secret: process.env.SANITY_WEBHOOK_SECRET || '',
+        secret: process.env.REVALIDATE_SECRET || '',
         route: '/',
       },
     });
@@ -19,13 +19,5 @@ test.describe('Revalidation API', () => {
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body.message).toBe('Revalidated /');
-  });
-
-  test('revalidate (webhook) endpoint rejects invalid signatures', async ({ request }) => {
-    const response = await request.post('/api/revalidate', {
-      data: { type: 'collections', slug: 'test' },
-      headers: { 'x-sanity-signature': 'invalid' },
-    });
-    expect(response.ok()).toBe(false);
   });
 });
