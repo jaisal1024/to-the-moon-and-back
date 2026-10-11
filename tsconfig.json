@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
+    "target": "ES2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,7 +22,8 @@
     "paths": {
       "src/*": ["./src/*"],
       "apollo-client": ["./apollo-client.ts"],
-      "sanity.config": ["./sanity.config.ts"]
+      "sanity.config": ["./sanity.config.ts"],
+      "@payload-config": ["./src/payload.config.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
