@@ -44,7 +44,6 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.4.0",
     "@mui/material": "^9.4.0",
-    "@portabletext/react": "^8.0.1",
     "@sanity/client": "^8.9.0",
     "@sanity/code-input": "^7.3.9",
     "@sanity/preview-url-secret": "^4.1.5",
