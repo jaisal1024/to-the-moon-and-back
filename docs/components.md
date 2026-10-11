@@ -1,6 +1,6 @@
 # Component Reference
 
-Every public page shares one design system in `src/components/site/`. Each page's own presentation lives next to its route in `src/app/`, styled with a CSS module.
+Every public page shares one design system in `src/components/site/`. Each page's own presentation lives next to its route in `src/app/(site)/`, styled with a CSS module.
 
 ---
 
@@ -44,18 +44,18 @@ Site map, contact links and the copyright line, in a black section at the end of
 
 ## Pages
 
-Each route's `page.tsx` is a server component: it fetches from the CMS, maps the result to plain props, and renders a client component that knows nothing about Sanity. That keeps the CMS swappable.
+Each route's `page.tsx` is a server component: it fetches from the CMS, maps the result to plain props, and renders a client component that knows nothing about the CMS (Payload, read through `src/cms/`). That keeps the CMS swappable.
 
-| Route               | Page component                            | Notes                                                                                                                          |
-| ------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `/`                 | `src/app/Home.tsx`                        | Rotating hero, covers beside a pinned numbered index whose active row follows the scroll                                       |
-| `/collections/[id]` | `src/app/collections/[id]/Collection.tsx` | Photos grouped into rows by orientation (`rows.ts`, unit tested), description revealed word by word, next collection row       |
-| `/blog`             | `src/app/blog/BlogIndex.tsx`              | Numbered post rows                                                                                                             |
-| `/blog/[slug]`      | `src/app/blog/[slug]/Post.tsx`            | Reading column, margin section numbers, code plates, reading progress thread. `richText.ts` maps Portable Text to plain blocks |
-| `/about`            | `src/app/about/About.tsx`                 | Rotating roles, word-reveal statements, scroll-drawn thread, the slot machine (below), collections index                       |
-| 404                 | `src/app/not-found.tsx`                   | No CMS dependency                                                                                                              |
+| Route               | Page component                                   | Notes                                                                                                                                   |
+| ------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                 | `src/app/(site)/Home.tsx`                        | Rotating hero, covers beside a pinned numbered index whose active row follows the scroll                                                |
+| `/collections/[id]` | `src/app/(site)/collections/[id]/Collection.tsx` | Photos grouped into rows by orientation (`rows.ts`, unit tested), description revealed word by word, next collection row                |
+| `/blog`             | `src/app/(site)/blog/BlogIndex.tsx`              | Numbered post rows                                                                                                                      |
+| `/blog/[slug]`      | `src/app/(site)/blog/[slug]/Post.tsx`            | Reading column, margin section numbers, code plates, reading progress thread. `richText.ts` maps Payload's Lexical body to plain blocks |
+| `/about`            | `src/app/(site)/about/About.tsx`                 | Rotating roles, word-reveal statements, scroll-drawn thread, the slot machine (below), collections index                                |
+| 404                 | `src/app/(site)/not-found.tsx`                   | No CMS dependency                                                                                                                       |
 
-### Slot machine — `src/app/about/slots/`
+### Slot machine — `src/app/(site)/about/slots/`
 
 The about page's night chapter opens with a pinned, playable slot machine. Scrolling it into place plays the first pull; a visitor's very first pull is a free, guaranteed jackpot (once per visitor, remembered in the save).
 
@@ -70,16 +70,16 @@ The about page's night chapter opens with a pinned, playable slot machine. Scrol
 
 **The show** (`SlotMachine.tsx` composes these):
 
-| File                                                                                                    | What it does                                                                                                                                                  |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `useSlotGame.ts`                                                                                        | Holds the engine state, saves it, adopts a newer save from another tab. `revealed` is the state the screen has caught up to; everything shown derives from it |
-| `useShow.ts` + `choreography.ts`                                                                        | `play()` takes one pull from the engine, then reveals it beat by beat. The choreography is a table of plain async scripts keyed by outcome kind               |
-| `useFrameLoop.ts`                                                                                       | The single `requestAnimationFrame` loop. Everything that moves registers a step with it                                                                       |
-| `useReels.ts`, `useParticles.ts`, `useShip.ts`, `useCountUp.ts`                                         | The imperative animation: reel transforms, the coin canvas, the rocket's flight, the ticking credit counter                                                   |
-| `useLever.ts`, `useShootingStar.ts`, `useScrollEntrance.ts`, `useSound.ts`, `useSky.ts`, `useTimers.ts` | Lever drag and its wandering target, star scheduling, scroll-driven entrance and first pull, Web Audio blips (off by default), the star field, unmount-safe timers                     |
-| `motion.ts`                                                                                             | `isCalm()` (reduced motion or no `matchMedia`) and one-shot moves replayed with the Web Animations API                                                        |
-| `Reels`, `Lever`, `Sign`, `Hud`, `Orb`, `StatsBar`, `ShootingStar`, `Pixel`                             | Presentational components                                                                                                                                     |
-| `slots.module.css`                                                                                      | Styles. The reels are cream in both themes, so the inks printed on them are fixed locally                                                                     |
+| File                                                                                                    | What it does                                                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `useSlotGame.ts`                                                                                        | Holds the engine state, saves it, adopts a newer save from another tab. `revealed` is the state the screen has caught up to; everything shown derives from it      |
+| `useShow.ts` + `choreography.ts`                                                                        | `play()` takes one pull from the engine, then reveals it beat by beat. The choreography is a table of plain async scripts keyed by outcome kind                    |
+| `useFrameLoop.ts`                                                                                       | The single `requestAnimationFrame` loop. Everything that moves registers a step with it                                                                            |
+| `useReels.ts`, `useParticles.ts`, `useShip.ts`, `useCountUp.ts`                                         | The imperative animation: reel transforms, the coin canvas, the rocket's flight, the ticking credit counter                                                        |
+| `useLever.ts`, `useShootingStar.ts`, `useScrollEntrance.ts`, `useSound.ts`, `useSky.ts`, `useTimers.ts` | Lever drag and its wandering target, star scheduling, scroll-driven entrance and first pull, Web Audio blips (off by default), the star field, unmount-safe timers |
+| `motion.ts`                                                                                             | `isCalm()` (reduced motion or no `matchMedia`) and one-shot moves replayed with the Web Animations API                                                             |
+| `Reels`, `Lever`, `Sign`, `Hud`, `Orb`, `StatsBar`, `ShootingStar`, `Pixel`                             | Presentational components                                                                                                                                          |
+| `slots.module.css`                                                                                      | Styles. The reels are cream in both themes, so the inks printed on them are fixed locally                                                                          |
 
 The engine decides and saves each pull before anything animates, so the symbols on the payline are the result and the credits always reconcile (`after = before + loan - cost + payout`). The lever is a plunger: taking hold of the knob sets a target wandering along the lever (random direction, speed and turns, so no two drags are alike). Letting go with the knob on it is a perfect pull, which stops the first two reels on a pair; letting go off it is a fumble, which costs double and pays nothing. A plain tap never aims, so it is an ordinary pull. From the keyboard, holding Space pumps the lever past a target that stays put. The lever has `touch-action: none`, so on a phone the drag is never taken for a scroll. Space/Enter only pull while focus is on the lever or the reels. Under reduced motion the reels snap to their result and nothing shakes, rains or flies.
 
