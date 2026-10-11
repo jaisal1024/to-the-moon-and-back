@@ -1,7 +1,5 @@
 'use client';
 
-import { gql } from '@apollo/client';
-import { useLazyQuery } from '@apollo/client/react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -23,11 +21,10 @@ import {
 import { clsx } from 'clsx';
 import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
+import type { NavCollection } from 'src/cms/collections';
 import useCollectionSlug from 'src/hooks/useCollectionSlug';
-import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 import Link from './Link';
-import LoadingSpinner from './LoadingSpinner';
 
 /*
 if the href is equal to the router pathname then underline the text
@@ -47,69 +44,33 @@ function CollectionListItem({ title, href }: { href: string; title: string }) {
   );
 }
 
-function CollectionList({ collectionData }: { collectionData: unknown }) {
+function CollectionList({ collections }: { collections: NavCollection[] }) {
   return (
     <List>
       <CollectionListItem title="Home" href="/" />
-      {(collectionData as any)?.allCollections?.map(
-        (collection: any, i: number) =>
-          collection && (
-            <CollectionListItem
-              key={collection._id ?? i}
-              title={collection.title || 'Untitled'}
-              href={`/collections/${collection.slug?.current || ''}`}
-            />
-          ),
-      )}
+      {collections.map((collection) => (
+        <CollectionListItem
+          key={collection.id}
+          title={collection.title || 'Untitled'}
+          href={`/collections/${collection.slug}`}
+        />
+      ))}
     </List>
   );
 }
 
-function NavBarComponent() {
+/** `collections` comes from the server-rendered Layout, so the menu opens instantly. */
+function NavBarComponent({ collections }: { collections: NavCollection[] }) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [showCollections, setShowCollections] = useState(false);
   const [collectionAnchorEl, setCollectionAnchorEl] = useState<HTMLElement | null>(null);
-  const [
-    getNavBarCollections,
-    { data: collectionData, error: fetchError, loading },
-  ] = useLazyQuery(
-    gql`
-      query GetNavBarCollections(
-        $sort: [CollectionsSorting!]
-        $limit: Int = 20
-      ) {
-        allCollections(sort: $sort, limit: $limit) {
-          _id
-          title
-          slug {
-            current
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        sort: GET_COLLECTIONS_SORT,
-      },
-    } as any,
-  );
   const collectionSlug = useCollectionSlug();
   const pathname = usePathname();
 
   return (
-    <AppBar
-      position="static"
-      color="transparent"
-      elevation={0}
-      sx={{ paddingTop: 1 }}
-    >
+    <AppBar position="static" color="transparent" elevation={0} sx={{ paddingTop: 1 }}>
       <Toolbar variant="dense">
-        <Link
-          href="/"
-          noLinkStyle
-          className="cursor-pointer"
-          data-testid="navbar-home-link"
-        >
+        <Link href="/" noLinkStyle className="cursor-pointer" data-testid="navbar-home-link">
           <Typography variant={pathname === '/' ? 'h1' : 'h2'} color="inherit">
             Jaisal Friedman
           </Typography>
@@ -117,14 +78,10 @@ function NavBarComponent() {
         <Box sx={{ flexGrow: 1 }} />
         <div
           className={clsx(
-            (collectionSlug || pathname === '/') &&
-              'underline underline-offset-8',
+            (collectionSlug || pathname === '/') && 'underline underline-offset-8',
             'hidden cursor-pointer p-1 sm:block',
           )}
-          onClick={() => {
-            setShowCollections(true);
-            getNavBarCollections();
-          }}
+          onClick={() => setShowCollections(true)}
           ref={(node) => setCollectionAnchorEl(node)}
           data-testid="navbar-collections-button"
         >
@@ -136,10 +93,7 @@ function NavBarComponent() {
           </div>
         </div>
         <div
-          className={clsx(
-            pathname === '/blog' && 'underline underline-offset-8',
-            'hidden cursor-pointer p-1 sm:block',
-          )}
+          className={clsx(pathname === '/blog' && 'underline underline-offset-8', 'hidden cursor-pointer p-1 sm:block')}
         >
           <Link href="/blog" noLinkStyle data-testid="navbar-blog-link">
             <Typography variant="h4" color="inherit">
@@ -170,34 +124,19 @@ function NavBarComponent() {
           }}
         >
           <Paper sx={{ minWidth: 150, minHeight: 45 }}>
-            {loading && <LoadingSpinner />}
-            {fetchError && (
-              <Typography variant="body2" className="py-2 text-dangerRed">
-                Failed to fetch collections
-              </Typography>
-            )}
-            {collectionData && (
-              <CollectionList collectionData={collectionData} />
-            )}
+            <CollectionList collections={collections} />
           </Paper>
         </Popover>
         <IconButton
           color="inherit"
           aria-label="menu"
           className="sm:hidden"
-          onClick={() => {
-            setMobileDrawerOpen(true);
-            getNavBarCollections();
-          }}
+          onClick={() => setMobileDrawerOpen(true)}
           data-testid="navbar-mobile-menu-button"
         >
           <MenuIcon />
         </IconButton>
-        <Dialog
-          open={mobileDrawerOpen}
-          onClose={() => setMobileDrawerOpen(false)}
-          fullScreen
-        >
+        <Dialog open={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} fullScreen>
           <DialogTitle sx={{ m: 0, p: 2 }}>
             <IconButton
               aria-label="close"
@@ -214,21 +153,10 @@ function NavBarComponent() {
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Typography
-              variant="h3"
-              data-testid="mobile-menu-collections-heading"
-            >
+            <Typography variant="h3" data-testid="mobile-menu-collections-heading">
               Collections
             </Typography>
-            {loading && <LoadingSpinner />}
-            {fetchError && (
-              <Typography variant="body2" className="py-2 text-dangerRed">
-                Failed to fetch collections
-              </Typography>
-            )}
-            {collectionData && (
-              <CollectionList collectionData={collectionData} />
-            )}
+            <CollectionList collections={collections} />
             <Typography variant="h3" data-testid="mobile-menu-blog-heading">
               Blog
             </Typography>

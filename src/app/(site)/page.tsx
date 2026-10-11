@@ -1,9 +1,7 @@
-import client from 'apollo-client';
 import { Metadata } from 'next';
+import { listCollections } from 'src/cms/collections';
 import ImageGrid from 'src/components/ImageGrid';
 import Layout from 'src/components/Layout';
-import { GET_COLLECTIONS } from 'src/queries/GetCollections';
-import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - Collections',
@@ -13,40 +11,21 @@ export const metadata: Metadata = {
 export const revalidate = 600; // 10-minutes in seconds
 
 export default async function IndexPage() {
-  const { data } = await client
-    .query({
-      query: GET_COLLECTIONS,
-      variables: {
-        offset: 0,
-        sort: GET_COLLECTIONS_SORT,
-      },
-    })
-    .catch((err) => {
-      console.error('getStaticProps failed for index.tsx', err);
-      throw err;
-    });
+  const collections = await listCollections();
 
-  const collections = data.allCollections;
-
-  const mapCollectionsToImageGrid = () => {
-    return collections.map((collection) => {
-      return {
+  // Each collection is represented on the homepage by its first photo.
+  const covers = collections.flatMap((collection) => {
+    const cover = collection.photos?.[0];
+    if (!cover) return [];
+    return [
+      {
+        key: collection.id,
         title: collection.title,
-        photo: collection.photos[0].photo,
-        button: {
-          title: collection.title,
-          href: `/collections/${collection.slug.current}`,
-        },
-      };
-    });
-  };
+        photo: cover.photo,
+        button: { title: collection.title, href: `/collections/${collection.slug}` },
+      },
+    ];
+  });
 
-  return (
-    <>
-      <Layout>
-        {collections.length > 0 && <ImageGrid collection={mapCollectionsToImageGrid()} />}
-        {collections.length < 1 && <h1>No collections to show.</h1>}
-      </Layout>
-    </>
-  );
+  return <Layout>{covers.length > 0 ? <ImageGrid collection={covers} /> : <h1>No collections to show.</h1>}</Layout>;
 }

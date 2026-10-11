@@ -6,6 +6,16 @@ type MaybeDraft = { _status?: 'draft' | 'published' | null };
 /** Maps a document to the site paths that render it. */
 type PathsFor<T> = (doc: T) => string[];
 
+/**
+ * `layout` also revalidates every page beneath each path; use it for content shown
+ * in a shared layout, such as the collections list in the nav on every page.
+ */
+type RevalidateOptions = {
+  type?: 'layout' | 'page';
+  /** Set false when a newly created document cannot appear on any page yet (media uploads). */
+  onCreate?: boolean;
+};
+
 /** Set `context: { skipRevalidate: true }` on Local API calls (bulk imports) to skip this. */
 const shouldSkip = (context: Record<string, unknown>) => context.skipRevalidate === true;
 
@@ -14,10 +24,10 @@ const shouldSkip = (context: Record<string, unknown>) => context.skipRevalidate 
 const isLive = (doc: MaybeDraft | undefined | null) =>
   doc != null && (doc as { id?: unknown }).id != null && doc._status !== 'draft';
 
-function revalidate(paths: Iterable<string>, req: PayloadRequest) {
+function revalidate(paths: Iterable<string>, req: PayloadRequest, { type }: RevalidateOptions) {
   for (const path of paths) {
     try {
-      revalidatePath(path);
+      revalidatePath(path, type);
       req.payload.logger.info(`Revalidated ${path}`);
     } catch (err) {
       // revalidatePath throws outside a Next.js request (CLI scripts, migrations).
@@ -32,23 +42,26 @@ function revalidate(paths: Iterable<string>, req: PayloadRequest) {
  */
 export function revalidateAfterChange<T extends MaybeDraft>(
   pathsFor: PathsFor<T>,
+  options: RevalidateOptions = {},
 ): CollectionAfterChangeHook<T & { id: number | string }> {
-  return ({ doc, previousDoc, context, req }) => {
+  return ({ doc, previousDoc, context, operation, req }) => {
     if (shouldSkip(context)) return doc;
+    if (operation === 'create' && options.onCreate === false) return doc;
     const paths = new Set<string>();
     if (isLive(doc)) pathsFor(doc).forEach((p) => paths.add(p));
     if (isLive(previousDoc)) pathsFor(previousDoc).forEach((p) => paths.add(p));
-    revalidate(paths, req);
+    revalidate(paths, req, options);
     return doc;
   };
 }
 
 export function revalidateAfterDelete<T extends MaybeDraft>(
   pathsFor: PathsFor<T>,
+  options: RevalidateOptions = {},
 ): CollectionAfterDeleteHook<T & { id: number | string }> {
   return ({ doc, context, req }) => {
     if (shouldSkip(context) || !isLive(doc)) return doc;
-    revalidate(pathsFor(doc), req);
+    revalidate(pathsFor(doc), req, options);
     return doc;
   };
 }

@@ -107,6 +107,8 @@ jobs:
         run: pnpm run generate
       - name: Run Payload migrations
         run: pnpm run migrate
+      - name: Seed sample content
+        run: pnpm run seed
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT

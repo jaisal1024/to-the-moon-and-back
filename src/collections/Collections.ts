@@ -6,8 +6,9 @@ import { revalidateAfterChange, revalidateAfterDelete } from './hooks/revalidate
 
 type CollectionDoc = Pick<Collection, 'slug' | '_status'>;
 
-// The homepage grid lists every collection; each also has its own page.
-const collectionPaths = ({ slug }: CollectionDoc) => ['/', ...(slug ? [`/collections/${slug}`] : [])];
+// Collections appear in the nav on every page, so revalidate the whole site layout.
+// That also covers the homepage grid and each collection's own page.
+const collectionPaths = () => ['/'];
 
 /** A photography series. Each array row in `photos` is one shot. */
 export const Collections: CollectionConfig = {
@@ -71,7 +72,7 @@ export const Collections: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateAfterChange<CollectionDoc>(collectionPaths)],
-    afterDelete: [revalidateAfterDelete<CollectionDoc>(collectionPaths)],
+    afterChange: [revalidateAfterChange<CollectionDoc>(collectionPaths, { type: 'layout' })],
+    afterDelete: [revalidateAfterDelete<CollectionDoc>(collectionPaths, { type: 'layout' })],
   },
 };
