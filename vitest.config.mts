@@ -12,8 +12,6 @@ export default defineConfig({
     globals: true,
     exclude: ['**/node_modules/**', '**/e2e/**', '**/.claude/**', '**/.next/**'],
     env: {
-      NEXT_PUBLIC_SANITY_DATASET: 'development',
-      NEXT_PUBLIC_SANITY_API_VERSION: '2022-11-28',
       NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: 'G-KL7CLHPFFB',
     },
   },
