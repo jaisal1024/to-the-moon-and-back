@@ -9,8 +9,9 @@ import * as path from 'path';
 // Set environment variables for E2E tests
 // Keep browser tests independent of analytics requests.
 process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = '';
-process.env.REVALIDATE_SECRET = 'super-not-secret-revalidate';
 dotenv.config({ path: path.resolve(import.meta.dirname, '.env') });
+// Fallback when there is no .env (CI). With .env, tests and a reused dev-local server share its value.
+process.env.REVALIDATE_SECRET ??= 'super-not-secret-revalidate';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
