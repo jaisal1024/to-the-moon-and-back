@@ -22,4 +22,7 @@
     "zod",
     "suspend-react",
   ],
+  "ignoreBinaries": [
+    "ngrok", // system install; the npm wrapper was removed (its postinstall binary download is blocked)
+  ],
 }
