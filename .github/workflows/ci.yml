@@ -103,8 +103,6 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Generate GraphQL types
-        run: pnpm run generate
       - name: Run Payload migrations
         run: pnpm run migrate
       - name: Seed sample content
