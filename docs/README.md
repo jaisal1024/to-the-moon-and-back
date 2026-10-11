@@ -4,17 +4,16 @@ This folder contains documentation for the **To the Moon and Back** project — 
 
 ## Contents
 
-| Document                                                                       | Description                                                                                                                    |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| [architecture.md](./architecture.md)                                           | Tech stack, high-level architecture, rendering strategy, styling system, **Agent-First Infra**, and **Environment Validation** |
-| [components.md](./components.md)                                               | Reference for UI components and **Metadata API** integration                                                                   |
-| [data-flow.md](./data-flow.md)                                                 | Sanity CMS schemas, GraphQL queries, SSG/ISR rendering lifecycle, revalidation flow, and Apollo Client setup                   |
-| [development.md](./development.md)                                             | Setup guide, dev server, GraphQL workflow, ISR testing, **CI/CD caching**, and code quality commands                           |
-| [architecture/payload-cms.md](./architecture/payload-cms.md)                   | **Target** architecture after the Sanity → Payload migration: route groups, content model, data access, revalidation, env      |
-| [plans/sanity-to-payload-migration.md](./plans/sanity-to-payload-migration.md) | Phased plan to replace Sanity with Payload CMS on Neon Postgres (Vercel Marketplace) + Vercel Blob                             |
+| Document                                                                       | Description                                                                                             |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| [architecture.md](./architecture.md)                                           | Stack, route groups, Payload content model, data access, revalidation, images, styling, and environment |
+| [components.md](./components.md)                                               | Reference for UI components and **Metadata API** integration                                            |
+| [data-flow.md](./data-flow.md)                                                 | Content model, `src/cms` data access, SSG/ISR lifecycle, on-demand revalidation, images, and local data |
+| [development.md](./development.md)                                             | Setup with Docker, content model changes, revalidation testing, git hooks, and code quality commands    |
+| [plans/sanity-to-payload-migration.md](./plans/sanity-to-payload-migration.md) | How the site moved from Sanity to Payload CMS, and the remaining cutover steps                          |
 
 ## Quick Links
 
 - [Live site (jaisal.xyz)](https://www.jaisal.xyz/)
-- [Sanity Studio](/studio) — content management (run locally or visit hosted)
+- [Payload admin](/admin) — content management (locally at http://localhost:3333/admin)
 - [Vercel dashboard](https://vercel.com) — deployment status and logs
