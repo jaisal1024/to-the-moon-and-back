@@ -7,11 +7,9 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Set environment variables for E2E tests
-process.env.NEXT_PUBLIC_SANITY_DATASET = 'development';
-process.env.NEXT_PUBLIC_SANITY_API_VERSION = '2022-11-28';
 // Keep browser tests independent of analytics requests.
 process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = '';
-process.env.SANITY_WEBHOOK_SECRET = 'super-not-secret-webhook';
+process.env.REVALIDATE_SECRET = 'super-not-secret-revalidate';
 dotenv.config({ path: path.resolve(import.meta.dirname, '.env') });
 
 /**
