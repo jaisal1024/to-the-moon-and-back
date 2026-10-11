@@ -20,6 +20,9 @@ env:
   NEXT_PUBLIC_SANITY_API_VERSION: '2022-11-28'
   # Test Google Analytics ID
   NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: 'G-KL7CLHPFFB'
+  # Payload CMS runs against a throwaway postgres:18 service container per job; CI never touches Neon.
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/to_the_moon
+  PAYLOAD_SECRET: ci-only-payload-secret
 
 jobs:
   title:
@@ -42,6 +45,20 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: to_the_moon
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d to_the_moon"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -68,6 +85,21 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001
+    # Inside a job container, service containers are reached by name, not localhost.
+    env:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/to_the_moon
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: to_the_moon
+        options: >-
+          --health-cmd "pg_isready -U postgres -d to_the_moon"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -77,6 +109,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Run Payload migrations
+        run: pnpm run migrate
       - name: Restore Next.js cache
         uses: actions/cache@v6
         with:
