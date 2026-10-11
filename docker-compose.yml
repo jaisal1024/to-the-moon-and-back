@@ -21,5 +21,32 @@ services:
       timeout: 3s
       retries: 10
 
+  # Vercel Blob emulator (https://github.com/payloadcms/vercel-blob-emulator, MIT).
+  # Speaks the @vercel/blob API, including browser client uploads, so the app runs
+  # the same storage code path locally as on Vercel. Development only: no auth.
+  # The image publishes no version tags, so it is pinned by digest.
+  blob:
+    image: ghcr.io/payloadcms/vercel-blob-emulator@sha256:de008a4957723b7fd8b93c00fa7abec4d257b838927614bacf4a4c02b9f58b1d
+    container_name: to-the-moon-blob
+    restart: unless-stopped
+    environment:
+      # Blob URLs the emulator returns; must match STORAGE_VERCEL_BLOB_BASE_URL in .env.
+      EMULATOR_BASE_URL: 'http://localhost:${BLOB_EMULATOR_PORT:-3100}'
+      # Must match the app's BLOB_READ_WRITE_TOKEN (store id "emulator").
+      BLOB_READ_WRITE_TOKEN: vercel_blob_rw_emulator_localdevonly
+    ports:
+      # Bound to localhost only: the emulator has no authentication.
+      - '127.0.0.1:${BLOB_EMULATOR_PORT:-3100}:3000'
+    volumes:
+      - blob-data:/data
+    healthcheck:
+      # No health route; any HTTP response (even 404) means the server is up.
+      # wget exits 4 only on network failure.
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3000/ >/dev/null 2>&1; test $$? -ne 4']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   db-data:
+  blob-data:
