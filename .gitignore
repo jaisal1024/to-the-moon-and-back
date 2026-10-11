@@ -63,3 +63,5 @@ test-results/**
 playwright-report/**
 .playwright-cli/**
 .env.local
+# Payload local uploads (dev only; production uses Vercel Blob)
+/media
