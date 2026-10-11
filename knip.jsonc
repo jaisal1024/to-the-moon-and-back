@@ -15,5 +15,11 @@
     "src/utils/helpers.ts",
     "src/utils/types.ts",
   ],
-  "ignoreDependencies": ["@sanity/preview-url-secret", "zod", "suspend-react", "typescript-compiler"],
+  "ignoreDependencies": [
+    "@graphql-typed-document-node/core", // imported only by generated, gitignored src/gql
+    "@sanity/preview-url-secret",
+    "@sanity/ui",
+    "zod",
+    "suspend-react",
+  ],
 }
