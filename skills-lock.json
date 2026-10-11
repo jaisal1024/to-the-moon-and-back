@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "address-feedback": {
+      "source": "jaisal1024/skills",
+      "sourceType": "github",
+      "skillPath": "skills/address-feedback/SKILL.md",
+      "computedHash": "de775f22a338b5db189d7ea230c4d0a09fa749eee06cdfb5b2a4e74a4dae30b9"
+    },
+    "exploratory-qa": {
+      "source": "jaisal1024/skills",
+      "sourceType": "github",
+      "skillPath": "skills/exploratory-qa/SKILL.md",
+      "computedHash": "c15dd1a9beca424fc615f4a240f5817b6631256d8a9c2d7a182d3692c82ae691"
+    }
+  }
+}
