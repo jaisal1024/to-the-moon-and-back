@@ -1,0 +1,4 @@
+interface:
+  display_name: "Address Feedback"
+  short_description: "Investigate and fix actionable review feedback"
+  default_prompt: "Use $address-feedback to address actionable review feedback on this branch."

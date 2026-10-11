@@ -1,0 +1,4 @@
+interface:
+  display_name: "Exploratory QA"
+  short_description: "Explore app flows and capture reviewed QA evidence"
+  default_prompt: "Use $exploratory-qa to verify the affected app flows and report evidence, defects, and coverage."
