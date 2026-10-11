@@ -1,11 +1,9 @@
-import client from 'apollo-client';
 import { Metadata } from 'next';
-import type { Image as SanityImage } from 'sanity';
+import { listCollections } from 'src/cms/collections';
+import { mediaSource } from 'src/cms/media';
 import SitePage from 'src/components/site/SitePage';
 import { logHomePageCollectionsLoaded, logHomePageCollectionsLoadFailed } from 'src/lib/posthog-logs';
-import { GET_COLLECTIONS } from 'src/queries/GetCollections';
-import { urlForImage } from 'src/sanity/lib/image';
-import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
+import type { Collection } from 'src/payload-types';
 
 import Home, { HomeCollection, HomePhoto } from './Home';
 
@@ -16,26 +14,21 @@ export const metadata: Metadata = {
 
 export const revalidate = 600; // 10-minutes in seconds
 
-type CmsPhoto = {
-  title?: string | null;
-  photo?: {
-    asset?: { metadata?: { dimensions?: { width?: number | null; height?: number | null } | null } | null } | null;
-  } | null;
-} | null;
+type Shot = NonNullable<Collection['photos']>[number];
 
-function toPhoto(entry: CmsPhoto, width: number): HomePhoto | undefined {
-  const url = entry?.photo
-    ? urlForImage(entry.photo as SanityImage)
-        ?.width(width)
-        .url()
-    : undefined;
-  if (!url) return undefined;
-  const dims = entry?.photo?.asset?.metadata?.dimensions;
-  const ratio = dims?.width && dims?.height ? dims.width / dims.height : 1.5;
-  return { src: url, alt: entry?.title ?? '', ratio };
+function toPhoto(shot: Shot | undefined): HomePhoto | undefined {
+  const source = mediaSource(shot?.photo, 'xl');
+  if (!source) return undefined;
+  const ratio = source.width && source.height ? source.width / source.height : 1.5;
+  return { src: source.src, alt: shot?.title?.trim() || source.alt, ratio };
 }
 
-// "2024-02-08" -> "February 2024" (dates are calendar days, so read them in UTC)
+const isLandscape = (shot: Shot) => {
+  const source = mediaSource(shot.photo);
+  return !!source?.width && !!source.height && source.width > source.height;
+};
+
+// "2024-02-08T00:00:00.000Z" -> "February 2024" (dates are calendar days, so read them in UTC)
 function monthYear(date?: string | null) {
   if (!date) return undefined;
   const d = new Date(`${date.slice(0, 10)}T00:00:00Z`);
@@ -46,34 +39,22 @@ function monthYear(date?: string | null) {
 // A CMS failure leaves the page without its list rather than failing it.
 async function getCollections(): Promise<HomeCollection[]> {
   try {
-    const { data } = await client.query({
-      query: GET_COLLECTIONS,
-      variables: { offset: 0, sort: GET_COLLECTIONS_SORT, limit: 20 },
-    });
-    const collections = (data?.allCollections ?? []).flatMap((collection) => {
-      const slug = collection.slug?.current;
-      if (!collection.title || !slug) return [];
-      const photos = (collection.photos ?? []).filter((p) => p?.photo);
+    const collections = (await listCollections()).map((collection) => {
+      const photos = (collection.photos ?? []).filter((shot) => mediaSource(shot.photo));
       // Cover: the collection's first photo. Hero: its first other landscape photo, so the hero
       // never repeats the cover shown in the list below; failing that, its second photo.
       const rest = photos.slice(1);
-      const isLandscape = (p: CmsPhoto) => {
-        const d = p?.photo?.asset?.metadata?.dimensions;
-        return !!d?.width && !!d?.height && d.width > d.height;
+      const heroShot = rest.find(isLandscape) ?? rest[0] ?? photos[0];
+      return {
+        title: collection.title,
+        href: `/collections/${collection.slug}`,
+        location: collection.location ?? undefined,
+        date: monthYear(collection.date),
+        description: collection.description?.trim() || undefined,
+        count: photos.length,
+        cover: toPhoto(photos[0]),
+        hero: toPhoto(heroShot),
       };
-      const heroEntry = rest.find(isLandscape) ?? rest[0] ?? photos[0];
-      return [
-        {
-          title: collection.title,
-          href: `/collections/${slug}`,
-          location: collection.location ?? undefined,
-          date: monthYear(collection.date),
-          description: collection.description?.trim() || undefined,
-          count: photos.length,
-          cover: toPhoto(photos[0], 1800),
-          hero: toPhoto(heroEntry, 1800),
-        },
-      ];
     });
     logHomePageCollectionsLoaded(collections.length);
     return collections;

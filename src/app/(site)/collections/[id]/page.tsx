@@ -1,13 +1,8 @@
-import { gql } from '@apollo/client';
-import client from 'apollo-client';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { Image as SanityImage } from 'sanity';
+import { getCollectionBySlug, listCollections, listCollectionSlugs } from 'src/cms/collections';
+import { mediaSource } from 'src/cms/media';
 import SitePage from 'src/components/site/SitePage';
-import { GET_COLLECTION } from 'src/queries/GetCollection';
-import { GET_COLLECTIONS } from 'src/queries/GetCollections';
-import { urlForImage } from 'src/sanity/lib/image';
-import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 import Collection, { type CollectionPhoto, type NextCollection } from './Collection';
 
@@ -17,23 +12,10 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-async function getCollection(id: string) {
-  const { data } = await client
-    .query({
-      query: GET_COLLECTION,
-      variables: { slug_current: id },
-    })
-    .catch((err) => {
-      console.error('Data fetch failed', err);
-      throw err;
-    });
-  return data?.allCollections?.[0];
-}
-
 // Next.js App Router dynamic metadata generation
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const collection = await getCollection(id).catch(() => undefined);
+  const collection = await getCollectionBySlug(id).catch(() => null);
 
   return {
     title: `Jaisal Friedman - ${collection?.title ?? 'Collection'}`,
@@ -42,55 +24,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const { data } = await client
-    .query<{ allCollections: Array<{ slug?: { current?: string } }> }>({
-      query: gql`
-        query GetCollectionSlugs {
-          allCollections {
-            slug {
-              current
-            }
-          }
-        }
-      `,
-    })
-    .catch((err) => {
-      console.error('generateStaticParams failed', err);
-      return { data: null };
-    });
-
-  if (!data) return [];
-
-  return data.allCollections.map((collection) => ({
-    id: collection?.slug?.current ?? '',
-  }));
+  const slugs = await listCollectionSlugs().catch((err) => {
+    console.error('generateStaticParams failed', err);
+    return [];
+  });
+  return slugs.map((id) => ({ id }));
 }
 
 // "Next collection" is the one after this in the collections index, wrapping to the first.
 // It is secondary, so a CMS failure hides it rather than failing the page.
 async function getNextCollection(id: string): Promise<NextCollection | undefined> {
   try {
-    const { data } = await client.query({
-      query: GET_COLLECTIONS,
-      variables: { offset: 0, sort: GET_COLLECTIONS_SORT, limit: 20 },
-    });
-    const all = (data?.allCollections ?? []).filter((c) => c.title && c.slug?.current);
-    const index = all.findIndex((c) => c.slug?.current === id);
+    const all = await listCollections();
+    const index = all.findIndex((c) => c.slug === id);
     if (index < 0 || all.length < 2) return undefined;
     const nextIndex = (index + 1) % all.length;
     const next = all[nextIndex];
-    const cover = next.photos?.[0]?.photo;
     return {
       number: String(nextIndex + 1).padStart(2, '0'),
-      title: next.title ?? '',
-      href: `/collections/${next.slug?.current}`,
+      title: next.title,
+      href: `/collections/${next.slug}`,
       location: next.location ?? undefined,
       date: next.date ?? undefined,
-      cover: cover
-        ? urlForImage(cover as SanityImage)
-            ?.width(1200)
-            .url()
-        : undefined,
+      cover: mediaSource(next.photos?.[0]?.photo, 'large')?.src,
     };
   } catch (err) {
     console.error('Failed to load the next collection', err);
@@ -100,21 +56,21 @@ async function getNextCollection(id: string): Promise<NextCollection | undefined
 
 export default async function CollectionPage({ params }: Props) {
   const { id } = await params;
-  const [collection, next] = await Promise.all([getCollection(id), getNextCollection(id)]);
+  const [collection, next] = await Promise.all([
+    getCollectionBySlug(id).catch((err) => {
+      console.error('Data fetch failed', err);
+      throw err;
+    }),
+    getNextCollection(id),
+  ]);
 
-  if (!collection?.title) notFound();
+  if (!collection) notFound();
 
   // Plain props: the page component knows nothing about the CMS.
-  const photos: CollectionPhoto[] = (collection.photos ?? []).flatMap((item) => {
-    const photo = item?.photo;
-    const src = photo
-      ? urlForImage(photo as SanityImage)
-          ?.width(2400)
-          .url()
-      : undefined;
-    if (!photo || !src) return [];
-    const dims = photo.asset?.metadata?.dimensions;
-    return [{ src, title: item?.title?.trim() ?? '', width: dims?.width ?? 3, height: dims?.height ?? 2 }];
+  const photos: CollectionPhoto[] = (collection.photos ?? []).flatMap((shot) => {
+    const source = mediaSource(shot.photo, 'xl');
+    if (!source) return [];
+    return [{ src: source.src, title: shot.title?.trim() ?? '', width: source.width ?? 3, height: source.height ?? 2 }];
   });
 
   return (
