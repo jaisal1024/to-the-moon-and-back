@@ -56,7 +56,6 @@ studio/.env.development
 # graphql generated fils
 # generated code
 # - GQL
-src/gql/**
 
 # Playwright
 test-results/**
