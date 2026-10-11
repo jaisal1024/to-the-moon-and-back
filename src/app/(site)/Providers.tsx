@@ -1,8 +1,6 @@
 'use client';
 
-import { ApolloProvider } from '@apollo/client/react';
 import { StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
-import client from 'apollo-client';
 import React, { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { createAppTheme } from 'src/theme';
 
@@ -37,9 +35,7 @@ function ProvidersComponent({ children }: ProvidersProps) {
 
   return (
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <ApolloProvider client={client}>{children}</ApolloProvider>
-      </ThemeProvider>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </StyledEngineProvider>
   );
 }
