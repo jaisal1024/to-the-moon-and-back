@@ -11,6 +11,7 @@ import { Collections } from './collections/Collections';
 import { Media } from './collections/Media';
 import { Posts } from './collections/Posts';
 import { Users } from './collections/Users';
+import { env } from './env.schema';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,13 +24,13 @@ export default buildConfig({
   },
   collections: [Users, Media, Collections, Posts],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: env.PAYLOAD_SECRET,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: env.DATABASE_URL,
     },
     // Schema changes ship as committed migrations; never auto-push in shared databases.
     push: false,
@@ -40,7 +41,7 @@ export default buildConfig({
     // Stores uploads in Vercel Blob when BLOB_READ_WRITE_TOKEN is set; otherwise
     // Payload falls back to local disk (./media), which is what local dev uses.
     vercelBlobStorage({
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: env.BLOB_READ_WRITE_TOKEN,
       // Serve files straight from Blob instead of proxying every image through
       // a Payload API route; media is public-read anyway.
       collections: { media: { disablePayloadAccessControl: true } },

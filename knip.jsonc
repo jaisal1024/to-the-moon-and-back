@@ -8,20 +8,7 @@
     "scripts/**/*.{ts,tsx,js,jsx}",
   ],
   "project": ["src/**/*.{ts,tsx,js,jsx,css}", "e2e/**/*.{ts,tsx,js,jsx}", "next.config.*", "postcss.config.*"],
-  "ignore": [
-    "src/env.schema.ts",
-    "src/sanity/components/IFramePreviewView.tsx",
-    "src/sanity/preview.ts",
-    "src/utils/helpers.ts",
-    "src/utils/types.ts",
-  ],
-  "ignoreDependencies": [
-    "@graphql-typed-document-node/core", // imported only by generated, gitignored src/gql
-    "@sanity/preview-url-secret",
-    "@sanity/ui",
-    "zod",
-    "suspend-react",
-  ],
+  "ignore": ["src/utils/helpers.ts", "src/utils/types.ts"],
   "ignoreBinaries": [
     "ngrok", // system install; the npm wrapper was removed (its postinstall binary download is blocked)
   ],

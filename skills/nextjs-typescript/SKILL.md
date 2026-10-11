@@ -125,7 +125,7 @@ Fetch CMS data in server components through `src/cms/*` and pass it to client co
 
 ### Avoid Large Build-Time Payloads
 
-Be careful with queries that fetch deeply nested data. The `GetCollections` query currently fetches all photos per collection just to display the cover — consider optimizing with a `limit: 1` on the photos array if Sanity supports it in the future.
+Be careful with reads that populate deeply nested data. `listCollections` populates every photo per collection just to show the cover; use `select` and `depth` in `src/cms/*` to fetch only what a page renders.
 
 ---
 

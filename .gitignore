@@ -4,7 +4,6 @@
 
 # dependencies
 /node_modules
-/studio/node_modules
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -22,7 +21,6 @@
 
 # production
 /build
-/studio/dist
 
 # misc
 .DS_Store
@@ -51,7 +49,6 @@ yarn-error.log*
 
 # Env files created by scripts for working locally
 .env
-studio/.env.development
 
 # graphql generated fils
 # generated code

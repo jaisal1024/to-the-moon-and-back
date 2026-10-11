@@ -21,7 +21,6 @@
     ],
     "paths": {
       "src/*": ["./src/*"],
-      "sanity.config": ["./sanity.config.ts"],
       "@payload-config": ["./src/payload.config.ts"]
     }
   },
