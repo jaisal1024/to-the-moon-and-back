@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.0.0...v1.0.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **deps:** upgrade Next.js to 16.4.0 and patch audit vulnerabilities ([#39](https://github.com/jaisal1024/to-the-moon-and-back/issues/39)) ([a59a72d](https://github.com/jaisal1024/to-the-moon-and-back/commit/a59a72d7795910a6c8a77a6c00643b2ce26a8f59))
+
 ## 1.0.0 (2026-10-04)
 
 
