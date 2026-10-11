@@ -1,22 +1,27 @@
 import { describe, expect, test } from 'vitest';
 
 import { formatPostDate } from './formatPostDate';
-import { portableTextToRichBlocks, splitComments } from './richText';
+import { lexicalToRichBlocks, splitComments } from './richText';
 
-const span = (text: string, marks: string[] = []) => ({ _type: 'span', text, marks });
+const text = (value: string, format = 0) => ({ type: 'text', text: value, format });
+const body = (...children: unknown[]) => ({ root: { type: 'root', children } });
 
-describe('portableTextToRichBlocks', () => {
-  test('maps block styles, decorators and links from markDefs', () => {
-    const blocks = portableTextToRichBlocks([
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [span('Re-post of original '), span('post', ['l1']), span(' I wrote')],
-        markDefs: [{ _key: 'l1', _type: 'link', href: 'https://example.com/post' }],
-      },
-      { _type: 'block', style: 'h2', children: [span('The Problem')], markDefs: [] },
-      { _type: 'block', style: 'h3', children: [span('Bold', ['strong', 'em']), span('x', ['code'])], markDefs: [] },
-    ]);
+describe('lexicalToRichBlocks', () => {
+  test('maps paragraphs, headings, format bits and links', () => {
+    const blocks = lexicalToRichBlocks(
+      body(
+        {
+          type: 'paragraph',
+          children: [
+            text('Re-post of original '),
+            { type: 'link', fields: { url: 'https://example.com/post', newTab: true }, children: [text('post')] },
+            text(' I wrote'),
+          ],
+        },
+        { type: 'heading', tag: 'h2', children: [text('The Problem')] },
+        { type: 'heading', tag: 'h3', children: [text('Bold', 1 | 2), text('x', 16)] },
+      ),
+    );
 
     expect(blocks).toEqual([
       {
@@ -38,51 +43,68 @@ describe('portableTextToRichBlocks', () => {
     ]);
   });
 
-  test('groups consecutive list items into bullet and numbered lists', () => {
-    const item = (text: string, listItem: string) => ({
-      _type: 'block',
-      style: 'normal',
-      listItem,
-      level: 1,
-      children: [span(text)],
-      markDefs: [],
-    });
-    const blocks = portableTextToRichBlocks([
-      item('a', 'bullet'),
-      item('b', 'bullet'),
-      item('one', 'number'),
-      item('two', 'number'),
-    ]);
+  test('maps bullet and numbered lists, flattening nested lists after their parent item', () => {
+    const item = (...children: unknown[]) => ({ type: 'listitem', children });
+    const blocks = lexicalToRichBlocks(
+      body(
+        { type: 'list', listType: 'bullet', children: [item(text('a')), item(text('b'))] },
+        {
+          type: 'list',
+          listType: 'number',
+          children: [
+            item(text('one')),
+            item({ type: 'list', listType: 'number', children: [item(text('nested'))] }),
+            item(text('two')),
+          ],
+        },
+      ),
+    );
     expect(blocks).toEqual([
       { type: 'list', ordered: false, items: [[{ text: 'a', marks: [] }], [{ text: 'b', marks: [] }]] },
-      { type: 'list', ordered: true, items: [[{ text: 'one', marks: [] }], [{ text: 'two', marks: [] }]] },
+      {
+        type: 'list',
+        ordered: true,
+        items: [[{ text: 'one', marks: [] }], [{ text: 'nested', marks: [] }], [{ text: 'two', marks: [] }]],
+      },
     ]);
   });
 
-  test('strips zero-width characters and drops empty spacer paragraphs', () => {
-    const blocks = portableTextToRichBlocks([
-      { _type: 'block', style: 'normal', children: [span('‍')], markDefs: [] },
-      { _type: 'block', style: 'normal', children: [span('‍In short, it worked.')], markDefs: [] },
-      { _type: 'block', style: 'h3', children: [span('‍', ['code']), span('Heading')], markDefs: [] },
-    ]);
+  test('strips zero-width characters, drops empty spacer paragraphs and keeps line breaks', () => {
+    const blocks = lexicalToRichBlocks(
+      body(
+        { type: 'paragraph', children: [text('\u200D')] },
+        { type: 'paragraph', children: [text('\u200DIn short,'), { type: 'linebreak' }, text('it worked.')] },
+        { type: 'heading', tag: 'h3', children: [text('\u200D', 16), text('Heading')] },
+      ),
+    );
     expect(blocks).toEqual([
-      { type: 'paragraph', spans: [{ text: 'In short, it worked.', marks: [] }] },
+      {
+        type: 'paragraph',
+        spans: [
+          { text: 'In short,', marks: [] },
+          { text: '\n', marks: [] },
+          { text: 'it worked.', marks: [] },
+        ],
+      },
       { type: 'h3', spans: [{ text: 'Heading', marks: [] }] },
     ]);
   });
 
-  test('maps code blocks with optional filename and language, and skips unknown types', () => {
+  test('maps Code blocks with an optional language, and skips unknown nodes', () => {
     expect(
-      portableTextToRichBlocks([
-        { _type: 'codeBlock', code: 'const a = 1;' },
-        { _type: 'code', code: 'x()', language: 'ts', filename: 'a.ts' },
-        { _type: 'image' },
-      ]),
+      lexicalToRichBlocks(
+        body(
+          { type: 'block', fields: { blockType: 'Code', code: 'const a = 1;' } },
+          { type: 'block', fields: { blockType: 'Code', code: 'x()', language: 'ts' } },
+          { type: 'block', fields: { blockType: 'Other' } },
+          { type: 'horizontalrule' },
+        ),
+      ),
     ).toEqual([
       { type: 'code', code: 'const a = 1;' },
-      { type: 'code', code: 'x()', language: 'ts', filename: 'a.ts' },
+      { type: 'code', code: 'x()', language: 'ts' },
     ]);
-    expect(portableTextToRichBlocks(undefined)).toEqual([]);
+    expect(lexicalToRichBlocks(undefined)).toEqual([]);
   });
 });
 
