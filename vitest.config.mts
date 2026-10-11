@@ -19,7 +19,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'apollo-client': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './apollo-client.ts'),
       '@': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './src'),
       'src': path.resolve(fileURLToPath(new URL('.', import.meta.url)), './src'),
     },
