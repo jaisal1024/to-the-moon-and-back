@@ -18,13 +18,15 @@ Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router,
 | Command                     | What it does                                                                                                 |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `pnpm run dev`               | Next dev server on http://localhost:3333 plus GraphQL codegen in watch mode                                  |
-| `pnpm run dev-local`         | Starts the Postgres container, applies migrations, then runs `pnpm run dev`                                   |
+| `pnpm run dev-local`         | Starts the Postgres container, applies migrations, seeds an empty database, runs `pnpm run dev`               |
 | `pnpm run dev-local:down`    | Stops the container. Data persists in the `db-data` volume; `docker compose down -v` wipes it                |
 | `pnpm run payload:types`     | Regenerate `src/payload-types.ts` after changing a collection                                                |
 | `pnpm run payload:importmap` | Regenerate the admin import map after adding custom admin components                                         |
 | `pnpm run create-admin`      | Create or update an admin from `ADMIN_EMAIL`/`ADMIN_PASSWORD`. Deployed sites block public first-user signup |
 | `pnpm run migrate:create`    | Generate a SQL migration in `src/migrations/` from collection changes. Commit it                             |
 | `pnpm run migrate`           | Apply pending migrations to `DATABASE_URL`. `build` runs this when `DATABASE_URL` is set                     |
+| `pnpm run seed`              | Add sample collections to an empty database. `dev-local` and CI run it; it skips when content exists         |
+| `pnpm run migrate:sanity`    | Copy Sanity content into `DATABASE_URL` (`SANITY_DATASET=production`, `DRY_RUN=1` to preview)                |
 | `pnpm run generate`          | GraphQL codegen into `src/gql/` (gitignored). Needs `NEXT_PUBLIC_SANITY_GRAPHQL_SCHEMA_URL`                  |
 | `pnpm run build`             | `generate` then `next build`                                                                                 |
 | `pnpm run check`             | `lint` + `type-check` + `test` + `knip`. Run before opening a PR                                             |
