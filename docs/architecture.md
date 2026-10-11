@@ -10,18 +10,18 @@
 
 ## Technology Stack
 
-| Layer           | Technology            | Version  | Purpose                                                  |
-| --------------- | --------------------- | -------- | -------------------------------------------------------- |
-| Framework       | **Next.js**           | ^16.1.6  | App Router, SSG + ISR rendering, API routes              |
-| Language        | **TypeScript**        | ^5.9.3   | Type safety across the full app                          |
-| CMS             | **Sanity.io**         | ^5.16.0  | Content management for photography collections           |
-| Data Fetching   | **Apollo Client**     | ^4.1.6   | GraphQL client for querying Sanity's GraphQL API         |
-| Type Generation | **graphql-codegen**   | ^5.0.3   | Generates TypeScript types from GraphQL schema           |
-| UI Library      | **MUI (Material UI)** | ^7.3.9   | Component library for layout, typography, buttons        |
-| Styling         | **Tailwind CSS**      | ^3.4.17  | Utility-first CSS for layout, spacing, and small accents |
-| Deployment      | **Vercel**            | —        | Auto-deploys on push to `main`                           |
-| Infrastructure  | **IaC**               | —        | Project defined via `vercel.json`                        |
-| Analytics       | **Google Analytics**  | —        | Via inline `gtag.js` script in the root layout           |
+| Layer           | Technology            | Version | Purpose                                                  |
+| --------------- | --------------------- | ------- | -------------------------------------------------------- |
+| Framework       | **Next.js**           | ^16.1.6 | App Router, SSG + ISR rendering, API routes              |
+| Language        | **TypeScript**        | ^5.9.3  | Type safety across the full app                          |
+| CMS             | **Sanity.io**         | ^5.16.0 | Content management for photography collections           |
+| Data Fetching   | **Apollo Client**     | ^4.1.6  | GraphQL client for querying Sanity's GraphQL API         |
+| Type Generation | **graphql-codegen**   | ^5.0.3  | Generates TypeScript types from GraphQL schema           |
+| UI Library      | **MUI (Material UI)** | ^7.3.9  | Component library for layout, typography, buttons        |
+| Styling         | **Tailwind CSS**      | ^3.4.17 | Utility-first CSS for layout, spacing, and small accents |
+| Deployment      | **Vercel**            | —       | Auto-deploys on push to `main`                           |
+| Infrastructure  | **IaC**               | —       | Project defined via `vercel.json`                        |
+| Analytics       | **Google Analytics**  | —       | Via inline `gtag.js` script in the root layout           |
 
 ---
 
@@ -111,17 +111,17 @@ The project uses **Zod** for strict environment variable validation.
 
 ## Key Configuration Files
 
-| File                 | Purpose                                                  |
-| -------------------- | -------------------------------------------------------- |
-| `next.config.js`     | Next.js config (bundle analyzer, image domains)         |
-| `vercel.json`        | Infrastructure as Code (routing, security headers)      |
-| `src/env.schema.ts`  | Strict environment variable validation                   |
-| `tailwind.config.js` | Tailwind CSS configuration + semantic color extensions  |
-| `codegen.ts`         | GraphQL codegen config — generates types to `src/gql/`  |
-| `sanity.config.ts`   | Sanity studio configuration                             |
-| `apollo-client.ts`   | Apollo Client singleton setup                           |
-| `tsconfig.json`      | TypeScript config with path aliases (`src/` → `@`)      |
-| `.eslintrc.json`     | ESLint rules (TypeScript, import sort, unused imports)  |
-| `.prettierrc.json`   | Prettier formatting config                              |
-| `renovate.json`      | Automated dependency updates config                     |
-| `backlog/`           | Structured agent task queue                             |
+| File                 | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `next.config.js`     | Next.js config (bundle analyzer, image domains)        |
+| `vercel.json`        | Infrastructure as Code (routing, security headers)     |
+| `src/env.schema.ts`  | Strict environment variable validation                 |
+| `tailwind.config.js` | Tailwind CSS configuration + semantic color extensions |
+| `codegen.ts`         | GraphQL codegen config — generates types to `src/gql/` |
+| `sanity.config.ts`   | Sanity studio configuration                            |
+| `apollo-client.ts`   | Apollo Client singleton setup                          |
+| `tsconfig.json`      | TypeScript config with path aliases (`src/` → `@`)     |
+| `.eslintrc.json`     | ESLint rules (TypeScript, import sort, unused imports) |
+| `.prettierrc.json`   | Prettier formatting config                             |
+| `renovate.json`      | Automated dependency updates config                    |
+| `backlog/`           | Structured agent task queue                            |
