@@ -1,5 +1,6 @@
 import { type CollectionConfig, slugField } from 'payload';
 
+import { sanityIdField } from '../fields/sanityId';
 import type { Collection } from '../payload-types';
 import { revalidateAfterChange, revalidateAfterDelete } from './hooks/revalidate';
 
@@ -25,6 +26,7 @@ export const Collections: CollectionConfig = {
     drafts: true,
   },
   fields: [
+    sanityIdField,
     {
       name: 'title',
       type: 'text',
