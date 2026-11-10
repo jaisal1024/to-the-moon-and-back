@@ -11,8 +11,8 @@ Visit either:
 
 - Next.js is used for SSG of static pages during the build process
 - Sanity.io is used as a headless CMS to manage and fetch collections (photography series). We use their graphql API instead of grok to make queries so we have strict types. And because grok is weird.
-- Tailwind + MUI are used to style the site
-- React is used in conjunction with Next.js/MUI but is relatively lightweight here
+- Public pages are styled with CSS modules on a shared design system in `src/components/site/` (see `docs/components.md`)
+- React is used in conjunction with Next.js but is relatively lightweight here
 
 TODO:
 
@@ -25,7 +25,7 @@ TODO:
 - Sanity's GraphQL API isn't great so there are a few weird things: 1. We fetch all the photos in each collection which is too much data for the `GetCollections` homepage query. This is because sanity doesn't allow subquery elements in the graph have a limit field. Which is to say the least, extremely limiting. I opened an issue here.
 - To get a collection by the slug instead of the collection ID, i had to use the `allCollections` top-level query instead of the `collection` query. We could store some sort of mapping from slug to collection but it would be outside of sanity which may get strange if they get out of sync somehow
 - Sanity data migrations are hard, `_type` cannot be properly re-named as the same objects so there is a little script in `scripts/migrateDocumentType.js` that does that but use with caution and try to avoid data migrations with Sanity.
-- Sanity Image URL parsing and usage with NextImage component is a little strange
+- Sanity image references go through `urlForImage` (`src/sanity/lib/image.ts`) before reaching `next/image`
 - Sanity requires all array fields of objects to be top-level objects if using the graphql API. For that reason the `Shot` document type is shown in the studio admin page but its just there so it can be used for photos in a collection. We store things like the title and maybe credits in the future on the `Shot` object along with the photo.
 
 ## Development

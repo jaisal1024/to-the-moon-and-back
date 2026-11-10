@@ -1,11 +1,7 @@
 import { graphql } from 'src/gql/gql';
 
 export const GET_COLLECTIONS = graphql(/* GraphQL */ `
-  query GetCollections(
-    $offset: Int!
-    $sort: [CollectionsSorting!]
-    $limit: Int = 10
-  ) {
+  query GetCollections($offset: Int!, $sort: [CollectionsSorting!], $limit: Int = 10) {
     allCollections(offset: $offset, sort: $sort, limit: $limit) {
       _id
       title
@@ -21,6 +17,12 @@ export const GET_COLLECTIONS = graphql(/* GraphQL */ `
             url
             _ref: _id
             _type
+            metadata {
+              dimensions {
+                width
+                height
+              }
+            }
           }
           _key
         }

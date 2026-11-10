@@ -1,21 +1,12 @@
 import client from 'apollo-client';
 import { Metadata } from 'next';
-import { Geist } from 'next/font/google';
 import type { Image as SanityImage } from 'sanity';
-import Footer from 'src/components/Footer';
-import NavBar from 'src/components/NavBar';
+import SitePage from 'src/components/site/SitePage';
 import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 import { urlForImage } from 'src/sanity/lib/image';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
 
 import About, { AboutCollection } from './About';
-import styles from './about.module.css';
-
-const geist = Geist({
-  subsets: ['latin'],
-  weight: ['600'],
-  variable: '--font-geist',
-});
 
 export const metadata: Metadata = {
   title: 'Jaisal Friedman - About',
@@ -39,7 +30,11 @@ async function getCollections(): Promise<AboutCollection[]> {
         {
           title: collection.title,
           href: `/collections/${slug}`,
-          photo: photo ? urlForImage(photo as SanityImage)?.width(800).url() : undefined,
+          photo: photo
+            ? urlForImage(photo as SanityImage)
+                ?.width(800)
+                .url()
+            : undefined,
         },
       ];
     });
@@ -53,16 +48,8 @@ export default async function AboutPage() {
   const collections = await getCollections();
 
   return (
-    <div className={`${geist.variable} ${styles.page}`}>
-      <header>
-        <NavBar />
-      </header>
-      <main className={styles.main}>
-        <About collections={collections} />
-      </main>
-      <footer>
-        <Footer />
-      </footer>
-    </div>
+    <SitePage>
+      <About collections={collections} />
+    </SitePage>
   );
 }

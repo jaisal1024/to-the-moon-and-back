@@ -1,0 +1,275 @@
+/* Home: the photography front door. Tokens, type scale, mats and night sections come from src/components/site. */
+
+/* hero: the /about build (cycling lines + matted photo + headline), turned so the photo owns the fold */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 1fr auto;
+  column-gap: var(--gap);
+  padding: calc(var(--pad) * 4) var(--pad) 0;
+}
+
+.lines {
+  grid-column: 1 / span 4;
+  align-self: end;
+  display: grid;
+  gap: 0.1em;
+}
+
+.lines p {
+  margin: 0;
+}
+
+.lines p:nth-child(1) {
+  color: var(--accent);
+}
+
+.lines p:nth-child(2) {
+  color: var(--accent-2);
+}
+
+.swap {
+  display: inline-block;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    filter 0.3s ease;
+}
+
+.out {
+  opacity: 0;
+  transform: translateY(0.3em);
+  filter: blur(3px);
+}
+
+.heroFrame {
+  grid-column: 5 / -1;
+  align-self: end;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9.4;
+  max-height: calc(100svh - var(--pad) * 4 - var(--xl) * 1.5);
+}
+
+.heroImg {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.heroImg.on {
+  opacity: 1;
+}
+
+.hero h1 {
+  grid-column: 1 / -1;
+  font-size: calc((100vw - 2 * var(--pad)) / 9.4);
+  font-weight: 600;
+  letter-spacing: -0.068em;
+  line-height: 0.86;
+  white-space: nowrap;
+  margin: 0 0 0 -0.04em;
+  padding: 0.12em 0 0.14em;
+}
+
+/* collections: covers on the right, a narrow index pinned on the left that follows them */
+.works {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+  padding: 12svh var(--pad) 14svh;
+}
+
+.index {
+  grid-column: 1 / span 4;
+  position: sticky;
+  top: 15svh;
+  align-self: start;
+  padding-left: calc(3px + var(--gap));
+}
+
+.rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 0;
+  background: linear-gradient(var(--thread-1), var(--thread-2), var(--thread-3)) no-repeat 0 0;
+  transition: height 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* same anatomy as the /about collections rows: number, title, arrow on hover, hairlines */
+.row {
+  display: grid;
+  grid-template-columns: calc(var(--sm) * 2.2) 1fr auto;
+  align-items: baseline;
+  gap: var(--gap);
+  padding: 0.5em 0;
+  border-top: 1px solid var(--rule);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.n {
+  font-size: var(--sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.row .name {
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+
+.row.on .name,
+.row:hover .name {
+  opacity: 1;
+}
+
+.on .n {
+  color: var(--accent);
+}
+
+.arrow {
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-0.3em);
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.row:hover .arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.covers {
+  grid-column: 5 / -1;
+  display: grid;
+  gap: 12svh;
+}
+
+.work {
+  display: grid;
+  gap: var(--gap);
+  align-content: start;
+}
+
+.portrait {
+  width: 50%;
+  justify-self: center;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+}
+
+.cover img {
+  will-change: transform;
+}
+
+.head {
+  display: none;
+  margin: 0;
+  font: inherit;
+}
+
+.cap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--gap);
+  font-size: var(--sm);
+  align-items: baseline;
+  margin: 0;
+}
+
+.where {
+  display: flex;
+  gap: 0.7em;
+  flex-wrap: wrap;
+}
+
+.desc {
+  font-size: var(--sm);
+  font-weight: 500;
+  max-width: 52ch;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  text-wrap: pretty;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .heroFrame {
+    grid-column: 1;
+    grid-row: 1;
+    aspect-ratio: 4 / 4.4;
+    max-height: none;
+    margin-bottom: 3svh;
+  }
+
+  .lines {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .hero h1 {
+    grid-row: 3;
+    font-size: calc((100vw - 2 * var(--pad)) / 4.72);
+  }
+
+  .works {
+    display: block;
+    padding: 6svh var(--pad) 10svh;
+  }
+
+  .index {
+    display: none;
+  }
+
+  .covers {
+    gap: 7svh;
+  }
+
+  .portrait {
+    width: 100%;
+  }
+
+  .head {
+    display: block;
+    padding-top: var(--gap);
+    border-top: 1px solid var(--rule);
+  }
+
+  .head a {
+    display: grid;
+    grid-template-columns: calc(var(--sm) * 2.2) 1fr;
+    align-items: baseline;
+    gap: var(--gap);
+  }
+
+  .head .name {
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+  }
+
+  .head .on .name {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .head .name {
+    opacity: 1;
+  }
+}

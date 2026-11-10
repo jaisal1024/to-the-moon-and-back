@@ -2,65 +2,57 @@ import { expect, test } from '@playwright/test';
 
 test('has title', async ({ page }) => {
   await page.goto('/');
-
-  // Expect a title "to contain" a substring.
-  // Adjust this based on the actual title of the home page.
   await expect(page).toHaveTitle(/Jaisal Friedman/);
+  await expect(page.getByTestId('collections-heading')).toBeVisible();
 });
 
-test('navigation to blog page', async ({ page, isMobile }) => {
+test('navigation to blog page', async ({ page }) => {
   await page.goto('/');
+  await page.getByTestId('nav-blog').click();
 
-  // Find a link with the test id "navbar-blog-link" and click it.
-  if (isMobile) {
-    await page.getByTestId('navbar-mobile-menu-button').click();
-  }
-  await page.getByTestId(isMobile ? 'navbar-list-item-blog' : 'navbar-blog-link').click();
-
-  // The new URL should contain "/blog".
   await expect(page).toHaveURL(/.*blog/);
+  await expect(page.getByTestId('blog-heading')).toBeVisible();
+  await expect(page.getByTestId('nav-blog')).toHaveAttribute('aria-current', 'page');
 });
 
-test('navigation to about page', async ({ page, isMobile }) => {
+test('navigation to about page', async ({ page }) => {
   await page.goto('/');
+  await page.getByTestId('nav-about').click();
 
-  // Find a link with the test id "navbar-about-link" and click it.
-  if (isMobile) {
-    await page.getByTestId('navbar-mobile-menu-button').click();
-  }
-  await page.getByTestId(isMobile ? 'navbar-list-item-about' : 'navbar-about-link').click();
-
-  // The new URL should contain "/about".
   await expect(page).toHaveURL(/.*about/);
-
-  // The about page should have a heading.
   await expect(page.getByTestId('about-heading')).toBeVisible();
 });
 
-test('footer is present on all pages', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByTestId('footer-copyright')).toBeVisible();
-
-  await page.goto('/blog');
-  await expect(page.getByTestId('footer-copyright')).toBeVisible();
-
+test('navigation back home from the name', async ({ page }) => {
   await page.goto('/about');
-  await expect(page.getByTestId('footer-copyright')).toBeVisible();
+  await page.getByTestId('nav-home').click();
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByTestId('nav-collections')).toHaveAttribute('aria-current', 'page');
 });
 
-test('mobile navigation menu works', async ({ page }) => {
-  // Set viewport to mobile size
-  await page.setViewportSize({ width: 375, height: 667 });
-  await page.goto('/');
+test('footer is present on all pages', async ({ page }) => {
+  for (const path of ['/', '/blog', '/about']) {
+    await page.goto(path);
+    await expect(page.getByTestId('footer-copyright')).toBeVisible();
+  }
+});
 
-  // Click the mobile menu button
-  await page.getByTestId('navbar-mobile-menu-button').click();
+test('unknown pages show the not found page', async ({ page }) => {
+  const response = await page.goto('/this-page-does-not-exist');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByTestId('not-found-heading')).toBeVisible();
+});
 
-  // Check if "Collections" is visible in the mobile menu (Dialog)
-  // Adjusted based on NavBar.tsx implementation
-  await expect(page.getByTestId('mobile-menu-collections-heading')).toBeVisible();
+test('top bar steps aside while scrolling down and returns on scroll up', async ({ page }) => {
+  await page.goto('/about');
+  const bar = page.getByRole('banner');
+  await expect(bar).toBeInViewport();
 
-  // Close the menu
-  await page.getByTestId('navbar-mobile-close-button').click();
-  await expect(page.getByTestId('mobile-menu-collections-heading')).not.toBeVisible();
+  // Scroll programmatically: mobile WebKit has no mouse wheel.
+  await page.evaluate(() => window.scrollTo(0, 1600));
+  await expect(bar).not.toBeInViewport();
+
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  await expect(bar).toBeInViewport();
 });

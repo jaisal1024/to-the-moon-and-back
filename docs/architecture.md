@@ -44,8 +44,9 @@
          │  (App Router + SSG / ISR)     │
          │                               │
          │  Routes (App Router):         │
-│  / (index) → ImageGrid        │
-│  /collections/[slug]          │
+│  /  (collections)             │
+│  /collections/[id]            │
+│  /blog, /blog/[slug]          │
 │  /about                       │
 │  /studio (Sanity embedded)    │
          └───────────────┬───────────────┘
@@ -79,14 +80,9 @@ For local development, ngrok is used to expose `localhost` to the internet so Sa
 
 ## Styling Architecture
 
-The site uses a **dual-styling approach**:
+Public pages are styled with **CSS modules** on top of one shared design system in `src/components/site/site.module.css`: colour tokens, a fluid type scale, black photo mats and black "night" sections, set in **Geist** (loaded via `next/font` in `SitePage`). Light and dark themes swap the tokens under `[data-theme='dark']`; `Providers` sets that attribute from the system preference or a `?theme=` override. See [components.md](./components.md).
 
-1. **MUI ThemeProvider** (`src/theme.ts`) — defines the global typography scale, light/dark color palettes, and font families
-   - **Fonts**: `Archivo Black` for the main hero heading (`h1`), `DM Sans` for all other headings and body text, both loaded via `next/font` in the root layout
-   - **Palette**: Light and dark modes built from shared brand tokens (`carbon`, `white`, `tangerine`, `dangerRed`)
-2. **Tailwind CSS** — used for layout, spacing, and small visual utilities (e.g., `sm:flex-row`, `hidden sm:block`, semantic color classes wired to CSS variables)
-
-Semantic color tokens for borders, surfaces, text, and accents are defined in `src/styles/globals.css` under `:root` / `:root[data-theme='dark']` and are exposed to Tailwind via `tailwind.config.js`. This keeps light/dark theming consistent across both MUI components and Tailwind utilities.
+The root layout still loads Tailwind, MUI's `ThemeProvider` and the `Archivo Black` / `DM Sans` fonts; after the redesign they are only used by `Providers` and the embedded Sanity Studio.
 
 ---
 

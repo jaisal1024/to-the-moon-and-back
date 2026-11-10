@@ -1,77 +1,61 @@
 # Component Reference
 
-All UI components live in `src/components/`. They are built using a combination of **MUI (Material UI)** and **Tailwind CSS** utility classes.
+Every public page shares one design system in `src/components/site/`. Each page's own presentation lives next to its route in `src/app/`, styled with a CSS module.
 
 ---
 
-## `Layout`
+## Site shell — `src/components/site/`
 
-**File:** `src/components/Layout.tsx`
+### `SitePage`
 
-Wraps every page with a consistent shell: `NavBar` at the top, then a padded content area, and `Footer` at the bottom.
+**File:** `src/components/site/SitePage.tsx`
 
-**Usage:**
+Wraps every public page: loads the Geist font, applies the design tokens, renders the `TopBar`, the page content in `<main>`, and the `SiteFooter`.
 
 ```tsx
-<Layout>
-  <YourPageContent />
-</Layout>
+<SitePage>
+  <Home {...props} />
+</SitePage>
 ```
 
----
+### `site.module.css`
 
-## `NavBar`
+The shared tokens and classes. Pages use the tokens (`--paper`, `--text`, `--accent`, `--accent-2`, `--thread-1..3`, `--pad`, `--gap`, `--mat`, `--rule`, `--muted`, and the type scale `--xl` / `--lg` / `--md` / `--sm`) and never hard-code colours, so dark theme works everywhere. Shared classes, imported as `shell`:
 
-**File:** `src/components/NavBar.tsx`
+- `shell.frame` + `shell.inner` — the black mat every photo sits in
+- `shell.night` — black sections with cream text and a lightened blue accent
+- `shell.pill`, `shell.link`, `shell.u`, `shell.muted`, `shell.xl`, `shell.lg`, `shell.sm`
 
-Responsive top navigation bar. Features:
+Dark theme overrides the tokens under `[data-theme='dark']`, which `Providers` sets on `<html>`.
 
-- **Desktop**: Shows brand name (link to `/`), a **Collections** dropdown (lazy-loads collections via Apollo `useLazyQuery` on hover/click), and an **About** link
-- **Mobile**: Hamburger icon opens a fullscreen `Dialog` with Collections and About
+### `TopBar`
 
-Key behaviors:
+**File:** `src/components/site/TopBar.tsx`
 
-- Active link detection via `useRouter().asPath` — active links get `underline` styling
-- Collections data is fetched lazily on demand to reduce initial load
+Fixed bar with Collections / Blog / About and the name linking home. It uses `mix-blend-mode: difference` so it reads over cream, black and photos, marks the current section with `aria-current`, and slides away while scrolling down.
 
-**Internal sub-components:**
+### `SiteFooter`
 
-- `CollectionListItem` — single nav list item with active underline
-- `CollectionList` — renders all collections from the lazy query
+**File:** `src/components/site/SiteFooter.tsx`
 
----
-
-## `ImageGrid`
-
-**File:** `src/components/ImageGrid.tsx`
-
-A responsive 2-column grid of photos with optional overlay buttons. Used on both:
-
-- `/` (homepage) — shows all collections, each with a cover photo and a link button
-- `/collections/[slug]` — shows all photos in a single collection
-
-**Props:**
-
-```ts
-type Props = {
-  collection: {
-    title?: string;
-    photo?: Partial<SanityImage>;
-    button?: { title: string; href: string };
-  }[];
-};
-```
-
-- The first 2 images get `priority` loading for LCP optimization
-- Clicking anywhere on the grid item navigates to the button's `href`
+Site map, contact links and the copyright line, in a black section at the end of every page.
 
 ---
 
-## `NextImage`
+## Pages
 
-**File:** `src/components/NextImage.tsx`
+Each route's `page.tsx` is a server component: it fetches from the CMS, maps the result to plain props, and renders a client component that knows nothing about Sanity. That keeps the CMS swappable.
 
-A thin wrapper around `next/image` that handles **Sanity image URL transformation** via `@sanity/image-url`. Converts a Sanity image asset reference into a valid CDN URL before passing it to `<Image>`.
+| Route               | Page component                            | Notes                                                                                                                          |
+| ------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `/`                 | `src/app/Home.tsx`                        | Rotating hero, covers beside a pinned numbered index whose active row follows the scroll                                       |
+| `/collections/[id]` | `src/app/collections/[id]/Collection.tsx` | Photos grouped into rows by orientation (`rows.ts`, unit tested), description revealed word by word, next collection row       |
+| `/blog`             | `src/app/blog/BlogIndex.tsx`              | Numbered post rows                                                                                                             |
+| `/blog/[slug]`      | `src/app/blog/[slug]/Post.tsx`            | Reading column, margin section numbers, code plates, reading progress thread. `richText.ts` maps Portable Text to plain blocks |
+| `/about`            | `src/app/about/About.tsx`                 | Rotating roles, word-reveal statements, scroll-drawn thread, flip cards, collections index                                     |
+| 404                 | `src/app/not-found.tsx`                   | No CMS dependency                                                                                                              |
+
+Scroll effects live in a single `useEffect` per page driven by `requestAnimationFrame`. They skip test environments (no `matchMedia` / SVG geometry in jsdom) and show the finished state under `prefers-reduced-motion`.
 
 ---
 
@@ -79,40 +63,7 @@ A thin wrapper around `next/image` that handles **Sanity image URL transformatio
 
 **Location:** `layout.tsx` (global) and individual `page.tsx` files.
 
-The project uses the native **Next.js Metadata API** for SEO and header management. This replaces the legacy `PageTitle` component and provides better integration with the App Router.
+The project uses the native **Next.js Metadata API** for SEO and header management.
 
 - **Static Metadata**: Defined via `export const metadata: Metadata` in page files.
-- **Dynamic Metadata**: Generated via `export async function generateMetadata()` for dynamic routes like `/collections/[slug]`.
-
----
-
-## `Link`
-
-**File:** `src/components/Link.tsx`
-
-A custom link component that wraps both `next/link` (for internal navigation) and standard `<a>` tags (for external). Provides a `noLinkStyle` prop to strip default anchor styling.
-
----
-
-## `Footer`
-
-**File:** `src/components/Footer.tsx`
-
-Site footer with social links (Instagram, LinkedIn, GitHub, email). Rendered by `Layout`.
-
----
-
-## `LoadingSpinner`
-
-**File:** `src/components/LoadingSpinner.tsx`
-
-Simple loading indicator used while lazy queries are in-flight (e.g., in the NavBar Collections dropdown).
-
----
-
-## Component Architecture Notes
-
-- **No global state library** — state is local (`useState`) or fetched via Apollo Client hooks (`useLazyQuery`)
-- **Dual styling**: MUI handles component styles and typography; Tailwind handles layout and responsive utilities
-- All components use **functional components** with React Hooks
-- Types are generated from the GraphQL schema via `codegen` and imported from `src/gql/graphql`
+- **Dynamic Metadata**: Generated via `export async function generateMetadata()` for dynamic routes like `/collections/[id]`.

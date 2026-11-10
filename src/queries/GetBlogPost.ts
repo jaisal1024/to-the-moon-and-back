@@ -2,17 +2,25 @@ import { gql } from '@apollo/client';
 
 import type { BlogPostSummary } from './GetBlogPosts';
 
-export type PortableTextBlock = {
+type PortableTextBlock = {
   _type: 'block';
   _key?: string;
   style?: string;
+  listItem?: string;
+  level?: number;
   children?: Array<{
+    _type?: string;
     text?: string;
     marks?: string[];
   }>;
+  markDefs?: Array<{
+    _key: string;
+    _type: string;
+    href?: string;
+  }>;
 };
 
-export type PortableTextCodeBlock = {
+type PortableTextCodeBlock = {
   _type: 'code' | 'codeBlock';
   _key?: string;
   code?: string;

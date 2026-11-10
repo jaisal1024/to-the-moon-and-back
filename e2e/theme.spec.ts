@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('theme overrides hydrate and keep Tailwind utilities working', async ({ page }) => {
+test('theme overrides hydrate and recolour the page surface', async ({ page }) => {
   const hydrationErrors: string[] = [];
   page.on('console', (message) => {
     if (message.type() === 'error' && /hydrat|didn't match/i.test(message.text())) {
@@ -11,14 +11,14 @@ test('theme overrides hydrate and keep Tailwind utilities working', async ({ pag
   await page.goto('/about?theme=dark', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(36, 36, 36)');
-  await page.setViewportSize({ width: 375, height: 667 });
-  await expect(page.getByTestId('navbar-mobile-menu-button')).toBeVisible();
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await expect(page.getByTestId('navbar-mobile-menu-button')).toBeHidden();
+  // The page surface follows the theme: cream in light, carbon in dark.
+  const surface = page.locator('main').locator('..');
+  await expect(surface).toHaveCSS('background-color', 'rgb(36, 36, 36)');
 
   await page.goto('/about?theme=light', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(surface).toHaveCSS('background-color', 'rgb(249, 244, 236)');
   expect(hydrationErrors).toEqual([]);
 });
 

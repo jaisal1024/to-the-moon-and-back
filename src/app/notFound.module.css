@@ -1,0 +1,82 @@
+/* 404. Tokens, type scale and mats come from src/components/site. */
+
+.hero {
+  --fw: clamp(180px, 27vw, 420px);
+
+  height: 100svh;
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 1fr var(--fw);
+  grid-template-rows: auto 1fr;
+  column-gap: var(--gap);
+  padding: calc(var(--pad) * 4) var(--pad) var(--pad);
+}
+
+.lines {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  gap: 0.1em;
+}
+
+.lines p {
+  margin: 0;
+}
+
+.lines .home {
+  color: var(--accent);
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.home:hover .arrow {
+  transform: translateX(0.25em);
+}
+
+/* 404 sits on the page margin (Geist's 4 has ~.025em of side bearing) and its baseline meets the bottom of the frame */
+.hero h1 {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  font-size: min(calc((100vw - 2 * var(--pad) - var(--fw) - var(--gap)) / 1.8), 50svh);
+  font-weight: 600;
+  letter-spacing: -0.068em;
+  line-height: 0.73;
+  white-space: nowrap;
+  margin: 0 0 0 -0.025em;
+}
+
+.frame {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    height: auto;
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .frame {
+    grid-column: 1;
+    grid-row: 1;
+    height: 52svh;
+    width: 80%;
+    margin-bottom: 3svh;
+  }
+
+  .lines {
+    grid-row: 2;
+  }
+
+  .hero h1 {
+    grid-row: 3;
+    font-size: calc((100vw - 2 * var(--pad)) / 1.75);
+    padding-top: 4svh;
+  }
+}
