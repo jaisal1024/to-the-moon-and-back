@@ -2,7 +2,7 @@
 
 ## Overview
 
-Content is authored in Sanity Studio and served via a **Sanity-hosted GraphQL API**. The Next.js app fetches this data at build time (SSG) and caches it with ISR. Client-side data fetching is used sparingly (e.g., NavBar lazy collection loading).
+Content is authored in Sanity Studio and served via a **Sanity-hosted GraphQL API**. The Next.js app fetches this data at build time (SSG) and caches it with ISR. All CMS data is fetched on the server; pages pass plain props to their client components.
 
 ---
 
@@ -61,9 +61,10 @@ Generated types are written to `src/gql/graphql.ts` and the helper `src/gql/gql.
 
 | Query                  | File                                          | Used In                             |
 | ---------------------- | --------------------------------------------- | ----------------------------------- |
-| `GetCollections`       | `src/queries/GetCollections.ts`               | `src/app/page.tsx` (Home page)      |
+| `GetCollections`       | `src/queries/GetCollections.ts`               | Home, About, and the collection page's next-collection row |
 | `GetCollection`        | `src/queries/GetCollection.ts`                | `src/app/collections/[id]/page.tsx` |
-| `GetNavBarCollections` | Inline in `src/components/NavBar.tsx`         | NavBar dropdown                     |
+| `GetBlogPosts`         | `src/queries/GetBlogPosts.ts`                 | `src/app/blog/page.tsx`             |
+| `GetBlogPost`          | `src/queries/GetBlogPost.ts`                  | `src/app/blog/[slug]/page.tsx`      |
 | `GetCollectionSlugs`   | Inline in `src/app/collections/[id]/page.tsx` | `generateStaticParams`              |
 
 > All queries use `allCollections` instead of `collection` because Sanity's GraphQL `collection` query requires the document ID, not a slug. Filtering by slug requires using `allCollections(where: { slug: { current: { eq: $slug } } })`.
@@ -104,9 +105,8 @@ The `/api/revalidate` route is built with Next.js App Router handlers and featur
 
 A singleton Apollo Client instance is created and exported. It is:
 
-- Provided app-wide via `<ApolloProvider>` in `_app.tsx`
-- Used directly in `getStaticProps` for SSG (the singleton ensures a single network call)
-- Used via `useLazyQuery` in `NavBar` for client-side lazy fetching
+- Provided app-wide via `<ApolloProvider>` in `src/app/Providers.tsx`
+- Used directly by server `page.tsx` files to fetch CMS data
 
 ```ts
 // apollo-client.ts
@@ -120,7 +120,7 @@ const client = new ApolloClient({
 
 ## Sanity Image URLs
 
-Sanity stores images as asset references (`_ref`, `_type`, `url`). The `NextImage` component uses `@sanity/image-url` to build a CDN-optimized URL from the asset reference before passing it to `next/image`.
+Sanity stores images as asset references (`_ref`, `_type`, `url`). Server pages call `urlForImage(photo)?.width(n).url()` (`src/sanity/lib/image.ts`, built on `@sanity/image-url`) and pass the resulting URL, plus the asset's pixel dimensions where layout needs orientation, to `next/image`.
 
 ---
 

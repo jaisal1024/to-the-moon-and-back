@@ -1,0 +1,323 @@
+/* Collection page. Tokens, type scale, mats, pills and night sections come from src/components/site. */
+
+.open {
+  --rowh: min(80svh, 860px);
+
+  padding: calc(var(--pad) * 5) var(--pad) 0;
+}
+
+/* opening: meta lines above the headline, as on /about; a portrait lead plate sits in the meta row */
+.meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--gap);
+  align-items: end;
+}
+
+.lines {
+  display: grid;
+  gap: 0.1em;
+}
+
+.when {
+  color: var(--accent);
+}
+
+.leadSlot .shot {
+  width: calc(var(--ar) * 50svh + 2 * var(--mat));
+}
+
+.title {
+  font-size: calc((100vw - 2 * var(--pad)) / 6.3);
+  font-weight: inherit;
+  letter-spacing: -0.068em;
+  line-height: 0.86;
+  margin: 0 0 0 -0.04em;
+  padding: 0.12em 0 0.17em;
+  text-wrap: balance;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* the series: every row snaps to the page margin */
+.series {
+  --rowh: min(80svh, 860px);
+  --capgap: clamp(48px, 10svh, 120px);
+
+  display: grid;
+  row-gap: var(--capgap);
+  padding: 2svh var(--pad) 8svh;
+}
+
+.row {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+  justify-self: start;
+  width: min(100%, calc(var(--sum) * var(--rowh) + var(--n) * 2 * var(--mat) + (var(--n) - 1) * var(--gap)));
+}
+
+/* full-bleed: edge to edge, capped so the whole photo fits the screen */
+.full {
+  --w: min(100vw, calc(var(--sum) * 92svh + 2 * var(--mat)));
+
+  width: var(--w);
+  margin: 0 calc(var(--pad) * -1);
+  justify-self: center;
+}
+
+/* the caption stays on the page margin even when a capped plate is narrower than the screen */
+.full .cap {
+  margin-left: calc(var(--pad) - (100vw - var(--w)) / 2);
+}
+
+/* grow shares are the photo ratios, so photos in a row stand the same height */
+.shot {
+  flex: var(--ar) 1 calc(2 * var(--mat));
+  min-width: 0;
+  margin: 0;
+  container-type: inline-size;
+}
+
+/* mats sized to the photo, so nothing is cropped or stretched */
+.plate {
+  padding: var(--mat);
+}
+
+.plateInner {
+  position: relative;
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.plateInner img {
+  object-fit: cover;
+}
+
+.cap {
+  display: grid;
+  grid-template-columns: 2.6em 1fr;
+  gap: var(--gap);
+  margin-top: 0.7em;
+  line-height: 1.08;
+}
+
+.n {
+  font-size: var(--sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.28em;
+  white-space: nowrap;
+}
+
+/* a row of three, and narrow plates: counter above the caption */
+.trio .cap {
+  grid-template-columns: 1fr;
+  gap: 0.25em;
+}
+
+.trio .n {
+  padding-top: 0;
+}
+
+@container (max-width: 440px) {
+  .cap {
+    grid-template-columns: 1fr;
+    gap: 0.25em;
+  }
+
+  .n {
+    padding-top: 0;
+  }
+}
+
+/* the owner's description, set as a statement like the /about ones; long ones step down to a reading size */
+.say {
+  font-size: clamp(38px, 6.6vw, 118px);
+  letter-spacing: -0.068em;
+  line-height: 0.98;
+  max-width: 11.5em;
+  margin: 0;
+  padding: 6svh 0;
+  text-wrap: balance;
+}
+
+.long {
+  font-size: clamp(26px, 3.4vw, 48px);
+  letter-spacing: -0.06em;
+  line-height: 1.04;
+  max-width: 24em;
+}
+
+.word {
+  opacity: 0.13;
+  transition: opacity 0.45s ease;
+}
+
+.on {
+  opacity: 1;
+}
+
+/* night: the next collection, straight above the footer */
+.next {
+  padding: 14svh var(--pad) 0;
+}
+
+.nextLabel {
+  margin-bottom: 1.4em;
+}
+
+.nx {
+  display: grid;
+  grid-template-columns: 2.6em minmax(0, 1fr) auto clamp(150px, 32vw, 520px);
+  gap: var(--gap);
+  align-items: end;
+  padding: var(--gap) 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.nxN {
+  font-size: var(--sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  align-self: start;
+  padding-top: 0.4em;
+}
+
+.nxText {
+  display: grid;
+  gap: 0.5em;
+  align-self: stretch;
+  align-content: space-between;
+  padding: 0.2em 0 0.1em;
+}
+
+.nxTitle {
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.thumb img {
+  object-fit: cover;
+  transform: scale(1.12);
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.arrow {
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-0.3em);
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  padding-right: 0.3em;
+  align-self: center;
+}
+
+.nx:hover .thumb img {
+  transform: scale(1);
+}
+
+.nx:hover .arrow {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  /* a portrait lead follows the headline on phones, so the title is on the first screen */
+  .open {
+    display: grid;
+    padding-top: calc(var(--pad) * 6);
+  }
+
+  .meta {
+    display: contents;
+  }
+
+  .leadSlot,
+  .leadSlot .shot {
+    width: 100%;
+  }
+
+  .leadSlot {
+    order: 2;
+    margin: 2svh 0 56px;
+  }
+
+  .title {
+    font-size: calc((100vw - 2 * var(--pad)) / 4.6);
+  }
+
+  .series {
+    --rowh: 62svh;
+    --capgap: 56px;
+
+    padding-bottom: 7svh;
+  }
+
+  /* rows of landscapes or of three stack; every photo runs the full width, each caption clear of the next plate */
+  .stack {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--capgap);
+  }
+
+  .stack .shot {
+    flex: none;
+    width: 100%;
+  }
+
+  .full {
+    --w: 100vw;
+  }
+
+  .cap {
+    grid-template-columns: 1fr;
+    gap: 0.25em;
+  }
+
+  .n {
+    padding-top: 0;
+  }
+
+  .say {
+    padding: 2svh 0;
+  }
+
+  .long {
+    font-size: 24px;
+  }
+
+  .nx {
+    grid-template-columns: 1fr;
+  }
+
+  .nxN,
+  .arrow {
+    display: none;
+  }
+
+  .thumb {
+    order: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    opacity: 1;
+  }
+
+  .plateInner {
+    transform: none !important;
+  }
+}

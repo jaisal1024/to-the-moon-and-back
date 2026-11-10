@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useId, useRef, useState } from 'react';
+import shell from 'src/components/site/site.module.css';
 
 import styles from './about.module.css';
 
@@ -36,8 +37,7 @@ function moonPath(phase: number) {
       const corner = (x < 3 || x > w - 4) && (y < 3 || y > h - 4);
       const frame = (x === 0 || x === w - 1 || y === 0 || y === h - 1) && !corner;
       const disc = Math.hypot(x - cx, y - cy) <= r;
-      const lit =
-        phase === 2 ? disc : phase === 1 ? disc && x <= cx : disc && Math.hypot(x - cx - 4.5, y - cy) > r;
+      const lit = phase === 2 ? disc : phase === 1 ? disc && x <= cx : disc && Math.hypot(x - cx - 4.5, y - cy) > r;
       if (frame || lit) d += `M${x} ${y}h1v1h-1z`;
     }
   }
@@ -148,7 +148,9 @@ export default function About({ collections }: { collections: AboutCollection[] 
       const g = Math.max(18, W * 0.022);
       const pf = portrait.getBoundingClientRect();
       const start =
-        window.innerWidth > MOBILE_MAX ? [pf.left - origin.left + pf.width * 0.62, pf.bottom - origin.top - 2] : [W * 0.9, -40];
+        window.innerWidth > MOBILE_MAX
+          ? [pf.left - origin.left + pf.width * 0.62, pf.bottom - origin.top - 2]
+          : [W * 0.9, -40];
       const pts = [
         start,
         [Math.min(W - 20, A.r + W * 0.16), A.t + A.h * 0.25],
@@ -271,9 +273,15 @@ export default function About({ collections }: { collections: AboutCollection[] 
               </a>
             </p>
           </div>
-          <div ref={portraitRef} className={clsx(styles.frame, styles.portrait)}>
-            <div className={styles.inner}>
-              <Image src="/images/me.png" alt="Picture of the author" fill preload sizes="(max-width: 720px) 92vw, 27vw" />
+          <div ref={portraitRef} className={clsx(shell.frame, styles.portrait)}>
+            <div className={shell.inner}>
+              <Image
+                src="/images/me.png"
+                alt="Picture of the author"
+                fill
+                preload
+                sizes="(max-width: 720px) 92vw, 27vw"
+              />
             </div>
           </div>
         </div>
@@ -300,8 +308,8 @@ export default function About({ collections }: { collections: AboutCollection[] 
           { src: '/images/about/sunset-table.jpg', span: styles.w7, sizes: '(max-width: 720px) 92vw, 56vw' },
           { src: '/images/about/palms.jpg', span: styles.w5, sizes: '(max-width: 720px) 46vw, 40vw' },
         ].map((photo) => (
-          <div key={photo.src} className={clsx(styles.frame, photo.span)}>
-            <div className={styles.inner} data-grow>
+          <div key={photo.src} className={clsx(shell.frame, photo.span)}>
+            <div className={shell.inner} data-grow>
               <Image src={photo.src} alt="" fill sizes={photo.sizes} />
             </div>
           </div>
@@ -317,10 +325,10 @@ export default function About({ collections }: { collections: AboutCollection[] 
         </p>
       </section>
 
-      <div className={styles.night}>
+      <div className={shell.night}>
         <section ref={fanRef} className={styles.fan}>
           <div className={styles.pin}>
-            <span className={styles.pill}>I love to</span>
+            <span className={clsx(shell.pill, styles.fanLabel)}>I love to</span>
             {HOBBIES.map((hobby, i) => (
               <div key={hobby} className={styles.card} data-card>
                 <div className={clsx(styles.face, styles.front)}>
@@ -330,7 +338,7 @@ export default function About({ collections }: { collections: AboutCollection[] 
                 </div>
                 <div className={clsx(styles.face, styles.back)}>
                   <Image src={HOBBY_PHOTOS[i]} alt="" fill sizes="(max-width: 720px) 33vw, 19vw" />
-                  <b className={styles.lg}>{hobby}</b>
+                  <b className={shell.lg}>{hobby}</b>
                 </div>
               </div>
             ))}
@@ -339,12 +347,12 @@ export default function About({ collections }: { collections: AboutCollection[] 
 
         {collections.length > 0 && (
           <section className={styles.rows}>
-            <span className={styles.pill}>Collections</span>
+            <span className={clsx(shell.pill, styles.rowsLabel)}>Collections</span>
             {collections.map((collection, i) => (
               <Link key={collection.href} className={styles.row} href={collection.href}>
                 <span className={styles.n}>{String(i + 1).padStart(2, '0')}</span>
-                <span className={clsx(styles.name, styles.lg)}>{collection.title}</span>
-                <span className={clsx(styles.arrow, styles.lg)} aria-hidden="true">
+                <span className={clsx(styles.name, shell.lg)}>{collection.title}</span>
+                <span className={clsx(styles.arrow, shell.lg)} aria-hidden="true">
                   →
                 </span>
                 <span className={styles.thumb}>

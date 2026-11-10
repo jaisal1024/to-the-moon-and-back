@@ -1,0 +1,399 @@
+/* Blog post. Tokens, type scale, pills and night sections come from src/components/site. */
+
+/* page grid: the reading column sits in the middle; the left band carries the thread and the section numerals */
+.page {
+  --read: clamp(17px, 1.05vw + 5px, 21px);
+  --h2: clamp(28px, 2.8vw, 40px);
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  display: grid;
+  grid-template-columns:
+    [full-start] var(--pad) [margin-start] minmax(0, 1fr) [text-start] minmax(0, 34em) [text-end] minmax(0, 1fr)
+    [wide-end] var(--pad) [full-end];
+  font-size: var(--read);
+}
+
+.page > * {
+  grid-column: text;
+}
+
+/* title: a display headline in the /about manner, hung on the reading column's left edge */
+.head {
+  padding-top: clamp(130px, 24svh, 260px);
+  padding-bottom: clamp(40px, 9svh, 110px);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2em;
+  align-items: baseline;
+  margin-bottom: clamp(18px, 2.4vw, 34px);
+  font-size: var(--sm);
+}
+
+/* two classes so it outranks the shell's ".site a { color: inherit }" */
+.meta .allPosts {
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.meta .allPosts:hover {
+  color: var(--accent);
+}
+
+.head h1 {
+  grid-column: text-start / wide-end;
+  font-size: clamp(46px, calc((100vw - 2 * var(--pad)) / 11.5), 160px);
+  letter-spacing: -0.068em;
+  line-height: 0.9;
+  margin: 0 0 0 -0.05em;
+  max-width: 8.6em;
+  text-wrap: balance;
+  font-weight: inherit;
+}
+
+/* long-form body: same family, real leading, near-normal tracking */
+.prose {
+  position: relative;
+  padding-bottom: 18svh;
+}
+
+.prose > * {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.prose p,
+.prose li {
+  font-weight: 500;
+  line-height: 1.62;
+  letter-spacing: -0.012em;
+}
+
+.prose p + p {
+  margin-top: 1.05em;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.18em;
+  transition: color 0.2s ease;
+}
+
+.prose a:hover {
+  color: var(--accent);
+}
+
+.prose :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 0.12em 0.34em;
+  border-radius: 0.42em;
+  background: var(--pill-bg);
+}
+
+.prose h2 {
+  font-size: var(--h2);
+  font-weight: inherit;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+  margin: 2.2em 0 0.6em;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--rule);
+  text-wrap: balance;
+}
+
+.n {
+  position: absolute;
+  right: calc(100% + clamp(24px, 2.4vw, 40px));
+  top: 0.6em;
+  letter-spacing: -0.06em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.4s ease;
+}
+
+.prose h2[data-reached] .n {
+  color: var(--accent);
+}
+
+.prose h3 {
+  font-size: clamp(20px, 1.7vw, 24px);
+  font-weight: inherit;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin: 1.5em 0 0.9em;
+  text-wrap: balance;
+}
+
+.prose h3 code {
+  font: inherit;
+  letter-spacing: inherit;
+  background: none;
+  padding: 0;
+}
+
+.prose h2 + h3 {
+  margin-top: 0.6em;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1.05em 0;
+  padding-left: 1.6em;
+  list-style: none;
+}
+
+.prose li + li {
+  margin-top: 0.55em;
+}
+
+.prose li {
+  position: relative;
+}
+
+.prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: -1.25em;
+  top: 0.62em;
+  width: 0.36em;
+  height: 0.36em;
+  background: var(--text);
+}
+
+.prose ol {
+  counter-reset: n;
+}
+
+.prose ol > li {
+  counter-increment: n;
+}
+
+.prose ol > li::before {
+  content: counter(n, decimal-leading-zero);
+  position: absolute;
+  left: -1.6em;
+  top: 0.2em;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* code: a black plate (a night section), breaking out of the column equally on both sides;
+   it scrolls inside and fades at the right edge while there is more */
+.prose .code {
+  grid-column: margin-start / wide-end;
+  justify-self: center;
+  width: min(100%, 900px);
+  margin: 1.8em 0 1.6em;
+}
+
+.code::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 72px;
+  background: linear-gradient(to right, transparent, var(--ink));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.code[data-more]::after {
+  opacity: 1;
+}
+
+.cap {
+  display: flex;
+  gap: 0.4em;
+  padding: var(--gap) var(--gap) 0;
+}
+
+.cap > span {
+  font-family: var(--mono);
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+.code pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: clamp(20px, 2.2vw, 32px) clamp(18px, 2.2vw, 32px);
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-weight: 500;
+  tab-size: 2;
+  scrollbar-color: var(--muted) transparent;
+}
+
+.code pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.code code {
+  font-family: inherit;
+}
+
+/* the plate is a night section, so --accent is the lightened blue */
+.comment {
+  color: var(--accent);
+}
+
+/* reading progress: the blue to plum thread draws down the left band as you read */
+.progress {
+  grid-column: full;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.progress stop:nth-child(1) {
+  stop-color: var(--thread-1);
+}
+
+.progress stop:nth-child(2) {
+  stop-color: var(--thread-2);
+}
+
+.progress stop:nth-child(3) {
+  stop-color: var(--thread-3);
+}
+
+.progress path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track {
+  stroke: var(--rule);
+  stroke-width: 2px;
+  opacity: 0.5;
+}
+
+.ink {
+  stroke-width: clamp(3px, 0.3vw, 5px);
+}
+
+/* mobile: a 2px bar along the top of the viewport */
+.topbar {
+  display: none;
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--thread-1), var(--thread-2), var(--thread-3));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+/* end: the night chapter with the way back; the footer follows */
+.after {
+  padding: 14svh var(--pad) 0;
+}
+
+.back {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--gap);
+  padding: clamp(22px, 3.4vw, 52px) 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.arrow {
+  color: var(--accent);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.back:hover .arrow {
+  transform: translateX(-0.1em);
+}
+
+@media (max-width: 720px) {
+  .page {
+    grid-template-columns:
+      [full-start] var(--pad) [margin-start text-start] minmax(0, 1fr) [text-end wide-end] var(--pad)
+      [full-end];
+  }
+
+  .head {
+    padding-top: 120px;
+    padding-bottom: 36px;
+  }
+
+  .head h1 {
+    font-size: 13.4vw;
+    max-width: none;
+  }
+
+  .n {
+    display: none;
+  }
+
+  .prose .code {
+    grid-column: full;
+    width: 100%;
+  }
+
+  .cap {
+    padding: var(--pad) var(--pad) 0;
+  }
+
+  .code pre {
+    padding: 18px var(--pad);
+    font-size: 13px;
+  }
+
+  .code::after {
+    width: 48px;
+  }
+
+  .progress {
+    display: none;
+  }
+
+  .topbar {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress {
+    display: none;
+  }
+}

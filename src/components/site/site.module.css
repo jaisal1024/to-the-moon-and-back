@@ -1,0 +1,241 @@
+/*
+ * Shared design system for every public page: colour tokens, type scale, black photo mats,
+ * pills, the black "night" sections, the floating top bar and the footer.
+ * Page styles build on these tokens; they don't redefine them.
+ */
+.site {
+  --paper: #f9f4ec;
+  --ink: #000;
+  --text: #000;
+  --cream: #f9f4ec;
+  --muted: rgba(0, 0, 0, 0.4);
+  --rule: rgba(0, 0, 0, 0.14);
+  --pill-bg: rgba(0, 0, 0, 0.06);
+  --accent: #1d3db8;
+  --accent-2: #8e2a8c;
+  --thread-1: #1d3db8;
+  --thread-2: #5a33a8;
+  --thread-3: #8e2a8c;
+  --night-accent: #7d95ff;
+  --pad: clamp(14px, 1.95vw, 28px);
+  --gap: clamp(8px, 1.17vw, 16px);
+  --mat: clamp(8px, 1.4vw, 22px);
+  --xl: clamp(46px, 7.47vw, 132px);
+  --lg: clamp(30px, 4.3vw, 76px);
+  --md: clamp(18px, 1.95vw, 28px);
+  --sm: clamp(13px, 1.37vw, 19px);
+
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--text);
+  overflow-x: clip;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-weight: 600;
+  font-size: var(--md);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  -webkit-font-smoothing: antialiased;
+}
+
+:global([data-theme='dark']) .site {
+  --paper: #242424;
+  --text: #fff;
+  --muted: rgba(255, 255, 255, 0.45);
+  --rule: rgba(255, 255, 255, 0.16);
+  --pill-bg: rgba(255, 255, 255, 0.08);
+  --accent: #8da2ff;
+  --accent-2: #d993d6;
+  --thread-1: #8da2ff;
+  --thread-2: #b494f2;
+  --thread-3: #d993d6;
+}
+
+/* zero-specificity base so page and shell classes (.link, .u) always win */
+:where(.site) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(.site) img {
+  display: block;
+}
+
+.xl {
+  font-size: var(--xl);
+  letter-spacing: -0.068em;
+  line-height: 1;
+}
+
+.lg {
+  font-size: var(--lg);
+  letter-spacing: -0.07em;
+  line-height: 1;
+}
+
+.sm {
+  font-size: var(--sm);
+}
+
+.pill {
+  display: inline-block;
+  font-size: var(--sm);
+  padding: 0.32em 0.5em;
+  border-radius: 0.42em;
+  background: var(--pill-bg);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.link {
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--accent);
+}
+
+/* underlined inline link */
+.u {
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.14em;
+  transition: color 0.2s ease;
+}
+
+.u:hover {
+  color: var(--accent);
+}
+
+/* photos always sit in a black mat */
+.frame {
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.inner {
+  position: absolute;
+  inset: var(--mat);
+  overflow: hidden;
+}
+
+.inner img {
+  object-fit: cover;
+}
+
+/* black sections: cream text and the lightened blue */
+.night {
+  --accent: var(--night-accent);
+  --muted: rgba(249, 244, 236, 0.45);
+  --rule: rgba(249, 244, 236, 0.18);
+  --pill-bg: rgba(249, 244, 236, 0.12);
+
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* fixed top bar: difference blend so it reads on cream, black and photos; slides away while scrolling down */
+.bar {
+  position: fixed;
+  z-index: 50;
+  top: var(--pad);
+  left: var(--pad);
+  right: var(--pad);
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  font-size: var(--sm);
+  mix-blend-mode: difference;
+  color: #fff;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.away {
+  transform: translateY(calc(-100% - var(--pad) * 2));
+}
+
+.bar > * {
+  pointer-events: auto;
+}
+
+.bar nav {
+  display: flex;
+  gap: 0.15em;
+  align-items: center;
+  margin-left: -0.5em;
+}
+
+.bar nav a {
+  padding: 0.32em 0.5em;
+  border-radius: 0.42em;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.bar nav a[aria-current],
+.bar nav a:hover {
+  background: #fff;
+  color: #000;
+}
+
+.bar > a {
+  align-self: center;
+}
+
+.moon {
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.5em;
+  fill: #fff;
+}
+
+.footer {
+  display: grid;
+  grid-template-columns: 1.6fr 2fr 5.4fr;
+  gap: var(--gap);
+  padding: 10svh var(--pad) var(--pad);
+  align-items: end;
+}
+
+.footer ul {
+  list-style: none;
+  margin: 0.7em 0 0;
+  padding: 0;
+  line-height: 1.12;
+}
+
+.by {
+  justify-self: end;
+  font-size: var(--sm);
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .site {
+    --lg: 26px;
+  }
+
+  .bar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .footer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .by {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 2em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site * {
+    transition: none !important;
+  }
+}

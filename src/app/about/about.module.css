@@ -1,88 +1,11 @@
-/*
- * About page. Highlight colours: dark blue first, plum second; the thread blends between them.
- * Dark theme keeps the same shapes with lighter tints so the highlights read on carbon.
- */
-.page {
-  --paper: #f9f4ec;
-  --card: #f9f4ec;
-  --ink: #000;
-  --text: #000;
-  --accent: #1d3db8;
-  --accent-2: #8e2a8c;
-  --thread-1: #1d3db8;
-  --thread-2: #5a33a8;
-  --thread-3: #8e2a8c;
-  --night-accent: #7d95ff;
-  --pad: clamp(14px, 1.95vw, 28px);
-  --gap: clamp(8px, 1.17vw, 16px);
-  --mat: clamp(8px, 1.4vw, 22px);
-  --lg: clamp(30px, 4.3vw, 76px);
-  --md: clamp(18px, 1.95vw, 28px);
-  --sm: clamp(13px, 1.37vw, 19px);
-
-  background: var(--paper);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: clip;
-}
-
-:global([data-theme='dark']) .page {
-  --paper: #242424;
-  --text: #fff;
-  --accent: #8da2ff;
-  --accent-2: #d993d6;
-  --thread-1: #8da2ff;
-  --thread-2: #b494f2;
-  --thread-3: #d993d6;
-}
-
-.main {
-  font-family: var(--font-geist), Arial, sans-serif;
-  font-weight: 600;
-  font-size: var(--md);
-  line-height: 1;
-  letter-spacing: -0.05em;
-  -webkit-font-smoothing: antialiased;
-}
-
-.lg {
-  font-size: var(--lg);
-  letter-spacing: -0.07em;
-  line-height: 1;
-}
-
-.pill {
-  display: inline-block;
-  font-size: var(--sm);
-  padding: 0.32em 0.5em;
-  border-radius: 0.42em;
-  background: rgba(249, 244, 236, 0.12);
-}
-
-/* photos sit in black mats; the inner image eases up to full size as it scrolls in */
-.frame {
-  background: var(--ink);
-  position: relative;
-  overflow: hidden;
-}
-
-.inner {
-  position: absolute;
-  inset: var(--mat);
-  overflow: hidden;
-  will-change: transform;
-}
-
-.inner img {
-  object-fit: cover;
-}
+/* About page. Tokens, type scale, mats, pills and night sections come from src/components/site. */
 
 /* hero */
 .hero {
-  min-height: calc(100svh - 72px);
+  min-height: 100svh;
   display: grid;
   grid-template-rows: 1fr auto;
-  padding: 2svh var(--pad) 0;
+  padding: calc(var(--pad) * 4) var(--pad) 0;
 }
 
 .hero h1 {
@@ -244,13 +167,6 @@
 }
 
 /* night chapter: cards, then the collections index */
-.night {
-  --accent: var(--night-accent);
-
-  background: var(--ink);
-  color: var(--card);
-}
-
 .fan {
   height: 230svh;
   position: relative;
@@ -266,7 +182,7 @@
   perspective: 1400px;
 }
 
-.fan .pill {
+.fanLabel {
   position: absolute;
   top: 16svh;
   left: var(--pad);
@@ -291,7 +207,7 @@
 }
 
 .front {
-  background: var(--card);
+  background: var(--cream);
 }
 
 .front svg {
@@ -302,7 +218,7 @@
 
 .back {
   background: #a8a59c;
-  color: var(--card);
+  color: var(--cream);
   transform: rotateY(180deg);
   padding: 9%;
   place-items: end start;
@@ -329,7 +245,7 @@
   padding: 0 var(--pad) 8svh;
 }
 
-.rows .pill {
+.rowsLabel {
   margin-bottom: 1.4em;
 }
 
@@ -339,16 +255,16 @@
   align-items: center;
   gap: var(--gap);
   padding: var(--gap) 0;
-  border-top: 1px solid rgba(249, 244, 236, 0.18);
+  border-top: 1px solid var(--rule);
 }
 
 .row:last-child {
-  border-bottom: 1px solid rgba(249, 244, 236, 0.18);
+  border-bottom: 1px solid var(--rule);
 }
 
 .n {
   font-size: var(--sm);
-  color: rgba(249, 244, 236, 0.45);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -393,10 +309,6 @@
 }
 
 @media (max-width: 720px) {
-  .page {
-    --lg: 26px;
-  }
-
   .meta {
     grid-template-columns: 1fr;
     align-content: end;
@@ -443,7 +355,7 @@
     width: 33vw;
   }
 
-  .fan .pill {
+  .fanLabel {
     top: 14svh;
   }
 
@@ -461,10 +373,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .main * {
-    transition: none !important;
-  }
-
   .word {
     opacity: 1;
   }
