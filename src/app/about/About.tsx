@@ -5,8 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import shell from 'src/components/site/site.module.css';
+import { clamp } from 'src/utils/math';
 
 import styles from './about.module.css';
+import SlotMachine from './slots/SlotMachine';
 
 export type AboutCollection = {
   title: string;
@@ -16,35 +18,11 @@ export type AboutCollection = {
 
 const ROLES = ['engineering manager', 'photographer', 'technical leader', 'product thinker', 'data lover'];
 const HOBBIES = ['surf', 'read', 'learn spanish'];
-const INTERESTS = ['startups', 'literature', 'traveling'];
-const INTEREST_PHOTOS = ['/images/about/startups.jpg', '/images/about/literature-sidewalk.jpg', '/images/about/traveling.jpg'];
 
 const MOBILE_MAX = 720;
 const THREAD_STEPS = 300;
 
-const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-
-// Card backs: a pixel moon in three phases inside a plain frame, as one path of 1x1 squares.
-function moonPath(phase: number) {
-  const w = 25;
-  const h = 35;
-  const cx = 12;
-  const cy = 17;
-  const r = 7.4;
-  let d = '';
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const corner = (x < 3 || x > w - 4) && (y < 3 || y > h - 4);
-      const frame = (x === 0 || x === w - 1 || y === 0 || y === h - 1) && !corner;
-      const disc = Math.hypot(x - cx, y - cy) <= r;
-      const lit = phase === 2 ? disc : phase === 1 ? disc && x <= cx : disc && Math.hypot(x - cx - 4.5, y - cy) > r;
-      if (frame || lit) d += `M${x} ${y}h1v1h-1z`;
-    }
-  }
-  return d;
-}
-const MOON_PATHS = [0, 1, 2].map(moonPath);
 
 function Rotator({ items, delay, className }: { items: string[]; delay: number; className?: string }) {
   const [index, setIndex] = useState(0);
@@ -101,7 +79,6 @@ export default function About({ collections }: { collections: AboutCollection[] 
   const inkRef = useRef<SVGLinearGradientElement>(null);
   const sayARef = useRef<HTMLParagraphElement>(null);
   const sayBRef = useRef<HTMLParagraphElement>(null);
-  const fanRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const portrait = portraitRef.current;
@@ -110,15 +87,13 @@ export default function About({ collections }: { collections: AboutCollection[] 
     const ink = inkRef.current;
     const sayA = sayARef.current;
     const sayB = sayBRef.current;
-    const fan = fanRef.current;
-    if (!portrait || !body || !path || !ink || !sayA || !sayB || !fan) return;
+    if (!portrait || !body || !path || !ink || !sayA || !sayB) return;
     // Needs real layout and SVG geometry, which test environments don't provide.
     if (typeof path.getTotalLength !== 'function' || typeof window.matchMedia !== 'function') return;
 
     const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const says = [sayA, sayB].map((el) => Array.from(el.querySelectorAll<HTMLElement>('[data-word]')));
     const grows = Array.from(body.querySelectorAll<HTMLElement>('[data-grow]'));
-    const cards = Array.from(fan.querySelectorAll<HTMLElement>('[data-card]'));
     let threadLength = 0;
     // Furthest point down the page the thread has reached after each step, so it draws in scroll order.
     let threadDepth: number[] = [];
@@ -189,9 +164,8 @@ export default function About({ collections }: { collections: AboutCollection[] 
     }
 
     function frame() {
-      if (!body || !path || !fan) return;
+      if (!body || !path) return;
       const vh = window.innerHeight;
-      const mobile = window.innerWidth < MOBILE_MAX;
       const reduce = reduceQuery.matches;
 
       grows.forEach((el) => {
@@ -212,19 +186,6 @@ export default function About({ collections }: { collections: AboutCollection[] 
       if (reduce) k = THREAD_STEPS;
       else while (k < THREAD_STEPS && threadDepth[k + 1] <= head) k++;
       path.style.strokeDashoffset = String(threadLength * (1 - k / THREAD_STEPS));
-
-      const fr = fan.getBoundingClientRect();
-      const fp = reduce ? 1 : clamp(-fr.top / (fr.height - vh), 0, 1);
-      const spread = easeOut(clamp(fp / 0.4, 0, 1));
-      cards.forEach((card, i) => {
-        const side = i - 1;
-        const flip = easeOut(clamp((fp - 0.42 - i * 0.12) / 0.3, 0, 1));
-        const x = side * (mobile ? 31.5 : 25) * spread;
-        const y = Math.abs(side) * (mobile ? 3 : 5) * spread;
-        const rot = side * (mobile ? 6 : 13) * spread * (1 - flip * 0.75) + side * 4 * (1 - spread);
-        card.style.transform = `translate(${x}vw, ${y}vh) rotate(${rot}deg) rotateY(${flip * 180}deg)`;
-        card.style.zIndex = side === 0 ? '3' : '2';
-      });
     }
 
     let raf = 0;
@@ -327,24 +288,7 @@ export default function About({ collections }: { collections: AboutCollection[] 
       </section>
 
       <div className={shell.night}>
-        <section ref={fanRef} className={styles.fan}>
-          <div className={styles.pin}>
-            <span className={clsx(shell.pill, styles.fanLabel)}>I&apos;m interested in</span>
-            {INTERESTS.map((interest, i) => (
-              <div key={interest} className={styles.card} data-card>
-                <div className={clsx(styles.face, styles.front)}>
-                  <svg viewBox="0 0 25 35" shapeRendering="crispEdges" aria-hidden="true">
-                    <path d={MOON_PATHS[i]} />
-                  </svg>
-                </div>
-                <div className={clsx(styles.face, styles.back)}>
-                  <Image src={INTEREST_PHOTOS[i]} alt="" fill sizes="(max-width: 720px) 33vw, 19vw" />
-                  <b className={shell.lg}>{interest}</b>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <SlotMachine />
 
         {collections.length > 0 && (
           <section className={styles.rows}>

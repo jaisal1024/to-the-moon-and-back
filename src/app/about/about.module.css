@@ -166,81 +166,7 @@
   stroke-linejoin: round;
 }
 
-/* night chapter: cards, then the collections index */
-.fan {
-  height: 230svh;
-  position: relative;
-}
-
-.pin {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  perspective: 1400px;
-}
-
-.fanLabel {
-  position: absolute;
-  top: 16svh;
-  left: var(--pad);
-}
-
-.card {
-  position: absolute;
-  width: clamp(140px, 19vw, 290px);
-  aspect-ratio: 5 / 7;
-  will-change: transform;
-  transform-style: preserve-3d;
-}
-
-.face {
-  position: absolute;
-  inset: 0;
-  border-radius: clamp(10px, 1.2vw, 18px);
-  backface-visibility: hidden;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.front {
-  background: var(--cream);
-}
-
-.front svg {
-  width: 86%;
-  height: 90%;
-  fill: #000;
-}
-
-.back {
-  background: #a8a59c;
-  color: var(--cream);
-  transform: rotateY(180deg);
-  padding: 9%;
-  place-items: end start;
-}
-
-.back img {
-  object-fit: cover;
-}
-
-.back::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 55%);
-}
-
-.back b {
-  position: relative;
-  z-index: 1;
-  font-weight: inherit;
-}
-
+/* night chapter: the slot machine (slots/), then the collections index */
 .rows {
   padding: 0 var(--pad) 8svh;
 }
@@ -320,10 +246,6 @@
     max-height: 56svh;
   }
 
-  .back b {
-    font-size: 21px;
-  }
-
   .body {
     padding: 2svh var(--pad) 6svh;
   }
@@ -349,14 +271,6 @@
 
   .say {
     padding: 12svh 0 14svh;
-  }
-
-  .card {
-    width: 33vw;
-  }
-
-  .fanLabel {
-    top: 14svh;
   }
 
   .row {

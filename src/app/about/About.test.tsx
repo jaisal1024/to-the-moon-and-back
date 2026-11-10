@@ -8,10 +8,7 @@ test('renders the intro, statements and links', () => {
 
   expect(screen.getByTestId('about-heading')).toHaveTextContent("Hi, I'm Jaisal.");
   expect(screen.getByText('engineering manager')).toBeInTheDocument();
-  expect(screen.getByText("I'm interested in")).toBeInTheDocument();
-  for (const interest of ['startups', 'literature', 'traveling']) {
-    expect(screen.getByText(interest)).toBeInTheDocument();
-  }
+  expect(screen.getByRole('button', { name: 'Pull the lever' })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Counsel Health' })).toHaveAttribute(
     'href',
     'https://www.counselhealth.com/',

@@ -1,0 +1,893 @@
+/*
+ * The slot machine in the about page's night chapter: pixel art and clean type on black.
+ * Colours come from the shared tokens (--cream, --ink, --night-accent, --muted). The reels are
+ * cream paper in both themes, so the inks printed on them are fixed here rather than taken from
+ * --accent / --accent-2, which lighten in the dark theme.
+ */
+.game {
+  --reel-blue: #1d3db8;
+  --reel-violet: #5a33a8;
+  --reel-plum: #8e2a8c;
+  --glow-plum: #d993d6;
+  --faint: color-mix(in srgb, var(--cream) 16%, transparent);
+
+  height: 200svh;
+  position: relative;
+}
+
+.pin {
+  --cell: min(19svh, 17vw, 190px);
+  --hud: clamp(24px, 4.2svh, 38px);
+  --bulb-gap: clamp(8px, 1.2vw, 16px);
+
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pin svg {
+  display: block;
+}
+
+.pin [hidden] {
+  display: none;
+}
+
+/* night sky: two layers of pixel stars, a plum glow for the full moon round, a cream flash for 777 */
+.sky {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  animation: twinkle 3.2s steps(2) infinite alternate;
+}
+
+.sky + .sky {
+  animation: twinkle 2.3s steps(2) infinite alternate-reverse;
+}
+
+@keyframes twinkle {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 50% at 50% 16%,
+    color-mix(in srgb, var(--reel-plum) 50%, transparent),
+    color-mix(in srgb, var(--reel-blue) 16%, transparent) 55%,
+    transparent 75%
+  );
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.pin[data-moonlit] .glow {
+  opacity: 1;
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.fx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 0 var(--pad);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas:
+    '. orb .'
+    'hud machine stats';
+  align-items: center;
+  justify-items: center;
+  gap: clamp(10px, 1.8svh, 20px) clamp(24px, 3.4vw, 60px);
+  will-change: transform;
+}
+
+/* the orb: a pixel moon that waxes toward the free spins */
+.orb {
+  grid-area: orb;
+  width: clamp(58px, 10.5svh, 100px);
+  aspect-ratio: 1;
+}
+
+.orb svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.orbDark {
+  fill: color-mix(in srgb, var(--cream) 13%, transparent);
+}
+
+.orbLit {
+  fill: var(--cream);
+  transition: fill 0.4s ease;
+}
+
+.pin[data-moonlit] .orbLit {
+  fill: var(--glow-plum);
+}
+
+.pin[data-moonlit] .orb {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--glow-plum) 70%, transparent));
+}
+
+.machine {
+  grid-area: machine;
+  position: relative;
+}
+
+.machine[data-rumble] {
+  animation: rumble 0.09s linear infinite alternate;
+}
+
+@keyframes rumble {
+  from {
+    transform: translate(-2px, 1px);
+  }
+
+  to {
+    transform: translate(2px, -1px);
+  }
+}
+
+/* cabinet: a stepped pixel outline, nothing skeuomorphic */
+.cab {
+  --s: 5px;
+
+  position: relative;
+  padding: calc(var(--bulb-gap) * 1.5 + 3px) calc(var(--bulb-gap) * 2 + 3px);
+  display: grid;
+  gap: calc(var(--bulb-gap) * 1.9);
+}
+
+.cab::before,
+.cab::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  clip-path: polygon(
+    0 calc(2 * var(--s)),
+    var(--s) calc(2 * var(--s)),
+    var(--s) var(--s),
+    calc(2 * var(--s)) var(--s),
+    calc(2 * var(--s)) 0,
+    calc(100% - 2 * var(--s)) 0,
+    calc(100% - 2 * var(--s)) var(--s),
+    calc(100% - var(--s)) var(--s),
+    calc(100% - var(--s)) calc(2 * var(--s)),
+    100% calc(2 * var(--s)),
+    100% calc(100% - 2 * var(--s)),
+    calc(100% - var(--s)) calc(100% - 2 * var(--s)),
+    calc(100% - var(--s)) calc(100% - var(--s)),
+    calc(100% - 2 * var(--s)) calc(100% - var(--s)),
+    calc(100% - 2 * var(--s)) 100%,
+    calc(2 * var(--s)) 100%,
+    calc(2 * var(--s)) calc(100% - var(--s)),
+    var(--s) calc(100% - var(--s)),
+    var(--s) calc(100% - 2 * var(--s)),
+    0 calc(100% - 2 * var(--s))
+  );
+}
+
+.cab::before {
+  inset: 0;
+  background: color-mix(in srgb, var(--cream) 90%, transparent);
+  transition: background-color 0.4s ease;
+}
+
+.cab::after {
+  inset: 3px;
+  background: var(--ink);
+}
+
+.pin[data-moonlit] .cab::before {
+  background: var(--glow-plum);
+}
+
+.cab > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* the sign: every word the machine says is 5x7 pixel type */
+/* the line is taken out of flow so a long one scales down instead of widening the cabinet */
+.sign {
+  position: relative;
+  height: clamp(22px, 4.2svh, 40px);
+}
+
+.sign svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--cream);
+  animation: signIn 0.32s cubic-bezier(0.2, 1.7, 0.4, 1);
+}
+
+@keyframes signIn {
+  from {
+    transform: translateY(35%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.sign[data-tone='dim'] svg {
+  fill: var(--muted);
+}
+
+.sign[data-tone='blue'] svg {
+  fill: var(--night-accent);
+}
+
+.sign[data-tone='plum'] svg,
+.sign[data-tone='hot'] svg {
+  fill: var(--glow-plum);
+}
+
+.sign[data-tone='jack'] svg {
+  fill: var(--night-accent);
+  animation:
+    signIn 0.32s cubic-bezier(0.2, 1.7, 0.4, 1),
+    blink 0.4s steps(1) 7,
+    shine 1s ease-in-out 2.8s infinite alternate;
+}
+
+@keyframes blink {
+  50% {
+    fill: var(--glow-plum);
+  }
+}
+
+@keyframes shine {
+  to {
+    fill: var(--cream);
+  }
+}
+
+/* reels: three strips of cream paper; the middle row is the payline */
+.window {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell));
+  gap: clamp(4px, 0.5vw, 8px);
+  height: calc(var(--cell) * 3);
+  cursor: pointer;
+}
+
+.reel {
+  position: relative;
+  overflow: hidden;
+  background: var(--cream);
+  height: 100%;
+}
+
+.reel::before,
+.reel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--cell);
+  background: color-mix(in srgb, var(--ink) 66%, transparent);
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.reel::before {
+  top: 0;
+}
+
+.reel::after {
+  bottom: 0;
+}
+
+/* a launch counts rockets in any row, so the whole window lights up */
+.window[data-lit] .reel::before,
+.window[data-lit] .reel::after {
+  opacity: 0;
+}
+
+.strip {
+  will-change: transform;
+}
+
+.reel[data-blur] .strip {
+  filter: blur(2.5px);
+}
+
+.cell {
+  height: var(--cell);
+  display: grid;
+  place-items: center;
+}
+
+.cell svg {
+  width: 70%;
+  height: 70%;
+}
+
+.blue {
+  fill: var(--reel-blue);
+}
+
+.violet {
+  fill: var(--reel-violet);
+}
+
+.plum {
+  fill: var(--reel-plum);
+}
+
+.ink {
+  fill: var(--ink);
+}
+
+.cell[data-hit] {
+  box-shadow: inset 0 0 0 clamp(4px, 0.5vw, 7px) var(--reel-plum);
+}
+
+.cell[data-hit='pair'] {
+  box-shadow: inset 0 0 0 clamp(4px, 0.5vw, 7px) var(--reel-blue);
+}
+
+.cell[data-hit] svg {
+  animation: hop 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) 2;
+}
+
+.cell[data-away] svg {
+  visibility: hidden;
+}
+
+@keyframes hop {
+  40% {
+    transform: translateY(-14%) scale(1.12);
+  }
+}
+
+.window:focus-visible,
+.lever:focus-visible,
+.mute:focus-visible,
+.star:focus-visible {
+  outline: 2px solid var(--night-accent);
+  outline-offset: 5px;
+}
+
+/*
+ * Square marquee bulbs around the window. The chase is one keyframe animation per bulb, offset by
+ * its place in the ring (--i) or by odd/even (--odd); the cabinet's data-bulbs picks the pattern.
+ */
+.bulbs {
+  position: absolute;
+  inset: calc(-1 * var(--bulb-gap));
+  pointer-events: none;
+}
+
+.bulb {
+  --on: var(--cream);
+
+  position: absolute;
+  width: clamp(4px, 0.45vw, 6px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: var(--faint);
+  /* idle: every third bulb lit, stepping round slowly */
+  animation: lit-third 0.84s steps(1) infinite;
+  animation-delay: calc(var(--i) * -0.28s);
+}
+
+.cab[data-bulbs='spin'] .bulb {
+  animation: lit-half 0.28s steps(1) infinite;
+  animation-delay: calc(var(--i) * -0.07s);
+}
+
+/* a comet a third of the ring long, lapping it while the last reel crawls */
+.cab[data-bulbs='tease'] .bulb {
+  --on: var(--glow-plum);
+
+  animation: lit-third 1.68s steps(1) infinite;
+  animation-delay: calc(var(--i) * -0.035s);
+}
+
+.cab[data-bulbs='pair'] .bulb {
+  --on: var(--night-accent);
+
+  animation: lit-half 0.28s steps(1) infinite;
+  animation-delay: calc(var(--odd) * -0.14s);
+}
+
+.cab[data-bulbs='win'] .bulb {
+  --on: var(--glow-plum);
+
+  animation: lit-half 0.14s steps(1) infinite;
+  animation-delay: calc(var(--odd) * -0.07s);
+}
+
+.pin[data-moonlit] .bulb {
+  --on: var(--glow-plum);
+}
+
+@keyframes lit-third {
+  0% {
+    background: var(--on);
+    box-shadow: 0 0 10px var(--on);
+  }
+
+  33.4%,
+  100% {
+    background: var(--faint);
+    box-shadow: none;
+  }
+}
+
+@keyframes lit-half {
+  0% {
+    background: var(--on);
+    box-shadow: 0 0 10px var(--on);
+  }
+
+  50%,
+  100% {
+    background: var(--faint);
+    box-shadow: none;
+  }
+}
+
+/* floating payout tag */
+.float {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  padding: 0.5em 0.7em;
+  background: var(--ink);
+  pointer-events: none;
+  font-size: calc(var(--cell) * 0.2);
+  transform: translate(-50%, -50%);
+  animation: floatUp 1.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+.float svg {
+  height: 1.4em;
+  fill: var(--night-accent);
+}
+
+.float[data-big] {
+  font-size: calc(var(--cell) * 0.3);
+}
+
+.float[data-big] svg {
+  fill: var(--glow-plum);
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translate(-50%, -30%) scale(0.4);
+    opacity: 0;
+  }
+
+  18% {
+    transform: translate(-50%, -60%) scale(1.15);
+    opacity: 1;
+  }
+
+  30% {
+    transform: translate(-50%, -60%) scale(1);
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -190%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* hud: credits, streak, free spins */
+.hud {
+  grid-area: hud;
+  justify-self: end;
+  display: grid;
+  justify-items: end;
+  gap: calc(var(--hud) * 0.55);
+  min-width: calc(var(--hud) * 4);
+}
+
+.hud svg {
+  height: calc(var(--hud) * 0.5);
+  width: auto;
+  fill: var(--cream);
+}
+
+.hud > div {
+  min-height: calc(var(--hud) * 0.5);
+}
+
+.coins {
+  display: flex;
+  gap: calc(var(--hud) * 0.3);
+  align-items: center;
+  transform-origin: right center;
+}
+
+.coins svg {
+  height: var(--hud);
+}
+
+.coins .coin {
+  fill: var(--glow-plum);
+}
+
+.coins[data-falling] svg:last-child {
+  fill: var(--muted);
+}
+
+@keyframes bump {
+  40% {
+    transform: scale(1.25);
+  }
+}
+
+.streak svg {
+  fill: var(--night-accent);
+  animation: bump 0.4s cubic-bezier(0.2, 1.9, 0.4, 1);
+}
+
+.extra svg {
+  fill: var(--glow-plum);
+  animation: bump 0.4s cubic-bezier(0.2, 1.9, 0.4, 1);
+}
+
+/* lever: drag the knob down, or click it */
+.lever {
+  position: absolute;
+  left: calc(100% + clamp(4px, 0.8vw, 12px));
+  top: 50%;
+  margin-top: calc(var(--cell) * -1.15);
+  width: clamp(30px, 3.4vw, 50px);
+  height: calc(var(--cell) * 2.1);
+  cursor: grab;
+  background: none;
+  border: 0;
+  padding: 0;
+  touch-action: none;
+  color: inherit;
+}
+
+.lever:active {
+  cursor: grabbing;
+}
+
+.base {
+  position: absolute;
+  left: 0;
+  bottom: 6%;
+  width: 64%;
+  height: 16%;
+  background: color-mix(in srgb, var(--cream) 22%, transparent);
+}
+
+.base::before {
+  content: '';
+  position: absolute;
+  left: -45%;
+  top: 30%;
+  width: 45%;
+  height: 40%;
+  background: inherit;
+}
+
+.arm {
+  --arm: clamp(4px, 0.5vw, 6px);
+
+  position: absolute;
+  left: 32%;
+  bottom: 14%;
+  width: var(--arm);
+  margin-left: calc(-0.5 * var(--arm));
+  height: calc(78% - var(--pull, 0) * 60%);
+  background: var(--cream);
+  transition: height 0.38s cubic-bezier(0.3, 2.2, 0.5, 1);
+}
+
+.lever[data-dragging] .arm {
+  transition: none;
+}
+
+.lever[data-pulled] .arm {
+  transition: height 0.11s ease-in;
+}
+
+.knob {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: clamp(26px, 2.8vw, 40px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -62%);
+  fill: var(--glow-plum);
+  transition: fill 0.2s ease;
+}
+
+.lever[data-dragging] .knob {
+  fill: var(--cream);
+}
+
+@media (hover: hover) {
+  .lever:hover .knob {
+    fill: var(--cream);
+  }
+}
+
+/* stats: the only ordinary type in the machine */
+.stats {
+  grid-area: stats;
+  justify-self: start;
+  margin-left: clamp(40px, 4.4vw, 70px);
+  display: grid;
+  gap: 0.5em;
+  justify-items: start;
+  font-size: var(--sm);
+  letter-spacing: -0.03em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats dl {
+  display: grid;
+  gap: 0.5em;
+  min-width: 8.5em;
+  margin: 0;
+}
+
+.stats dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.6em;
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--cream);
+}
+
+.mute {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.3em;
+  margin-left: -0.3em;
+  height: 1.9em;
+  color: var(--muted);
+}
+
+.mute svg {
+  height: 100%;
+  fill: currentcolor;
+}
+
+.mute:hover,
+.mute[aria-pressed='true'] {
+  color: var(--cream);
+}
+
+/* the ship, and the shooting star */
+.ship {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 7;
+  width: calc(var(--cell) * 0.7);
+  aspect-ratio: 1;
+  margin: calc(var(--cell) * -0.35) 0 0 calc(var(--cell) * -0.35);
+  pointer-events: none;
+}
+
+.ship svg {
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  width: 64px;
+  height: 64px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.star svg {
+  width: 44px;
+  height: auto;
+  overflow: visible;
+  fill: var(--cream);
+}
+
+.star .tail {
+  fill: var(--night-accent);
+}
+
+.star .tailFar {
+  fill: var(--muted);
+}
+
+.star[data-mode='fly'] {
+  animation: starFly 3.4s linear forwards;
+}
+
+.star[data-mode='hold'] {
+  left: 12%;
+  top: 16%;
+}
+
+@keyframes starFly {
+  from {
+    transform: translate(-10vw, 8svh);
+  }
+
+  to {
+    transform: translate(104vw, 46svh);
+  }
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .pin {
+    --cell: min(15.5svh, 22vw, 150px);
+    --hud: 20px;
+  }
+
+  .stage {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'orb'
+      'machine'
+      'hud'
+      'stats';
+    row-gap: clamp(10px, 1.9svh, 18px);
+  }
+
+  .cab {
+    --s: 4px;
+
+    padding: calc(var(--bulb-gap) * 1.6 + 3px) calc(var(--bulb-gap) * 1.75 + 3px);
+  }
+
+  .lever {
+    width: 30px;
+    left: calc(100% + 5px);
+  }
+
+  .hud {
+    justify-self: center;
+    width: calc(var(--cell) * 3 + var(--bulb-gap) * 3.5 + 20px);
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    justify-items: center;
+    min-height: var(--hud);
+  }
+
+  .hud > :first-child {
+    justify-self: start;
+    transform-origin: left center;
+  }
+
+  .hud > :last-child {
+    justify-self: end;
+  }
+
+  .stats {
+    justify-self: center;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3em 1em;
+    max-width: 92vw;
+  }
+
+  .stats dl {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3em 1em;
+    min-width: 0;
+  }
+
+  .stats dl > div {
+    gap: 0.35em;
+  }
+
+  .star[data-mode='fly'] {
+    animation-duration: 2.8s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulb,
+  .cab[data-bulbs] .bulb {
+    animation: none;
+  }
+
+  .bulb:nth-child(3n + 1) {
+    background: var(--on);
+    box-shadow: 0 0 10px var(--on);
+  }
+
+  .machine[data-rumble] {
+    animation: none;
+  }
+
+  .sky,
+  .sign svg,
+  .sign[data-tone='jack'] svg,
+  .cell[data-hit] svg,
+  .streak svg,
+  .extra svg {
+    animation: none;
+  }
+
+  .sign[data-tone='jack'] svg {
+    fill: var(--glow-plum);
+  }
+
+  .float {
+    animation: none;
+    transform: translate(-50%, -120%);
+  }
+
+  .star[data-mode='fly'] {
+    animation: none;
+    left: 12%;
+    top: 16%;
+  }
+}
