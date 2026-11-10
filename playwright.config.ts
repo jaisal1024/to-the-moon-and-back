@@ -25,8 +25,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* GitHub-hosted runners have 4 vCPUs; leave room for the dev server. */
-  workers: process.env.CI ? 2 : undefined,
+  /* CI serves a production build, so every runner core can drive a browser. */
+  workers: process.env.CI ? '100%' : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -57,10 +57,12 @@ export default defineConfig({
     },
   ],
 
-  /* Run your local dev server before starting the tests */
+  /* Locally, test against the dev server. On CI, build once and serve the result so no test
+     waits on an on-demand compile (the Studio bundle alone could exceed its 30s timeout). */
   webServer: {
-    command: 'pnpm run dev',
+    command: process.env.CI ? 'pnpm run build && pnpm run start -p 3333' : 'pnpm run dev',
     url: 'http://localhost:3333',
     reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
   },
 });
