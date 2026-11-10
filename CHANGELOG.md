@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.2.0...v1.3.0) (2026-11-10)
+
+
+### Features
+
+* **about:** add what to reach out about section ([#55](https://github.com/jaisal1024/to-the-moon-and-back/issues/55)) ([b4caeca](https://github.com/jaisal1024/to-the-moon-and-back/commit/b4caeca42f7e45f7a1d36a052947d19f8f2f7eb6))
+
 ## [1.2.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.3...v1.2.0) (2026-11-10)
 
 
