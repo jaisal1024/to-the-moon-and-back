@@ -30,7 +30,7 @@ TODO:
 
 ## Development
 
-Use Node.js 24 or newer and pnpm 12 (pinned in `package.json`; `corepack enable` picks it up). Install dependencies with `pnpm install --frozen-lockfile`.
+Use Node.js 26 or newer and pnpm 12 (pinned in `package.json`; `corepack enable` picks it up). Install dependencies with `pnpm install --frozen-lockfile`.
 
 `pnpm-workspace.yaml` enforces a 3-day `minimumReleaseAge` and blocks all dependency install scripts. If an install fails because a version is too new, wait or pick an older one; if a new dependency wants to run a build script, add it to `allowBuilds` (as `false` unless it truly needs the script).
 
