@@ -81,7 +81,7 @@ yarn build
       → generateStaticParams → enumerate slugs
       → generateMetadata → dynamic metadata
       → Page Render → Apollo query GetCollection (per slug)
-  → about/page.tsx → static
+  → about/page.tsx → Apollo query GetCollections (collections index; skipped if the CMS is unreachable)
 ```
 
 ### Runtime (ISR)

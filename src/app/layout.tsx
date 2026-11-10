@@ -1,5 +1,4 @@
 import 'src/styles/globals.css';
-import 'src/styles/animate.css';
 
 import { Metadata } from 'next';
 import { Archivo_Black, DM_Sans } from 'next/font/google';

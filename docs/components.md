@@ -86,22 +86,6 @@ The project uses the native **Next.js Metadata API** for SEO and header manageme
 
 ---
 
-## `AnimatedSpan`
-
-**File:** `src/components/AnimatedSpan.tsx`
-
-Cycles through an array of strings with a CSS fade animation. Used on the About page to animate alternating text (e.g., "software engineer", "photographer").
-
-**Props:**
-
-```ts
-{ items: string[] } & React.HTMLProps<HTMLSpanElement>
-```
-
-> ⚠️ If you change the CSS animation duration in `animate.css`, also update the `transitionTotal` constant in this file (it must stay in sync).
-
----
-
 ## `Link`
 
 **File:** `src/components/Link.tsx`
