@@ -222,6 +222,26 @@
 
   .bar {
     grid-template-columns: 1fr auto;
+    font-size: 16px;
+  }
+
+  .bar nav a {
+    padding: 0.45em 0.5em;
+  }
+
+  /* invisible 44px-tall hit area, so the pills stay their size but are easy to tap */
+  .bar a {
+    position: relative;
+  }
+
+  .bar a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
   }
 
   .footer {

@@ -79,7 +79,7 @@ function Plate({
         <span className={styles.n}>
           {index + 1} / {total}
         </span>
-        <span>{photo.title}</span>
+        <span className={styles.t}>{photo.title}</span>
       </figcaption>
     </figure>
   );
