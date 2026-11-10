@@ -134,9 +134,9 @@ Opens a visual bundle analyzer to inspect client/server bundle sizes.
 
 1. **Sanity GraphQL limitations**: `allCollections` must be used instead of `collection` when filtering by slug, because Sanity's `collection` query only accepts document IDs
 2. **No per-photo limit in collection queries**: Sanity doesn't support sub-query element limits in GraphQL. The homepage fetches all photos for each collection (only uses the first photo for the cover image), which is expensive
-3. **AnimatedSpan timing**: If you change the CSS animation duration in `src/styles/animate.css`, update `transitionTotal` in `AnimatedSpan.tsx` to match (it should be half the CSS duration since the animation alternates)
-4. **Sanity data migrations**: Renaming `_type` fields requires using the migration script at `scripts/migrateDocumentType.js`. Use with extreme caution
-5. **Sanity Image + NextImage**: Sanity image references need to go through `@sanity/image-url` before passing to `next/image`. See `NextImage.tsx` for the pattern
-6. **Font loading**: Fonts are loaded via `next/font` in `src/app/layout.tsx`:
+3. **Sanity data migrations**: Renaming `_type` fields requires using the migration script at `scripts/migrateDocumentType.js`. Use with extreme caution
+4. **Sanity Image + NextImage**: Sanity image references need to go through `@sanity/image-url` before passing to `next/image`. See `NextImage.tsx` for the pattern
+5. **Font loading**: Fonts are loaded via `next/font` in `src/app/layout.tsx`:
    - `Archivo Black` for the main hero heading
    - `DM Sans` for all other headings and body text
+   - `Geist` is loaded only by `src/app/about/page.tsx` for the About page
