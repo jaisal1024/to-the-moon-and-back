@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js >= 18 (see `.nvmrc`)
+- Node.js >= 26 (see `.nvmrc`)
 - Yarn (package manager)
 - Access to the Sanity project (ask Jaisal for credentials)
 
