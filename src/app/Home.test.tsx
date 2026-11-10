@@ -27,7 +27,7 @@ const COLLECTIONS: HomeCollection[] = [
 test('renders the heading without a list when there are no collections', () => {
   render(<Home collections={[]} />);
 
-  expect(screen.getByTestId('collections-heading')).toHaveTextContent('Collections');
+  expect(screen.getByTestId('collections-heading')).toHaveTextContent("Jaisal's Collections");
   expect(screen.queryByRole('navigation', { name: 'Collections' })).not.toBeInTheDocument();
   expect(screen.queryAllByRole('link')).toHaveLength(0);
 });

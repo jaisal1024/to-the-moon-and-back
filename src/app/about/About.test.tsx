@@ -17,7 +17,7 @@ test('renders the intro, statements and links', () => {
     'href',
     'https://www.linkedin.com/in/jaisalfriedman/',
   );
-  expect(screen.queryByText('Collections')).not.toBeInTheDocument();
+  expect(screen.queryByText("Jaisal's Collections")).not.toBeInTheDocument();
 });
 
 test('says what to reach out about and what not to', () => {
@@ -32,7 +32,7 @@ test('says what to reach out about and what not to', () => {
   for (const topic of ['recruiting', 'spam', 'NFTs']) {
     expect(screen.getByText(topic)).toBeInTheDocument();
   }
-  expect(screen.getByText("I'm not open to new opportunities.")).toBeInTheDocument();
+  expect(screen.getByText("I'm not open to new opportunities at the moment.")).toBeInTheDocument();
 });
 
 test('lists collections in order with links', () => {

@@ -103,7 +103,7 @@ function Hero({ collections }: { collections: HomeCollection[] }) {
           </Link>
         </>
       )}
-      <h1 data-testid="collections-heading">Collections</h1>
+      <h1 data-testid="collections-heading">Jaisal&apos;s Collections</h1>
     </section>
   );
 }
