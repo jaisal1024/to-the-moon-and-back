@@ -234,7 +234,43 @@
   transform: none;
 }
 
+/* what to get in touch about, and what not to */
+.reach {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 8svh var(--gap);
+  padding: 8svh var(--pad) 12svh;
+}
+
+.reachLabel {
+  margin-bottom: 1.4em;
+}
+
+.reach ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.12em;
+}
+
+.no {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 0.06em;
+}
+
+.note {
+  margin-top: 0.9em;
+  font-size: var(--sm);
+  color: var(--muted);
+}
+
 @media (max-width: 720px) {
+  .reach {
+    grid-template-columns: 1fr;
+  }
+
   .meta {
     grid-template-columns: 1fr;
     align-content: end;

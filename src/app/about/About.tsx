@@ -18,6 +18,8 @@ export type AboutCollection = {
 
 const ROLES = ['engineering manager', 'photographer', 'technical leader', 'product thinker', 'data lover'];
 const HOBBIES = ['surf', 'read', 'learn spanish'];
+const REACH_OUT = ['advising', 'angel investing', 'open source contributing'];
+const NO_REACH_OUT = ['recruiting', 'spam', 'NFTs'];
 
 const MOBILE_MAX = 720;
 const THREAD_STEPS = 300;
@@ -309,6 +311,30 @@ export default function About({ collections }: { collections: AboutCollection[] 
             ))}
           </section>
         )}
+
+        <section className={styles.reach}>
+          <div>
+            <span className={clsx(shell.pill, styles.reachLabel)}>Reach out about</span>
+            <ul>
+              {REACH_OUT.map((topic) => (
+                <li key={topic} className={shell.lg}>
+                  {topic}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <span className={clsx(shell.pill, styles.reachLabel)}>Please don&apos;t reach out about</span>
+            <ul>
+              {NO_REACH_OUT.map((topic) => (
+                <li key={topic} className={clsx(shell.lg, styles.no)}>
+                  {topic}
+                </li>
+              ))}
+            </ul>
+            <p className={styles.note}>I&apos;m not open to new opportunities.</p>
+          </div>
+        </section>
       </div>
     </>
   );

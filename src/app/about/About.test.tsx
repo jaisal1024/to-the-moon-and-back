@@ -20,6 +20,21 @@ test('renders the intro, statements and links', () => {
   expect(screen.queryByText('Collections')).not.toBeInTheDocument();
 });
 
+test('says what to reach out about and what not to', () => {
+  render(<About collections={[]} />);
+
+  expect(screen.getByText('Reach out about')).toBeInTheDocument();
+  for (const topic of ['advising', 'angel investing', 'open source contributing']) {
+    expect(screen.getByText(topic)).toBeInTheDocument();
+  }
+  expect(screen.queryByText('new product launches')).not.toBeInTheDocument();
+  expect(screen.getByText("Please don't reach out about")).toBeInTheDocument();
+  for (const topic of ['recruiting', 'spam', 'NFTs']) {
+    expect(screen.getByText(topic)).toBeInTheDocument();
+  }
+  expect(screen.getByText("I'm not open to new opportunities.")).toBeInTheDocument();
+});
+
 test('lists collections in order with links', () => {
   render(
     <About
