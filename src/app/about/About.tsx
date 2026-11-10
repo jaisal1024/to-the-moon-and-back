@@ -14,9 +14,10 @@ export type AboutCollection = {
   photo?: string;
 };
 
-const ROLES = ['software engineer', 'photographer', 'technical leader', 'product thinker', 'data lover'];
+const ROLES = ['engineering manager', 'photographer', 'technical leader', 'product thinker', 'data lover'];
 const HOBBIES = ['surf', 'read', 'learn spanish'];
-const HOBBY_PHOTOS = ['/images/about/surf.jpg', '/images/about/read.jpg', '/images/about/spanish.jpg'];
+const INTERESTS = ['startups', 'literature', 'traveling'];
+const INTEREST_PHOTOS = ['/images/about/startups.jpg', '/images/about/literature-sidewalk.jpg', '/images/about/traveling.jpg'];
 
 const MOBILE_MAX = 720;
 const THREAD_STEPS = 300;
@@ -305,7 +306,7 @@ export default function About({ collections }: { collections: AboutCollection[] 
         {[
           { src: '/images/about/surfer.jpg', span: styles.w8, sizes: '(max-width: 720px) 92vw, 64vw' },
           { src: '/images/about/arches.jpg', span: styles.w4, sizes: '(max-width: 720px) 46vw, 32vw' },
-          { src: '/images/about/sunset-table.jpg', span: styles.w7, sizes: '(max-width: 720px) 92vw, 56vw' },
+          { src: '/images/about/coast.jpg', span: styles.w7, sizes: '(max-width: 720px) 92vw, 56vw' },
           { src: '/images/about/palms.jpg', span: styles.w5, sizes: '(max-width: 720px) 46vw, 40vw' },
         ].map((photo) => (
           <div key={photo.src} className={clsx(shell.frame, photo.span)}>
@@ -328,17 +329,17 @@ export default function About({ collections }: { collections: AboutCollection[] 
       <div className={shell.night}>
         <section ref={fanRef} className={styles.fan}>
           <div className={styles.pin}>
-            <span className={clsx(shell.pill, styles.fanLabel)}>I love to</span>
-            {HOBBIES.map((hobby, i) => (
-              <div key={hobby} className={styles.card} data-card>
+            <span className={clsx(shell.pill, styles.fanLabel)}>I&apos;m interested in</span>
+            {INTERESTS.map((interest, i) => (
+              <div key={interest} className={styles.card} data-card>
                 <div className={clsx(styles.face, styles.front)}>
                   <svg viewBox="0 0 25 35" shapeRendering="crispEdges" aria-hidden="true">
                     <path d={MOON_PATHS[i]} />
                   </svg>
                 </div>
                 <div className={clsx(styles.face, styles.back)}>
-                  <Image src={HOBBY_PHOTOS[i]} alt="" fill sizes="(max-width: 720px) 33vw, 19vw" />
-                  <b className={shell.lg}>{hobby}</b>
+                  <Image src={INTEREST_PHOTOS[i]} alt="" fill sizes="(max-width: 720px) 33vw, 19vw" />
+                  <b className={shell.lg}>{interest}</b>
                 </div>
               </div>
             ))}

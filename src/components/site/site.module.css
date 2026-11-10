@@ -198,7 +198,7 @@
   grid-template-columns: 1.6fr 2fr 5.4fr;
   gap: var(--gap);
   padding: 10svh var(--pad) var(--pad);
-  align-items: end;
+  align-items: start;
 }
 
 .footer ul {
@@ -210,6 +210,7 @@
 
 .by {
   justify-self: end;
+  align-self: end;
   font-size: var(--sm);
   color: var(--muted);
 }

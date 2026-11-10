@@ -49,10 +49,13 @@ test('top bar steps aside while scrolling down and returns on scroll up', async 
   const bar = page.getByRole('banner');
   await expect(bar).toBeInViewport();
 
-  // Scroll programmatically: mobile WebKit has no mouse wheel.
-  await page.evaluate(() => window.scrollTo(0, 1600));
-  await expect(bar).not.toBeInViewport();
+  // Scroll programmatically (mobile WebKit has no mouse wheel), and keep scrolling until the
+  // client scroll handler has hydrated and reacted, so a slow hydration can't make this flaky.
+  await expect(async () => {
+    await page.evaluate(() => window.scrollBy(0, 400));
+    await expect(bar).not.toBeInViewport({ timeout: 500 });
+  }).toPass();
 
-  await page.evaluate(() => window.scrollTo(0, 1200));
+  await page.evaluate(() => window.scrollBy(0, -400));
   await expect(bar).toBeInViewport();
 });
