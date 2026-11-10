@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.0...v1.1.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **deps:** upgrade Next.js to 16.4.5 and patch Dependabot vulnerabilities ([#45](https://github.com/jaisal1024/to-the-moon-and-back/issues/45)) ([55da169](https://github.com/jaisal1024/to-the-moon-and-back/commit/55da16956d0c17b9d0104590f9a3528d181cc8e7))
+
 ## [1.1.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.0.0...v1.1.0) (2026-11-10)
 
 
