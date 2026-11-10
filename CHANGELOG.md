@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.2...v1.1.3) (2026-11-10)
+
+
+### Bug Fixes
+
+* **release:** match release-please's component branch name in auto-merge ([#47](https://github.com/jaisal1024/to-the-moon-and-back/issues/47)) ([65d4a87](https://github.com/jaisal1024/to-the-moon-and-back/commit/65d4a87e06759125bc7aee0853b7e1cae2aed7a3))
+
 ## [1.1.2](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.1...v1.1.2) (2026-11-10)
 
 
