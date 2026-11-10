@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.1...v1.1.2) (2026-11-10)
+
+
+### Bug Fixes
+
+* **site:** quieter collection captions and a bigger mobile header ([#48](https://github.com/jaisal1024/to-the-moon-and-back/issues/48)) ([6c44afb](https://github.com/jaisal1024/to-the-moon-and-back/commit/6c44afbe5f437026f59181b3c11c82121cb8d34e))
+
 ## [1.1.1](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.0...v1.1.1) (2026-11-10)
 
 
