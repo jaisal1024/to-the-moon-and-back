@@ -40,6 +40,7 @@ test('footer keeps the site map, contact links and copyright', () => {
     'https://www.linkedin.com/in/jaisalfriedman/',
   );
   expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/jaisal1024');
+  expect(screen.getByRole('link', { name: 'X' })).toHaveAttribute('href', 'https://x.com/jaisal_f');
   expect(screen.getByRole('link', { name: 'hi@jaisal.xyz' })).toHaveAttribute('href', 'mailto:hi@jaisal.xyz');
   expect(screen.getByTestId('footer-copyright')).toHaveTextContent(
     `designed and built by © Jaisal Friedman ${new Date().getFullYear()}`,

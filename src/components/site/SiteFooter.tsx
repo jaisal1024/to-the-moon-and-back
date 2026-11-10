@@ -12,6 +12,7 @@ const SITE_MAP = [
 const CONNECT = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jaisalfriedman/' },
   { label: 'GitHub', href: 'https://github.com/jaisal1024' },
+  { label: 'X', href: 'https://x.com/jaisal_f' },
   { label: 'hi@jaisal.xyz', href: 'mailto:hi@jaisal.xyz' },
 ];
 
