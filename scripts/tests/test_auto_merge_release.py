@@ -10,6 +10,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "auto_merge_release.sh"
 REPO = "owner/repo"
 BOT = "release-app[bot]"
 SHA = "a" * 40
+BRANCH = "release-please--branches--main--components--to-the-moon-and-back"
 MOCK_GH = r'''#!/usr/bin/env python3
 import json, os, sys
 from pathlib import Path
@@ -44,7 +45,7 @@ class ReleaseAutomationTest(unittest.TestCase):
             "number": 7, "state": "open", "draft": False,
             "user": {"login": BOT, "type": "Bot"},
             "base": {"ref": "main", "repo": {"full_name": REPO}},
-            "head": {"sha": SHA, "ref": "release-please--branches--main",
+            "head": {"sha": SHA, "ref": BRANCH,
                      "repo": {"full_name": REPO}},
             "labels": [{"name": "autorelease: pending"}],
             "title": "chore(main): release 0.1.0", "changed_files": 1,
@@ -112,9 +113,11 @@ class ReleaseAutomationTest(unittest.TestCase):
         for changes in [
             {"draft": True}, {"state": "closed"}, {"labels": []},
             {"base": {"ref": "other", "repo": {"full_name": REPO}}},
-            {"head": {"sha": SHA, "ref": "release-please--branches--main-evil",
+            {"head": {"sha": SHA, "ref": BRANCH + "-evil",
                       "repo": {"full_name": REPO}}},
             {"head": {"sha": SHA, "ref": "release-please--branches--main",
+                      "repo": {"full_name": REPO}}},
+            {"head": {"sha": SHA, "ref": BRANCH,
                       "repo": {"full_name": "attacker/fork"}}},
         ]:
             with self.subTest(changes=changes):

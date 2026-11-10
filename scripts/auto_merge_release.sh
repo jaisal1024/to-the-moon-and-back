@@ -8,30 +8,38 @@ set -euo pipefail
 : "${RELEASE_BOT_LOGIN:?dedicated release App bot login is required}"
 : "${RELEASE_PRS:?release-please PR output is required}"
 
+# release-please names the branch after the target branch and the package-name
+# component in release-please-config.json.
+RELEASE_BRANCH="release-please--branches--main--components--to-the-moon-and-back"
+
 jq -e 'type == "array" and all(.[];
   (.number | type) == "number" and .number > 0 and .number == (.number | floor))' \
   <<< "$RELEASE_PRS" > /dev/null
 
 pending=$(gh api "repos/$GH_REPO/pulls" --method GET -f state=open -f base=main \
-  --paginate --slurp | jq --arg repo "$GH_REPO" --arg bot "$RELEASE_BOT_LOGIN" '[flatten[] |
+  --paginate --slurp | jq --arg repo "$GH_REPO" --arg bot "$RELEASE_BOT_LOGIN" \
+  --arg branch "$RELEASE_BRANCH" '[flatten[] |
     select(.user.login == $bot and .user.type == "Bot" and
       .base.ref == "main" and .base.repo.full_name == $repo and
       .head.repo.full_name == $repo and
-      .head.ref == "release-please--branches--main" and
+      .head.ref == $branch and
       any(.labels[]; .name == "autorelease: pending")) | {number}]')
 numbers=$(jq -r --argjson pending "$pending" '. + $pending | unique_by(.number) | .[].number' \
   <<< "$RELEASE_PRS")
 
 verify_pr() {
-  jq -e --arg repo "$GH_REPO" --arg bot "$RELEASE_BOT_LOGIN" '
+  jq -e --arg repo "$GH_REPO" --arg bot "$RELEASE_BOT_LOGIN" --arg branch "$RELEASE_BRANCH" '
     .state == "open" and .draft == false and
     .user.login == $bot and .user.type == "Bot" and
     .base.ref == "main" and .base.repo.full_name == $repo and
     .head.repo.full_name == $repo and
-    .head.ref == "release-please--branches--main" and
+    .head.ref == $branch and
     any(.labels[]; .name == "autorelease: pending") and
     (.head.sha | test("^[0-9a-f]{40}$"))
-  ' > /dev/null
+  ' > /dev/null || {
+    echo "PR is not a verified release PR (author, target, branch, label or head)." >&2
+    return 1
+  }
 }
 
 while IFS= read -r number; do
