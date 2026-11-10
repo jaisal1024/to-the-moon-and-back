@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.3...v1.2.0) (2026-11-10)
+
+
+### Features
+
+* **about:** replace the interest cards with a slot machine game ([#53](https://github.com/jaisal1024/to-the-moon-and-back/issues/53)) ([7ff00f6](https://github.com/jaisal1024/to-the-moon-and-back/commit/7ff00f6609ca945d1d70c194619184e803f692c8))
+
 ## [1.1.3](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.1.2...v1.1.3) (2026-11-10)
 
 
