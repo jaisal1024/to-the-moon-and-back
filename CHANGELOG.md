@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.5.0...v1.6.0) (2026-11-12)
+
+
+### Features
+
+* **about:** give the slot lever a wandering target and a perfect pull ([#61](https://github.com/jaisal1024/to-the-moon-and-back/issues/61)) ([0b61b19](https://github.com/jaisal1024/to-the-moon-and-back/commit/0b61b193db515dd059cf12ae1f8f391768b1f4f5))
+
 ## [1.5.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.4.0...v1.5.0) (2026-11-12)
 
 
