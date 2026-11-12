@@ -44,7 +44,7 @@ export default function SiteFooter() {
         </ul>
       </div>
       <p className={styles.by} data-testid="footer-copyright">
-        designed and built by © Jaisal Friedman {new Date().getFullYear()}
+        site design, code and all photography by © Jaisal Friedman {new Date().getFullYear()}
       </p>
     </footer>
   );

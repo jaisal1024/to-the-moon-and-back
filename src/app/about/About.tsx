@@ -294,7 +294,7 @@ export default function About({ collections }: { collections: AboutCollection[] 
 
         {collections.length > 0 && (
           <section className={styles.rows}>
-            <span className={clsx(shell.pill, styles.rowsLabel)}>Collections</span>
+            <span className={clsx(shell.pill, styles.rowsLabel)}>Jaisal&apos;s Collections</span>
             {collections.map((collection, i) => (
               <Link key={collection.href} className={styles.row} href={collection.href}>
                 <span className={styles.n}>{String(i + 1).padStart(2, '0')}</span>
@@ -332,7 +332,7 @@ export default function About({ collections }: { collections: AboutCollection[] 
                 </li>
               ))}
             </ul>
-            <p className={styles.note}>I&apos;m not open to new opportunities.</p>
+            <p className={styles.note}>I&apos;m not open to new opportunities at the moment.</p>
           </div>
         </section>
       </div>
