@@ -13,7 +13,12 @@ export type HomePhoto = {
   alt: string;
   /** width / height */
   ratio: number;
+  /** Tiny inline preview shown while the photo loads. */
+  blurDataURL?: string;
 };
+
+const blur = (photo: HomePhoto) =>
+  photo.blurDataURL ? ({ placeholder: 'blur', blurDataURL: photo.blurDataURL } as const) : {};
 
 export type HomeCollection = {
   title: string;
@@ -97,6 +102,7 @@ function Hero({ collections }: { collections: HomeCollection[] }) {
                   fill
                   preload={i === 0}
                   sizes="(max-width: 720px) 92vw, 64vw"
+                  {...blur(slide.hero!)}
                 />
               ))}
             </span>
@@ -236,6 +242,7 @@ export default function Home({ collections }: { collections: HomeCollection[] })
                           alt={c.cover.alt}
                           fill
                           sizes={portrait ? '(max-width: 720px) 92vw, 32vw' : '(max-width: 720px) 92vw, 64vw'}
+                          {...blur(c.cover)}
                         />
                       )}
                     </span>

@@ -20,7 +20,7 @@ function toPhoto(shot: Shot | undefined): HomePhoto | undefined {
   const source = mediaSource(shot?.photo, 'xl');
   if (!source) return undefined;
   const ratio = source.width && source.height ? source.width / source.height : 1.5;
-  return { src: source.src, alt: shot?.title?.trim() || source.alt, ratio };
+  return { src: source.src, alt: shot?.title?.trim() || source.alt, ratio, blurDataURL: source.blurDataURL };
 }
 
 const isLandscape = (shot: Shot) => {

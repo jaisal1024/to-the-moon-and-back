@@ -42,4 +42,10 @@ describe('mediaSource', () => {
     expect(mediaSource(null)).toBeNull();
     expect(mediaSource(media({ url: null, sizes: {} }))).toBeNull();
   });
+
+  it('passes the blur placeholder through when the media has one', () => {
+    const blurDataUrl = 'data:image/webp;base64,AAAA';
+    expect(mediaSource(media({ blurDataUrl }), 'card')?.blurDataURL).toBe(blurDataUrl);
+    expect(mediaSource(media({ blurDataUrl: null }), 'card')?.blurDataURL).toBeUndefined();
+  });
 });

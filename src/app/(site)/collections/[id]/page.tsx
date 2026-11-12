@@ -70,7 +70,15 @@ export default async function CollectionPage({ params }: Props) {
   const photos: CollectionPhoto[] = (collection.photos ?? []).flatMap((shot) => {
     const source = mediaSource(shot.photo, 'xl');
     if (!source) return [];
-    return [{ src: source.src, title: shot.title?.trim() ?? '', width: source.width ?? 3, height: source.height ?? 2 }];
+    return [
+      {
+        src: source.src,
+        title: shot.title?.trim() ?? '',
+        width: source.width ?? 3,
+        height: source.height ?? 2,
+        blurDataURL: source.blurDataURL,
+      },
+    ];
   });
 
   return (
