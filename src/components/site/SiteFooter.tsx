@@ -1,5 +1,8 @@
+'use client';
+
 import { clsx } from 'clsx';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 import styles from './site.module.css';
 
@@ -10,11 +13,16 @@ const SITE_MAP = [
 ];
 
 const CONNECT = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jaisalfriedman/' },
-  { label: 'GitHub', href: 'https://github.com/jaisal1024' },
-  { label: 'X', href: 'https://x.com/jaisal_f' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jaisalfriedman/', destination: 'linkedin' },
+  { label: 'GitHub', href: 'https://github.com/jaisal1024', destination: 'github' },
+  { label: 'X', href: 'https://x.com/jaisal_f', destination: 'x' },
   { label: 'hi@jaisal.xyz', href: 'mailto:hi@jaisal.xyz' },
 ];
+
+function captureSocialLinkOpened(destination: string | undefined) {
+  if (!destination || !process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN || !process.env.NEXT_PUBLIC_POSTHOG_HOST) return;
+  posthog.capture('social_link_opened', { destination });
+}
 
 export default function SiteFooter() {
   return (
@@ -36,7 +44,13 @@ export default function SiteFooter() {
         <ul>
           {CONNECT.map((item) => (
             <li key={item.href}>
-              <a className={styles.link} href={item.href} target="_blank" rel="noreferrer">
+              <a
+                className={styles.link}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => captureSocialLinkOpened(item.destination)}
+              >
                 {item.label}
               </a>
             </li>

@@ -3,6 +3,7 @@
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import shell from 'src/components/site/site.module.css';
 import { clamp } from 'src/utils/math';
@@ -25,6 +26,11 @@ const MOBILE_MAX = 720;
 const THREAD_STEPS = 300;
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+function captureProfileLinkOpened(destination: 'counsel_health' | 'linkedin') {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN || !process.env.NEXT_PUBLIC_POSTHOG_HOST) return;
+  posthog.capture('profile_link_opened', { destination });
+}
 
 function Rotator({ items, delay, className }: { items: string[]; delay: number; className?: string }) {
   const [index, setIndex] = useState(0);
@@ -232,7 +238,12 @@ export default function About({ collections }: { collections: AboutCollection[] 
             </p>
             <p>
               I currently work at{' '}
-              <a href="https://www.counselhealth.com/" target="_blank" rel="noreferrer">
+              <a
+                href="https://www.counselhealth.com/"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => captureProfileLinkOpened('counsel_health')}
+              >
                 Counsel Health
               </a>
             </p>
@@ -280,7 +291,12 @@ export default function About({ collections }: { collections: AboutCollection[] 
         ))}
         <p ref={sayBRef} className={clsx(styles.say, styles.right)}>
           <Words text="If you are looking to learn more check out" />{' '}
-          <a href="https://www.linkedin.com/in/jaisalfriedman/" target="_blank" rel="noreferrer">
+          <a
+            href="https://www.linkedin.com/in/jaisalfriedman/"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => captureProfileLinkOpened('linkedin')}
+          >
             <Words text="my LinkedIn" />
           </a>
           <span className={styles.word} data-word>
