@@ -283,6 +283,10 @@
   gap: clamp(4px, 0.5vw, 8px);
   height: calc(var(--cell) * 3);
   cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .reel {
@@ -571,7 +575,7 @@
   animation: bump 0.4s cubic-bezier(0.2, 1.9, 0.4, 1);
 }
 
-/* lever: drag the knob down, or click it */
+/* lever: drag the knob down and let go on the target, or just click it */
 .lever {
   position: absolute;
   left: calc(100% + clamp(4px, 0.8vw, 12px));
@@ -583,12 +587,61 @@
   background: none;
   border: 0;
   padding: 0;
+  /* a drag on the lever is the lever's, never a scroll */
   touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   color: inherit;
 }
 
 .lever:active {
   cursor: grabbing;
+}
+
+/* a thumb-sized area to grab around a thin lever */
+.lever::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--cell) * -0.45) -14px calc(var(--cell) * -0.2) -8px;
+}
+
+/* the target: it slides along the lever while the knob is dragged; let go on it */
+.target {
+  --notch: clamp(3px, 0.35vw, 5px);
+
+  position: absolute;
+  left: 0;
+  right: 18%;
+  /* the knob sits at 92% - pull * 60% (see .arm), so the same sum puts the target under it */
+  bottom: calc(92% - (var(--target) + var(--reach)) * 60%);
+  height: calc(var(--reach) * 2 * 60%);
+  border-block: var(--notch) solid var(--night-accent);
+  background: color-mix(in srgb, var(--night-accent) 40%, transparent);
+  color: var(--night-accent);
+  transition:
+    background-color 0.08s linear,
+    border-color 0.08s linear;
+}
+
+/* its label runs down the lever's outer side, where there is room even on a phone */
+.targetLabel {
+  position: absolute;
+  left: calc(100% + clamp(9px, 1vw, 14px));
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.targetLabel svg {
+  display: block;
+  height: clamp(9px, 1vw, 14px);
+  fill: currentcolor;
+}
+
+.lever[data-on-target] .target {
+  border-color: var(--cream);
+  background: color-mix(in srgb, var(--cream) 55%, transparent);
+  color: var(--cream);
 }
 
 .base {
@@ -623,7 +676,7 @@
   transition: height 0.38s cubic-bezier(0.3, 2.2, 0.5, 1);
 }
 
-.lever[data-dragging] .arm {
+.lever[data-held] .arm {
   transition: none;
 }
 
@@ -642,8 +695,13 @@
   transition: fill 0.2s ease;
 }
 
-.lever[data-dragging] .knob {
+.lever[data-held] .knob,
+.lever[data-pulled] .knob {
   fill: var(--cream);
+}
+
+.lever[data-on-target] .knob {
+  fill: var(--night-accent);
 }
 
 @media (hover: hover) {
@@ -799,6 +857,11 @@
     --s: 4px;
 
     padding: calc(var(--bulb-gap) * 1.6 + 3px) calc(var(--bulb-gap) * 1.75 + 3px);
+  }
+
+  /* nudged over so the lever and the label on its target clear the edge of the screen */
+  .machine {
+    left: -6px;
   }
 
   .lever {

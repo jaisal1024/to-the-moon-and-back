@@ -1,4 +1,4 @@
-import type { CSSProperties, KeyboardEvent, RefObject } from 'react';
+import type { ComponentProps, CSSProperties, RefObject } from 'react';
 
 import type { Show } from './choreography';
 import { REEL_LENGTH, REELS, wrap } from './engine';
@@ -25,18 +25,12 @@ type Props = {
   /** A cell whose rocket is off flying. */
   away: string | null;
   floats: Show['floats'];
-  onPull: () => void;
+  /** Click and key props from useLever. */
+  press: ComponentProps<'div'>;
 };
 
 /** The window onto the three reels, ringed with bulbs. Clicking or tapping it pulls the lever. */
-export function Reels({ windowRef, strips, hits, away, floats, onPull }: Props) {
-  // Only reached with focus on the reels, so the page keeps its own space-to-scroll.
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== ' ' && event.key !== 'Enter') return;
-    event.preventDefault();
-    if (!event.repeat) onPull();
-  };
-
+export function Reels({ windowRef, strips, hits, away, floats, press }: Props) {
   return (
     <div
       ref={windowRef}
@@ -46,8 +40,8 @@ export function Reels({ windowRef, strips, hits, away, floats, onPull }: Props) 
       aria-label={WORDS.labels.reels}
       // A launch counts rockets in any row, so every row lights up.
       data-lit={hits?.kind === 'launch' || undefined}
-      onClick={onPull}
-      onKeyDown={onKeyDown}
+      // Space and Enter only arrive with focus on the reels, so the page keeps its own space-to-scroll.
+      {...press}
     >
       <div className={styles.bulbs} aria-hidden="true">
         {BULBS.map(([x, y], i) => (

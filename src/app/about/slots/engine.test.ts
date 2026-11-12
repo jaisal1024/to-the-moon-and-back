@@ -7,6 +7,7 @@ import {
   FREE_MULTIPLIER,
   FREE_SPINS,
   fromSaved,
+  FUMBLE_COST,
   type GameState,
   initialState,
   LOAN,
@@ -318,6 +319,115 @@ describe('shooting star', () => {
     expect(outcome.cost).toBe(COST);
     expect(state.lucky).toBe(false);
     expect(spin(state, rng).outcome.usedStar).toBe(false);
+  });
+});
+
+describe('perfect pull', () => {
+  test('pairs the first two reels and leaves the third to chance', () => {
+    for (let first = 0; first < REEL_LENGTH; first++)
+      for (let third = 0; third < REEL_LENGTH; third++) {
+        const { outcome } = spin(playing(), landing([first, 0, third]), 'hit');
+        expect(outcome.perfect).toBe(true);
+        expect(outcome.stops[0]).toBe(first);
+        expect(outcome.stops[2]).toBe(third);
+        expect(outcome.line[0]).toBe(outcome.line[1]);
+        expect(outcome.tease).toBe(true);
+        expect(outcome.kind).not.toBe('miss');
+      }
+  });
+
+  test('the documented odds and return are exact', () => {
+    const odds: Record<OutcomeKind, number> = { launch: 0, sevens: 0, triple: 0, pair: 0, miss: 0 };
+    let paid = 0;
+    for (let first = 0; first < REEL_LENGTH; first++) {
+      const seconds = REELS[1].flatMap((symbol, stop) => (symbol === REELS[0][first] ? [stop] : []));
+      for (const second of seconds)
+        for (let third = 0; third < REEL_LENGTH; third++) {
+          const result = evaluate([first, second, third]);
+          const weight = 1 / (REEL_LENGTH * seconds.length * REEL_LENGTH);
+          odds[result.kind] += weight;
+          paid += weight * result.base;
+        }
+    }
+    expect(odds.launch).toBeCloseTo(1 / 64, 10);
+    expect(odds.sevens).toBeCloseTo(1 / 64, 10);
+    expect(odds.triple).toBeCloseTo(13 / 96, 10);
+    expect(odds.pair).toBeCloseTo(5 / 6, 10);
+    expect(odds.miss).toBe(0);
+    expect(paid).toBeCloseTo(21.1, 1);
+  });
+
+  test('costs the same as any pull and feeds the moon like any win', () => {
+    const before = playing();
+    const { state, outcome } = spin(before, landing([1, 0, 3]), 'hit');
+    expect(outcome.line).toEqual(['wave', 'wave', 'camera']);
+    expect(state.credits).toBe(before.credits - COST + PAYTABLE.pair);
+    expect(state.meter).toBe(1);
+  });
+
+  test('the opening pull and a caught star take precedence', () => {
+    const opening = spin(initialState(), seeded(1), 'hit').outcome;
+    expect(opening.opening).toBe(true);
+    expect(opening.perfect).toBe(false);
+    const lucky = spin(playing({ lucky: true }), seeded(1), 'hit').outcome;
+    expect(lucky.usedStar).toBe(true);
+    expect(lucky.perfect).toBe(false);
+  });
+
+  test('an ordinary pull is neither perfect nor fumbled', () => {
+    const { outcome } = spin(playing(), seeded(1));
+    expect(outcome.perfect).toBe(false);
+    expect(outcome.fumbled).toBe(false);
+    expect(outcome.cost).toBe(COST);
+  });
+});
+
+describe('fumble', () => {
+  test('costs double and never pays, whatever the reels would have shown', () => {
+    for (let seed = 1; seed <= 500; seed++) {
+      const before = playing();
+      const { state, outcome } = spin(before, seeded(seed), 'missed');
+      expect(outcome.fumbled).toBe(true);
+      expect(outcome.kind).toBe('miss');
+      expect(evaluate(outcome.stops).kind).toBe('miss');
+      expect(outcome.cost).toBe(FUMBLE_COST);
+      expect(outcome.payout).toBe(0);
+      expect(state.credits).toBe(before.credits - FUMBLE_COST);
+      expect(state.streak).toBe(0);
+    }
+  });
+
+  test('a random source stuck on a win still ends in a miss', () => {
+    const stuck = stopsFor(['wave', 'wave', 'wave']);
+    const { outcome } = spin(playing(), () => (stuck[0] + 0.5) / REEL_LENGTH, 'missed');
+    expect(outcome.kind).toBe('miss');
+  });
+
+  test('ends a streak and borrows when it cannot be paid for', () => {
+    const { state, outcome } = spin(playing({ credits: FUMBLE_COST - 1, streak: 4 }), seeded(3), 'missed');
+    expect(outcome.loan).toBe(LOAN);
+    expect(state.credits).toBe(FUMBLE_COST - 1 + LOAN - FUMBLE_COST);
+    expect(state.streak).toBe(0);
+  });
+
+  test('a fumbled free spin is still free, and is spent', () => {
+    const before = playing({ meter: METER_MAX, freeSpins: 2 });
+    const { state, outcome } = spin(before, seeded(5), 'missed');
+    expect(outcome.cost).toBe(0);
+    expect(outcome.kind).toBe('miss');
+    expect(state.credits).toBe(before.credits);
+    expect(state.freeSpins).toBe(1);
+  });
+
+  test('the opening pull and a caught star take precedence', () => {
+    const opening = spin(initialState(), seeded(1), 'missed').outcome;
+    expect(opening.fumbled).toBe(false);
+    expect(opening.cost).toBe(0);
+    expect(opening.kind).toBe('triple');
+    const lucky = spin(playing({ lucky: true }), seeded(1), 'missed').outcome;
+    expect(lucky.fumbled).toBe(false);
+    expect(lucky.cost).toBe(COST);
+    expect(lucky.kind).toBe('triple');
   });
 });
 
