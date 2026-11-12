@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.3.0...v1.4.0) (2026-11-12)
+
+
+### Features
+
+* **copy:** clarify ownership of collections and photography ([#59](https://github.com/jaisal1024/to-the-moon-and-back/issues/59)) ([981411e](https://github.com/jaisal1024/to-the-moon-and-back/commit/981411e0c2c6f90e9292266581820767d6c1beb1))
+
 ## [1.3.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.2.0...v1.3.0) (2026-11-10)
 
 
