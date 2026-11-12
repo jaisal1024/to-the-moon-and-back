@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.4.0...v1.5.0) (2026-11-12)
+
+
+### Features
+
+* instrument application with PostHog ([#57](https://github.com/jaisal1024/to-the-moon-and-back/issues/57)) ([e1bd063](https://github.com/jaisal1024/to-the-moon-and-back/commit/e1bd063d7477d25f99d214941600ef7436a7ba64))
+
 ## [1.4.0](https://github.com/jaisal1024/to-the-moon-and-back/compare/v1.3.0...v1.4.0) (2026-11-12)
 
 
