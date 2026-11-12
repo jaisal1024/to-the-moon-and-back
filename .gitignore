@@ -62,3 +62,4 @@ src/gql/**
 test-results/**
 playwright-report/**
 .playwright-cli/**
+.env.local

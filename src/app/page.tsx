@@ -2,6 +2,7 @@ import client from 'apollo-client';
 import { Metadata } from 'next';
 import type { Image as SanityImage } from 'sanity';
 import SitePage from 'src/components/site/SitePage';
+import { logHomePageCollectionsLoaded, logHomePageCollectionsLoadFailed } from 'src/lib/posthog-logs';
 import { GET_COLLECTIONS } from 'src/queries/GetCollections';
 import { urlForImage } from 'src/sanity/lib/image';
 import { GET_COLLECTIONS_SORT } from 'src/utils/constants';
@@ -49,7 +50,7 @@ async function getCollections(): Promise<HomeCollection[]> {
       query: GET_COLLECTIONS,
       variables: { offset: 0, sort: GET_COLLECTIONS_SORT, limit: 20 },
     });
-    return (data?.allCollections ?? []).flatMap((collection) => {
+    const collections = (data?.allCollections ?? []).flatMap((collection) => {
       const slug = collection.slug?.current;
       if (!collection.title || !slug) return [];
       const photos = (collection.photos ?? []).filter((p) => p?.photo);
@@ -74,8 +75,11 @@ async function getCollections(): Promise<HomeCollection[]> {
         },
       ];
     });
+    logHomePageCollectionsLoaded(collections.length);
+    return collections;
   } catch (err) {
     console.error('Failed to load collections for the home page', err);
+    logHomePageCollectionsLoadFailed();
     return [];
   }
 }

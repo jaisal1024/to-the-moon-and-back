@@ -7,6 +7,7 @@ minimumReleaseAge: 4320
 # and deny each one explicitly in allowBuilds below.
 strictDepBuilds: true
 allowBuilds:
+  core-js: false # postinstall only prints a funding banner
   '@parcel/watcher': false # uses prebuilt optional binaries
   esbuild: false # uses prebuilt optional binaries
   unrs-resolver: false # uses prebuilt optional binaries
