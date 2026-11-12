@@ -2,7 +2,14 @@ import type { Media } from 'src/payload-types';
 
 export type MediaSize = keyof NonNullable<Media['sizes']>;
 
-export type MediaSource = { src: string; width?: number; height?: number; alt: string };
+export type MediaSource = {
+  src: string;
+  width?: number;
+  height?: number;
+  alt: string;
+  /** Tiny inline preview for next/image's blur placeholder; missing on media uploaded before it existed. */
+  blurDataURL?: string;
+};
 
 /**
  * Picks the URL and intrinsic dimensions of one generated size, falling back to the
@@ -19,5 +26,6 @@ export function mediaSource(media: Media | number | null | undefined, size: Medi
     width: picked.width ?? undefined,
     height: picked.height ?? undefined,
     alt: media.alt,
+    blurDataURL: media.blurDataUrl ?? undefined,
   };
 }

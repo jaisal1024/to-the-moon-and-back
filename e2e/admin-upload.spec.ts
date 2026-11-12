@@ -3,7 +3,12 @@ import sharp from 'sharp';
 
 import { signIn } from './support/admin';
 
-type MediaDoc = { id: number; url: string; sizes: Record<string, { url?: string | null }> };
+type MediaDoc = {
+  id: number;
+  url: string;
+  blurDataUrl?: string | null;
+  sizes: Record<string, { url?: string | null }>;
+};
 
 test('admin upload goes browser to Blob storage and generates sizes', async ({ page }) => {
   await signIn(page);
@@ -32,6 +37,9 @@ test('admin upload goes browser to Blob storage and generates sizes', async ({ p
     expect(url, 'stored URL').toBeTruthy();
     expect((await page.request.get(url!)).status(), url!).toBe(200);
   }
+
+  // The blur placeholder is generated server-side even though the file went browser to Blob.
+  expect(doc.blurDataUrl).toMatch(/^data:image\/webp;base64,/);
 
   await page.request.delete(`/api/media/${doc.id}`);
 });
