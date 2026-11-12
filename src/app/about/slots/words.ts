@@ -13,13 +13,21 @@ export const WORDS = {
   /** On the sign before the first pull. */
   waiting: 'TO THE MOON',
   /** Cycled on the sign while the machine is idle. The payouts are appended by the game. */
-  hints: ['PULL THE LEVER', 'TAP THE REELS', 'ROCKETS GO WHERE?', 'WINS FEED THE MOON', 'CATCH A STAR'],
+  hints: ['DRAG THE LEVER', 'LET GO ON TARGET', 'OR JUST TAP', 'ROCKETS GO WHERE?', 'WINS FEED THE MOON', 'CATCH A STAR'],
   /** Added to the hints on devices with a keyboard. Space works once the lever has focus. */
-  keyboardHint: 'OR PRESS SPACE',
+  keyboardHint: 'OR HOLD SPACE',
   hintPair: 'PAIR',
   hintSevens: '777',
+  /** Followed by what letting go off the target costs. */
+  hintFumble: 'MISS THE TARGET',
   /** One is picked while the reels turn. */
   spinning: ['HERE WE GO', 'COME ON', 'SPINNING', 'MOON PLEASE', 'GOOD LUCK'],
+  /** Printed beside the target on the lever. Keep it very short. */
+  target: 'TARGET',
+  /** The lever was let go on the target. */
+  perfect: 'PERFECT PULL',
+  /** The lever was dragged and let go off the target. Followed by what it cost. */
+  fumbled: 'OFF TARGET',
   freeSpin: 'FREE SPIN',
   /** While the last reel is still turning with a win on the cards. */
   teasing: '. . .',

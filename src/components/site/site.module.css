@@ -50,6 +50,20 @@
   --thread-3: #d993d6;
 }
 
+/*
+ * The canvas behind the page, which shows when the browser bounces past the top of it. The global
+ * body is white; without this a strip of white flashes above the paper on every overscroll.
+ */
+:global(html):has(.site),
+:global(body):has(.site) {
+  background-color: #f9f4ec;
+}
+
+:global(html[data-theme='dark']):has(.site),
+:global(html[data-theme='dark'] body):has(.site) {
+  background-color: #242424;
+}
+
 /* zero-specificity base so page and shell classes (.link, .u) always win */
 :where(.site) a {
   color: inherit;

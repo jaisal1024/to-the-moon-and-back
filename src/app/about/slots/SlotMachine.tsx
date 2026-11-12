@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef } from 'react';
 
-import { METER_MAX, type Rng } from './engine';
+import { type Aim, METER_MAX, type Rng } from './engine';
 import { Hud } from './Hud';
 import { Lever } from './Lever';
 import { useReplay } from './motion';
@@ -15,6 +15,7 @@ import styles from './slots.module.css';
 import { StatsBar } from './StatsBar';
 import { useCountUp } from './useCountUp';
 import { useFrameLoop } from './useFrameLoop';
+import { useLever } from './useLever';
 import { useParticles } from './useParticles';
 import { cellIndex, cellKey, useReels } from './useReels';
 import { useOnScreen, useScrollEntrance } from './useScrollEntrance';
@@ -62,7 +63,10 @@ export default function SlotMachine({ rng = mathRandom }: { rng?: Rng }) {
   );
   const { show, play, star } = useShow({ game, reels, particles, sound, fly, timers, spots, onScreen });
 
-  const pull = useCallback((source: Source) => void play(source), [play]);
+  const pull = useCallback((source: Source, aim: Aim = 'none') => void play(source, aim), [play]);
+  const { lever, drag, press } = useLever({ loop, busy: show.busy, onPull: pull });
+  const leverHandlers = useMemo(() => ({ ...drag, ...press('lever') }), [drag, press]);
+  const pressReels = useMemo(() => press('reels'), [press]);
   // Scrolling the machine into place plays a new visitor's free opening pull. Nothing is ever
   // spent without a hand on the lever, so once the opening is behind them, arriving does nothing.
   const { current } = game;
@@ -101,6 +105,8 @@ export default function SlotMachine({ rng = mathRandom }: { rng?: Rng }) {
         data-cost={last?.cost}
         data-loan={last?.loan}
         data-payout={last?.payout}
+        data-perfect={last?.perfect || undefined}
+        data-fumbled={last?.fumbled || undefined}
         data-moonlit={moonlit || undefined}
       >
         <i ref={nearSky} className={styles.sky} aria-hidden="true" />
@@ -130,10 +136,10 @@ export default function SlotMachine({ rng = mathRandom }: { rng?: Rng }) {
                 hits={show.hits}
                 away={away}
                 floats={show.floats}
-                onPull={() => pull('reels')}
+                press={pressReels}
               />
             </div>
-            <Lever down={show.leverDown} nudge={show.pulses.nudge} onPull={pull} />
+            <Lever leverRef={lever} down={show.leverDown} nudge={show.pulses.nudge} handlers={leverHandlers} />
           </div>
           <StatsBar stats={revealed.stats} soundOn={sound.on} onToggleSound={sound.toggle} />
         </div>

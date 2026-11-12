@@ -1,38 +1,45 @@
-import { type CSSProperties, useRef } from 'react';
+import { type ComponentProps, type CSSProperties, type RefObject, useRef } from 'react';
 
 import { useReplay } from './motion';
-import { Glyph } from './Pixel';
+import { Glyph, PixelText } from './Pixel';
 import { KNOB } from './pixels';
 import styles from './slots.module.css';
-import { useLever } from './useLever';
+import { TARGET } from './useLever';
 import { WORDS } from './words';
 
 type Props = {
-  /** Held down for a moment when a pull starts anywhere other than a drag. */
+  /** useLever moves the knob and the target through this while the lever is held. */
+  leverRef: RefObject<HTMLButtonElement | null>;
+  /** Slammed down for a moment as a pull starts. */
   down: boolean;
   /** Counter that makes the knob beckon. */
   nudge: number;
-  onPull: (source: 'lever' | 'drag') => void;
+  /** Drag, click and key props from useLever. */
+  handlers: ComponentProps<'button'>;
 };
 
-/** The lever: a real button that can also be dragged down. */
-export function Lever({ down, nudge, onPull }: Props) {
+/** The lever: a real button that can also be dragged down. Let go on the target for a perfect pull. */
+export function Lever({ leverRef, down, nudge, handlers }: Props) {
   const knob = useRef<SVGSVGElement>(null);
-  const { pull, dragging, handlers } = useLever(onPull);
   useReplay(knob, nudge, 'nudge');
 
   return (
     <button
+      ref={leverRef}
       type="button"
       className={styles.lever}
       aria-label={WORDS.labels.lever}
       data-testid="slot-lever"
-      data-dragging={dragging || undefined}
       data-pulled={down || undefined}
-      style={{ '--pull': dragging ? pull : down ? 1 : 0 } as CSSProperties}
+      style={{ '--pull': down ? 1 : 0, '--target': TARGET.rest, '--reach': TARGET.reach } as CSSProperties}
       {...handlers}
     >
       <span className={styles.base} />
+      <span className={styles.target}>
+        <span className={styles.targetLabel}>
+          <PixelText text={WORDS.target} />
+        </span>
+      </span>
       <span className={styles.arm}>
         <Glyph ref={knob} className={styles.knob} d={KNOB} width={9} height={9} />
       </span>

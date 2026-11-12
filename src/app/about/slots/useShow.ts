@@ -2,7 +2,7 @@ import { type RefObject, useCallback, useMemo, useRef, useState } from 'react';
 
 import { beats } from './beats';
 import { lendCredits, OPENING_SHOW, type Pulse, revealRound, type Show, type Stage } from './choreography';
-import { FREE_MULTIPLIER, PAYTABLE, STAR_BONUS } from './engine';
+import { type Aim, FREE_MULTIPLIER, FUMBLE_COST, PAYTABLE, STAR_BONUS } from './engine';
 import { chance, pick } from './motion';
 import type { Particles } from './useParticles';
 import type { Reels } from './useReels';
@@ -13,8 +13,8 @@ import type { Sound } from './useSound';
 import type { Timers } from './useTimers';
 import { WORDS } from './words';
 
-/** What started a pull. A drag has already moved the lever, so it is not animated again. */
-export type Source = 'scroll' | 'lever' | 'drag' | 'reels';
+/** What started a pull. */
+export type Source = 'scroll' | 'lever' | 'reels';
 
 type Cast = {
   game: SlotGame;
@@ -38,6 +38,7 @@ const hints = () => {
     ...(keyboard ? [WORDS.keyboardHint] : []),
     `${WORDS.hintPair} +${PAYTABLE.pair}`,
     `${WORDS.hintSevens} +${PAYTABLE.triple.seven}`,
+    `${WORDS.hintFumble} -${FUMBLE_COST}`,
   ];
 };
 
@@ -104,21 +105,30 @@ export function useShow({ game, reels, particles, sound, fly, timers, spots, onS
   }, [stage, timers, current]);
 
   const play = useCallback(
-    async (source: Source) => {
+    async (_source: Source, aim: Aim = 'none') => {
       if (busy.current) return;
       busy.current = true;
       attract.stop();
       // The pull is decided and saved here, before anything moves. The rest only shows it.
-      const round = pull();
+      const round = pull(aim);
       const { outcome } = round;
       startStars();
       dismissStar();
-      stage.set({ busy: true, hits: null, announce: '', leverDown: source !== 'drag' });
+      stage.set({ busy: true, hits: null, announce: '', leverDown: true });
       timers.later(() => stage.set({ leverDown: false }), LEVER_DOWN_MS);
       try {
         if (outcome.loan) await lendCredits(stage, round);
         reveal(beats.pulled(round));
-        stage.say(outcome.free ? WORDS.freeSpin : pick(WORDS.spinning), 'dim');
+        if (outcome.perfect) {
+          stage.say(WORDS.perfect, 'hot');
+          sound.tune([784, 1175], 0.05, 'square', 0.05);
+          navigator.vibrate?.(30);
+        } else if (outcome.fumbled) {
+          stage.say(outcome.cost ? `${WORDS.fumbled} -${outcome.cost}` : WORDS.fumbled, 'hot');
+          sound.blip(140, 0.2, 'sawtooth', 0.05, 0, 70);
+        } else {
+          stage.say(outcome.free ? WORDS.freeSpin : pick(WORDS.spinning), 'dim');
+        }
         stage.set({ bulbs: 'spin' });
         sound.blip(180, 0.25, 'sawtooth', 0.04, 0, 520);
         await reels.spinTo(outcome.stops, {

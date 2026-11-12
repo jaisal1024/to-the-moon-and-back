@@ -5,6 +5,7 @@ import {
   COST,
   FREE_MULTIPLIER,
   FREE_SPINS,
+  FUMBLE_COST,
   type GameState,
   initialState,
   LOAN,
@@ -18,6 +19,7 @@ import {
 import { canWrite } from './pixels';
 import SlotMachine from './SlotMachine';
 import { STORAGE_KEY } from './storage';
+import { isOnTarget, powerAt, TARGET, targetPath } from './useLever';
 import { WORDS } from './words';
 
 // A random source that lands the reels on the queued stops, one pull after another.
@@ -31,6 +33,8 @@ const MISS: Stops = [1, 3, 0]; // wave, camera, palm
 const PAIR: Stops = [1, 0, 3]; // wave, wave, camera
 const NEAR_MISS: Stops = [1, 0, 1]; // wave, wave, crescent with a wave one row below
 const LAUNCH: Stops = [7, 2, 10];
+// How long a held key takes to pump the lever down to the middle of its resting target.
+const HOLD_TO_TARGET_MS = 392;
 const OPENED = START_CREDITS + PAYTABLE.triple.moon;
 
 // A returning visitor: the opening pull is behind them.
@@ -209,57 +213,251 @@ describe('launch and free spins', () => {
   });
 });
 
+describe('the lever as a plunger', () => {
+  // A repeatable stream of random numbers, one stream per seed.
+  const stream = (seed: number) => {
+    let state = (seed * 2654435761) % 2147483647;
+    return () => {
+      state = (state * 16807) % 2147483647;
+      return state / 2147483647;
+    };
+  };
+
+  test('the target sets off from its rest and never leaves its run or jumps', () => {
+    for (let seed = 1; seed <= 40; seed++) {
+      const at = targetPath(stream(seed));
+      expect(at(0)).toBeCloseTo(TARGET.rest);
+      for (let ms = 0; ms < 6000; ms += 16) {
+        expect(at(ms)).toBeGreaterThanOrEqual(TARGET.low - 1e-9);
+        expect(at(ms)).toBeLessThanOrEqual(TARGET.high + 1e-9);
+        expect(Math.abs(at(ms + 16) - at(ms))).toBeLessThan(0.03);
+      }
+    }
+  });
+
+  test('no two wanders are alike: it may set off either way, and at different speeds', () => {
+    const firstMoves = Array.from({ length: 40 }, (_, i) => targetPath(stream(i + 1))(60) - TARGET.rest);
+    expect(firstMoves.some((move) => move > 0)).toBe(true);
+    expect(firstMoves.some((move) => move < 0)).toBe(true);
+    expect(new Set(firstMoves.map((move) => Math.abs(move).toFixed(3))).size).toBeGreaterThan(20);
+  });
+
+  test('it doubles back at unpredictable moments', () => {
+    const turnsIn = (seed: number) => {
+      const at = targetPath(stream(seed));
+      const turns: number[] = [];
+      for (let ms = 16; ms < 3000; ms += 16)
+        if (Math.sign(at(ms + 16) - at(ms)) === -Math.sign(at(ms) - at(ms - 16))) turns.push(ms);
+      return turns;
+    };
+    expect(turnsIn(1).length).toBeGreaterThan(2);
+    expect(turnsIn(1)).not.toEqual(turnsIn(2));
+  });
+
+  test('the same random numbers give the same wander', () => {
+    const [a, b] = [targetPath(stream(7)), targetPath(stream(7))];
+    for (let ms = 0; ms < 3000; ms += 50) expect(a(ms)).toBe(b(ms));
+  });
+
+  test('a knob within reach of the target is on it; a lever at rest never is', () => {
+    expect(isOnTarget(TARGET.rest)).toBe(true);
+    expect(isOnTarget(0.45, 0.5)).toBe(true);
+    expect(isOnTarget(0.35, 0.5)).toBe(false);
+    const at = targetPath(stream(3));
+    for (let ms = 0; ms < 4000; ms += 37) expect(isOnTarget(0, at(ms))).toBe(false);
+  });
+
+  test('a held key pumps the lever down and back up, through the resting target', () => {
+    expect(powerAt(0)).toBe(0);
+    expect(powerAt(HOLD_TO_TARGET_MS)).toBeCloseTo(TARGET.rest, 2);
+    expect(powerAt(560)).toBeCloseTo(1);
+    expect(powerAt(1120)).toBeCloseTo(0);
+  });
+
+  test('everything gets quicker with every perfect pull in a row, up to a limit', () => {
+    const moved = (perfects: number) => Math.abs(targetPath(() => 0.9, perfects)(50) - TARGET.rest);
+    expect(moved(1)).toBeGreaterThan(moved(0));
+    expect(moved(2)).toBeGreaterThan(moved(1));
+    expect(moved(60)).toBeCloseTo(moved(50));
+    expect(powerAt(200, 1)).toBeGreaterThan(powerAt(200, 0));
+    expect(powerAt(140, 50)).toBeCloseTo(0.5);
+  });
+});
+
 describe('controls', () => {
+  // Pressing a key winds the lever up; letting it go pulls.
+  const press = (element: Element, key: string) => {
+    const handled = !fireEvent.keyDown(element, { key });
+    fireEvent.keyUp(element, { key });
+    return handled;
+  };
+
   test('space and enter pull only from the reels, and the page keeps its own keys', async () => {
     render(<SlotMachine rng={landing(OPENING, MISS, MISS)} />);
     const reels = screen.getByRole('button', { name: WORDS.labels.reels });
 
-    fireEvent.keyDown(document.body, { key: ' ' });
+    expect(press(document.body, ' ')).toBe(false);
     await settle();
     expect(stats()).toHaveTextContent('spins0');
 
-    expect(fireEvent.keyDown(reels, { key: ' ' })).toBe(false); // handled, so the page does not scroll
+    expect(press(reels, ' ')).toBe(true); // handled, so the page does not scroll
     await settle();
-    fireEvent.keyDown(reels, { key: 'Enter' });
+    press(reels, 'Enter');
     await settle();
     expect(stats()).toHaveTextContent('spins2');
-    expect(fireEvent.keyDown(reels, { key: 'ArrowDown' })).toBe(true);
+    expect(press(reels, 'ArrowDown')).toBe(false);
   });
 
   test('holding a key down is one pull, not a stream of them', async () => {
     render(<SlotMachine rng={landing(OPENING, MISS, MISS)} />);
     const reels = screen.getByRole('button', { name: WORDS.labels.reels });
     fireEvent.keyDown(reels, { key: ' ' });
-    await settle();
     fireEvent.keyDown(reels, { key: ' ', repeat: true });
+    fireEvent.keyDown(reels, { key: ' ', repeat: true });
+    expect(stats()).toHaveTextContent('spins0');
+    fireEvent.keyUp(reels, { key: ' ' });
     await settle();
     expect(stats()).toHaveTextContent('spins1');
-    // On the lever a held Enter would repeat the button's click; the repeat is cancelled.
+    // The lever handles its own keys too, so a held Enter cannot repeat the button's click.
     expect(fireEvent.keyDown(lever(), { key: 'Enter', repeat: true })).toBe(false);
-    expect(fireEvent.keyDown(lever(), { key: 'Enter' })).toBe(true);
   });
 
-  test('dragging the lever past half way pulls once; the click that follows is not a second pull', async () => {
+  // jsdom has no layout: give the lever a height so a drag can be measured. The knob travels 60% of it.
+  const LEVER_HEIGHT = 200;
+  const KNOB_TRAVEL = LEVER_HEIGHT * 0.6;
+  const sized = () => {
+    Object.defineProperty(lever(), 'offsetHeight', { value: LEVER_HEIGHT, configurable: true });
+    return lever();
+  };
+  const target = () => Number(lever().style.getPropertyValue('--target'));
+  /** Drags the knob for `ms`, ending `pull` of the way down (by default, on the target), without letting go. */
+  async function dragFor(ms: number, pull: (target: number) => number = (on) => on) {
+    const element = sized();
+    fireEvent.pointerDown(element, { clientY: 0 });
+    await tick(ms);
+    fireEvent.pointerMove(element, { clientY: pull(target()) * KNOB_TRAVEL });
+  }
+
+  test('a quick press and release of the lever is one ordinary pull', async () => {
     render(<SlotMachine rng={landing(OPENING, MISS)} />);
-    fireEvent.pointerDown(lever(), { clientY: 10 });
-    fireEvent.pointerMove(lever(), { clientY: 120 });
-    expect(lever()).toHaveAttribute('data-dragging', 'true');
+    fireEvent.pointerDown(lever());
+    expect(lever()).toHaveAttribute('data-held');
     fireEvent.pointerUp(lever());
+    expect(lever()).not.toHaveAttribute('data-held');
     fireEvent.click(lever());
     await settle();
     expect(stats()).toHaveTextContent('spins1');
-    expect(lever()).not.toHaveAttribute('data-dragging');
+    expect(machine()).not.toHaveAttribute('data-perfect');
   });
 
-  test('a cancelled drag puts the lever back without pulling', async () => {
+  test('dragging the knob onto the wandering target and letting go is a perfect pull', async () => {
+    seed(returning({ credits: 50 }));
+    // A perfect pull stops the second reel on the first reel's symbol, whatever was drawn for it.
+    render(<SlotMachine rng={landing([1, 0, 3])} />);
+    await tick(0);
+    await dragFor(500);
+    expect(lever()).toHaveAttribute('data-on-target');
+    expect(target()).not.toBe(TARGET.rest);
+    fireEvent.pointerUp(lever());
+    fireEvent.click(lever()); // the browser's click after a drag is not a second pull
+    await settle();
+    expect(machine()).toHaveAttribute('data-perfect');
+    expect(machine()).toHaveAttribute('data-kind', 'pair');
+    expect(machine()).toHaveAttribute('data-line', 'wave wave camera');
+    expect(credits()).toBe(50 - COST + PAYTABLE.pair);
+    expect(stats()).toHaveTextContent('spins1');
+  });
+
+  test('letting go off the target is a fumble: it costs double and pays nothing', async () => {
+    seed(returning({ credits: 50 }));
+    // The reels would have shown a pair; a fumble draws again until they show nothing.
+    render(<SlotMachine rng={landing(PAIR, MISS)} />);
+    await tick(0);
+    await dragFor(500, (on) => (on > 0.6 ? on - 0.3 : on + 0.3));
+    expect(lever()).not.toHaveAttribute('data-on-target');
+    fireEvent.pointerUp(lever());
+    await tick(100);
+    await settle();
+    expect(machine()).toHaveAttribute('data-fumbled');
+    expect(machine()).not.toHaveAttribute('data-perfect');
+    expect(machine()).toHaveAttribute('data-kind', 'miss');
+    expect(machine()).toHaveAttribute('data-cost', String(FUMBLE_COST));
+    expect(credits()).toBe(50 - FUMBLE_COST);
+  });
+
+  test('a tap never aims, so it is never a fumble', async () => {
+    seed(returning({ credits: 50 }));
+    render(<SlotMachine rng={landing(MISS)} />);
+    await tick(0);
+    await pull();
+    expect(machine()).not.toHaveAttribute('data-fumbled');
+    expect(credits()).toBe(50 - COST);
+  });
+
+  test('a drag let go near the top is a change of mind, not a pull', async () => {
+    seed(returning({ credits: 50 }));
+    render(<SlotMachine rng={landing(MISS)} />);
+    await tick(0);
+    await dragFor(200, () => 0.1);
+    fireEvent.pointerUp(lever());
+    fireEvent.click(lever());
+    await settle();
+    expect(stats()).toHaveTextContent('spins0');
+    expect(lever().style.getPropertyValue('--pull')).toBe('0');
+  });
+
+  test('holding Space pumps the lever, and letting go on the target is a perfect pull', async () => {
+    seed(returning({ credits: 50 }));
+    render(<SlotMachine rng={landing([1, 0, 3], [1, 0, 3])} />);
+    await tick(0);
+    fireEvent.keyDown(lever(), { key: ' ' });
+    await tick(HOLD_TO_TARGET_MS);
+    expect(lever()).toHaveAttribute('data-on-target');
+    fireEvent.keyUp(lever(), { key: ' ' });
+    await settle();
+    expect(machine()).toHaveAttribute('data-perfect');
+    // Each perfect pull in a row makes the lever quicker, so the target comes round sooner.
+    const reels = screen.getByRole('button', { name: WORDS.labels.reels });
+    fireEvent.keyDown(reels, { key: ' ' });
+    await tick(HOLD_TO_TARGET_MS * 0.88);
+    fireEvent.keyUp(reels, { key: ' ' });
+    await settle();
+    expect(machine()).toHaveAttribute('data-perfect');
+    expect(stats()).toHaveTextContent('spins2');
+  });
+
+  test('from the keyboard, letting go off the target is only an ordinary pull', async () => {
+    seed(returning({ credits: 50 }));
+    render(<SlotMachine rng={landing(MISS)} />);
+    await tick(0);
+    fireEvent.keyDown(lever(), { key: ' ' });
+    await tick(HOLD_TO_TARGET_MS / 3);
+    fireEvent.keyUp(lever(), { key: ' ' });
+    await settle();
+    expect(machine()).not.toHaveAttribute('data-fumbled');
+    expect(credits()).toBe(50 - COST);
+  });
+
+  test('a drag the browser takes over puts the lever back without pulling', async () => {
     render(<SlotMachine rng={landing(OPENING)} />);
-    fireEvent.pointerDown(lever(), { clientY: 10 });
-    fireEvent.pointerMove(lever(), { clientY: 120 });
+    await dragFor(300, () => 0.7);
     fireEvent.pointerCancel(lever());
     await settle();
     expect(stats()).toHaveTextContent('spins0');
-    expect(lever()).not.toHaveAttribute('data-dragging');
+    expect(lever()).not.toHaveAttribute('data-held');
     expect(lever().style.getPropertyValue('--pull')).toBe('0');
+    expect(target()).toBe(TARGET.rest);
+  });
+
+  test('the lever cannot be taken hold of while a pull is playing', async () => {
+    render(<SlotMachine rng={landing(OPENING, MISS)} />);
+    fireEvent.click(lever());
+    await tick(100);
+    fireEvent.pointerDown(lever());
+    expect(lever()).not.toHaveAttribute('data-held');
+    fireEvent.pointerUp(lever());
+    await settle();
+    expect(stats()).toHaveTextContent('spins1');
   });
 
   test('the sound toggle is off by default and stays quiet where audio is missing', () => {

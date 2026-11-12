@@ -22,6 +22,12 @@
  *    used up the meter goes back to zero.
  *  - Shooting star: catching one is worth STAR_BONUS credits and makes the next paid or free pull a
  *    guaranteed three of a kind (the reels are stopped on a matching line of an everyday symbol).
+ *  - Perfect pull: the lever is a plunger. Letting go of it on its target (useLever judges that; the
+ *    engine is only told) stops the first two reels on a matching pair, so the pull pays for itself
+ *    and the third reel decides the rest. Dragging the lever and letting go off the target is a
+ *    fumble: the pull costs FUMBLE_COST and the reels are stopped on a line that pays nothing. A
+ *    tap never aims, so it is an ordinary pull. The opening pull and a caught star take precedence
+ *    over both, and a fumbled free spin is still free.
  *  - Opening pull: a visitor's very first pull is free and always lands three full moons. It happens
  *    once: the saved game remembers it, so reloading the page cannot farm it.
  *  - Moon loan: if a pull is not free and there are fewer than COST credits, the moon lends LOAN
@@ -35,14 +41,21 @@
  *    return is about 111%: 1.10 to 1.12 measured over a million pulls, 1.05 to 1.15 over a hundred
  *    thousand. It drifts gently upward and the loan covers the dry spells. Stars and the opening
  *    pull are gifts on top of that. engine.test.ts checks every number in this comment.
+ *    A perfect pull draws the first and third stops as usual and matches the second to the first:
+ *      launch 1/64 (1.56%)   777 1/64 (1.56%)   three of a kind 13/96 (13.54%)   pair 5/6   miss never
+ *    That pays 21.1 credits per pull of 5 before the full moon round. Skill is meant to win, and
+ *    aiming is a real risk: a fumble is 10 credits gone, every time.
  */
 
 export type SymbolId = 'crescent' | 'moon' | 'wave' | 'palm' | 'camera' | 'book' | 'seven' | 'rocket';
 export type Rng = () => number;
 export type Stops = [number, number, number];
+/** Whether the lever was aimed at its target: not at all (a tap), let go on it, or let go off it. */
+export type Aim = 'none' | 'hit' | 'missed';
 export type OutcomeKind = 'launch' | 'sevens' | 'triple' | 'pair' | 'miss';
 
 export const COST = 5;
+export const FUMBLE_COST = 10;
 export const LOAN = 65;
 export const START_CREDITS = 41;
 export const STAR_BONUS = 7;
@@ -110,6 +123,10 @@ export type Outcome = {
   free: boolean;
   opening: boolean;
   usedStar: boolean;
+  /** The lever was let go on its target, and that is what paired the first two reels. */
+  perfect: boolean;
+  /** The lever was let go off its target, and that is what cost extra and stopped the reels on nothing. */
+  fumbled: boolean;
   bonusStarted: boolean;
   bonusEnded: boolean;
 };
@@ -178,6 +195,24 @@ function randomStops(rng: Rng): Stops {
   return [draw(rng, REEL_LENGTH), draw(rng, REEL_LENGTH), draw(rng, REEL_LENGTH)];
 }
 
+// A perfect pull: the first reel lands where it lands, the second is stopped on the same symbol,
+// and the third is left to chance.
+function pairedStops(rng: Rng): Stops {
+  const first = draw(rng, REEL_LENGTH);
+  const symbol = REELS[0][first];
+  const positions = REELS[1].flatMap((s, i) => (s === symbol ? [i] : []));
+  return [first, positions[draw(rng, positions.length)], draw(rng, REEL_LENGTH)];
+}
+
+// A fumble: stops that pay nothing. Six draws in ten are a miss already; the rest are drawn again.
+function losingStops(rng: Rng): Stops {
+  for (let tries = 0; tries < 40; tries++) {
+    const stops = randomStops(rng);
+    if (evaluate(stops).kind === 'miss') return stops;
+  }
+  return [1, 3, 0]; // wave, camera, palm
+}
+
 // Stops every reel on the same symbol, choosing among that symbol's positions on each reel.
 function matchingStops(symbol: SymbolId, rng: Rng): Stops {
   return REELS.map((strip) => {
@@ -187,18 +222,28 @@ function matchingStops(symbol: SymbolId, rng: Rng): Stops {
 }
 
 /** One pull of the lever. Pure: the same state and the same random numbers give the same result. */
-export function spin(state: GameState, rng: Rng): { state: GameState; outcome: Outcome } {
+export function spin(
+  state: GameState,
+  rng: Rng,
+  aim: Aim = 'none',
+): { state: GameState; outcome: Outcome } {
   const opening = state.opening;
   const free = !opening && state.freeSpins > 0;
   const usedStar = !opening && state.lucky;
-  const cost = opening || free ? 0 : COST;
+  const perfect = aim === 'hit' && !opening && !usedStar;
+  const fumbled = aim === 'missed' && !opening && !usedStar;
+  const cost = opening || free ? 0 : fumbled ? FUMBLE_COST : COST;
   const loan = state.credits < cost ? LOAN : 0;
 
   const stops = opening
     ? matchingStops('moon', rng)
     : usedStar
       ? matchingStops(EVERYDAY[draw(rng, EVERYDAY.length)], rng)
-      : randomStops(rng);
+      : perfect
+        ? pairedStops(rng)
+        : fumbled
+          ? losingStops(rng)
+          : randomStops(rng);
   const { base, ...result } = evaluate(stops);
   const multiplier = free ? FREE_MULTIPLIER : 1;
   const payout = base * multiplier;
@@ -242,7 +287,7 @@ export function spin(state: GameState, rng: Rng): { state: GameState; outcome: O
   };
   return {
     state: next,
-    outcome: { stops, ...result, cost, loan, multiplier, payout, free, opening, usedStar, bonusStarted, bonusEnded },
+    outcome: { stops, ...result, cost, loan, multiplier, payout, free, opening, usedStar, perfect, fumbled, bonusStarted, bonusEnded },
   };
 }
 

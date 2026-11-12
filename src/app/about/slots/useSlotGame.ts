@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Round } from './beats';
-import { catchStar, type GameState, initialState, type Rng, spin } from './engine';
+import { type Aim, catchStar, type GameState, initialState, type Rng, spin } from './engine';
 import { loadGame, parseGame, readRaw, saveGame, STORAGE_KEY } from './storage';
 
 export type SlotGame = {
   /** The state the screen has caught up to. Everything shown is derived from this. */
   revealed: GameState;
   reveal: (state: GameState) => void;
-  /** Decides and saves one pull. Nothing on screen changes until it is revealed. */
-  pull: () => Round;
+  /** Decides and saves one pull; `aim` says whether the lever was let go on its target. Nothing on screen changes until it is revealed. */
+  pull: (aim: Aim) => Round;
   /** Ends a pull: the screen now shows exactly what the engine holds. */
   settle: () => void;
   catchStar: () => void;
@@ -75,11 +75,11 @@ export function useSlotGame(rng: Rng): SlotGame {
     return {
       reveal,
       current: () => game.current,
-      pull: () => {
+      pull: (aim: Aim) => {
         adoptNewerSave();
         pulling.current = true;
         const before = game.current;
-        const { state: after, outcome } = spin(before, latestRng.current);
+        const { state: after, outcome } = spin(before, latestRng.current, aim);
         commit(after);
         return { before, after, outcome };
       },
