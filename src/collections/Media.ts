@@ -1,6 +1,7 @@
 import type { Access, CollectionConfig } from 'payload';
 
 import { sanityIdField } from '../fields/sanityId';
+import { generateBlurPlaceholder } from './hooks/blurPlaceholder';
 import { revalidateAfterChange, revalidateAfterDelete } from './hooks/revalidate';
 
 /**
@@ -40,8 +41,15 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      // Generated on upload by generateBlurPlaceholder; shown while the photo loads.
+      name: 'blurDataUrl',
+      type: 'text',
+      admin: { hidden: true },
+    },
   ],
   hooks: {
+    beforeChange: [generateBlurPlaceholder],
     // Photos (and their alt text) appear on the homepage, the about page, and collection
     // pages, so replacing or deleting one refreshes the whole site. New uploads
     // are not on any page until a collection references them, which revalidates then.

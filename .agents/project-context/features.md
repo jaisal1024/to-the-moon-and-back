@@ -73,6 +73,7 @@ is the Payload admin at `/admin`.
   rows by orientation. Photos are not clickable.
 - A "next collection" row links to the collection after this one in the home
   order, wrapping to the first.
+- Photos show a blurred preview while they load.
 - The page title is "Jaisal Friedman - <collection title>".
 - Pages are pre-built for every published collection slug.
 - An unknown slug, or an unpublished collection, returns 404.
@@ -143,7 +144,7 @@ neither the site nor the admin.
 - Blog post bodies use the Lexical editor with headings, lists, links, and code
   blocks.
 - Uploads go from the browser straight to Vercel Blob (the Docker emulator
-  locally). Each upload gets generated sizes.
+  locally). Each upload gets generated sizes and a blur placeholder.
 
 ### Revalidation
 
