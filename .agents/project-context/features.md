@@ -1,118 +1,125 @@
 # Product features
 
 Personal photography and portfolio site: Next.js App Router pages backed by
-Sanity content (collections of photos and blog posts) fetched over GraphQL.
-Every public page is anonymous; the only signed-in surface is Sanity Studio.
+Payload CMS content (collections of photos and blog posts), read on the server
+through `src/cms/`. Every public page is anonymous; the only signed-in surface
+is the Payload admin at `/admin`.
 
 ## Site-wide
 
 ### Navigation
 
-`src/components/NavBar.tsx`
+`src/components/site/TopBar.tsx`
 
-- The "Jaisal Friedman" title links home. It renders as an `h1` on `/` and `h2` elsewhere.
-- **Desktop (≥ Tailwind `sm`)**: Collections, Blog, and About in the top bar.
-  - Collections opens a popover that lazily queries up to 20 collections
-    (newest first). It shows a spinner while loading, "Failed to fetch collections" on
-    error, then a list starting with Home. The current route is underlined.
-  - Collections is underlined on `/` and any `/collections/*` page. Blog and About
-    are underlined on their own routes.
-- **Mobile (< `sm`)**: The desktop links are hidden. A hamburger opens a full-screen dialog
-  with Collections (same lazy list and states), Blog, and About sections, plus a
-  close button.
+- A fixed bar with Collections (`/`), Blog, and About, plus the name linking
+  home.
+- The current section is marked with `aria-current="page"`. Collections is
+  current on `/` and any `/collections/*` page.
+- The bar slides away while scrolling down and returns on scroll up.
+- The same bar is used at every width; there is no separate mobile menu and no
+  list of collections in the nav.
 
 ### Footer
 
-`src/components/Footer.tsx`
+`src/components/site/SiteFooter.tsx`
 
-- "© Jaisal Friedman <current year>".
-- Connect: LinkedIn, GitHub, `mailto:hi@jaisal.xyz` (icon links).
-- Site Map: Photography (`/`), Blog, About.
+- A black section at the end of every page with the copyright line.
+- Site map: Photography (`/`), Blog, About.
+- Contact: LinkedIn, GitHub, X, and `mailto:hi@jaisal.xyz`.
 
 ### Theme
 
-`src/app/Providers.tsx`, `src/theme.ts`, `src/styles/globals.css`
+`src/app/(site)/Providers.tsx`, `src/components/site/site.module.css`
 
 - Light/dark mode follows `prefers-color-scheme` and updates live when the OS
   setting changes.
 - A `?theme=dark` or `?theme=light` query param overrides the OS preference.
-- Mode is applied as `data-theme` on `<html>` and drives both MUI palettes and
-  Tailwind semantic color tokens.
-- Fonts: Archivo Black for the hero heading, DM Sans for everything else.
+- Mode is applied as `data-theme` on `<html>` and swaps the design tokens in
+  `site.module.css`.
+- Public pages are set in Geist, loaded in `SitePage`.
 
 ### Analytics and headers
 
 - The Google Analytics `gtag.js` tag loads when `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`
-  is set (`src/app/layout.tsx`).
+  is set (`src/app/(site)/SiteDocument.tsx`).
+- PostHog loads in the browser when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and
+  `NEXT_PUBLIC_POSTHOG_HOST` are set (`instrumentation-client.ts`); the server
+  logs homepage collection loads and failures (`src/lib/posthog-logs.ts`).
 - `vercel.json` adds `X-Content-Type-Options`, `X-Frame-Options: DENY`, and
   `X-XSS-Protection` to every response. It also enables clean URLs.
 
 ## Photography
 
-### Collections grid (home)
+### Collections (home)
 
-`/`. Sources: `src/app/page.tsx` and `src/components/ImageGrid.tsx`.
+`/` → `src/app/(site)/page.tsx`, `Home.tsx`
 
-- Lists all collections, newest created first, each shown by its first photo as
-  the cover. The grid is one column below `lg` and two columns at `lg` and up.
-- Each cover has a title overlay button. Clicking the image or the button opens
-  the collection.
-- Empty state: "No collections to show."
-- The page is statically generated and revalidates every 10 minutes.
+- A rotating hero, then up to 20 collections, newest created first: each
+  collection's cover beside a pinned, numbered index whose active row follows
+  the scroll.
+- The cover is the collection's first photo. The hero uses a different photo
+  from the same collection (its first other landscape photo) so it does not
+  repeat the cover.
+- Each cover and index row opens the collection.
+- If the CMS is unreachable the page renders without its list.
+- Statically generated; revalidates every 10 minutes and whenever a collection
+  or photo changes in the admin.
 
 ### Collection detail
 
-`/collections/[slug]` → `src/app/collections/[id]/page.tsx`
+`/collections/[slug]` → `src/app/(site)/collections/[id]/page.tsx`, `Collection.tsx`
 
-- Shows title, description, month and year of the collection date, location, and
-  the full photo grid. Photos are not clickable.
+- Title, description, month and year, location, and the photos grouped into
+  rows by orientation. Photos are not clickable.
+- A "next collection" row links to the collection after this one in the home
+  order, wrapping to the first.
 - The page title is "Jaisal Friedman - <collection title>".
-- Pages are pre-built for every collection slug and revalidate every 10 minutes.
-- An unknown slug currently returns **500** (the page throws). A 404 is intended.
+- Pages are pre-built for every published collection slug.
+- An unknown slug, or an unpublished collection, returns 404.
 - There is no `/collections` index page. That URL returns 404, even though
   the sitemap lists it.
 
-Content model (`src/sanity/schemas/collections.ts`, `shot.ts`): a collection has
-title, slug, description, date, location, and `photos[]`. Each photo is a
-`shot` with a title and an image served from `cdn.sanity.io` through `next/image`.
+Content model (`src/collections/Collections.ts`, `Media.ts`): a collection has
+title, slug, description, date, location, and `photos[]`. Each photo row is a
+title plus a `media` upload. Media files live in Vercel Blob with generated
+sizes (`thumbnail`, `card`, `large`, `xl`) and are served through `next/image`.
 
 ## Blog
 
 ### Blog index
 
-`/blog` → `src/app/blog/page.tsx`
+`/blog` → `src/app/(site)/blog/page.tsx`, `BlogIndex.tsx`
 
-- A card per post shows the title (linked), the publish date ("Month D, YYYY"), or
-  "Unpublished" if there is none, and a "Read post" link.
-- Empty state: "No blog posts yet. Add one in Sanity Studio to populate this
-  page."
-- Revalidates every 10 minutes.
+- Numbered rows, newest published first, each with the title and publish date
+  ("Month D, YYYY", in UTC), linking to the post.
 
 ### Blog post
 
-`/blog/[slug]` → `src/app/blog/[slug]/page.tsx`
+`/blog/[slug]` → `src/app/(site)/blog/[slug]/page.tsx`, `Post.tsx`
 
-- Title, publish date or "Unpublished", and Portable Text body.
-  - Supports h2 and h3 headings, paragraphs, inline code, and links. Links
-    starting with `http` open in a new tab.
-  - `code` blocks render as plain preformatted text. `codeBlock` blocks are
-    syntax-highlighted (VS Code Dark+ theme; languages are TypeScript,
-    JavaScript, HTML, and CSS). Both show an optional filename caption.
-- An unknown slug renders the 404 page.
+- Title, publish date, and the body in a reading column with margin section
+  numbers and a reading progress thread.
+- The body supports h2 and h3 headings, paragraphs, bullet and numbered lists,
+  bold, italic, inline code, links, and code blocks (`richText.ts` maps
+  Payload's Lexical body to plain blocks). External links open in a new tab.
+- An unknown slug, or an unpublished post, returns 404.
 
 ## About
 
-`/about` → `src/app/about/page.tsx`
+`/about` → `src/app/(site)/about/page.tsx`, `About.tsx`
 
-- A portrait with a glow effect, an intro, and two rotating word lists ("I'm a …",
-  "I love to …") driven by `AnimatedSpan`. Also links to Counsel Health and LinkedIn
-  (new tab), plus a location line.
-- Static. The image stacks above the text on mobile and sits beside it from `sm` up.
+- Rotating roles and hobbies, word-reveal statements, and a scroll-drawn thread.
+- A pinned, playable slot machine (`about/slots/`). Scrolling it into place
+  plays the first pull, and progress is saved in the browser.
+- An index of collections with their cover photos. It is hidden if the CMS is
+  unreachable.
 
 ## Not found
 
-`src/app/not-found.tsx`: centered "404 - Page Not Found" for unknown routes,
-rendered without the nav and footer.
+`src/app/(site)/not-found.tsx`: a "Page Not Found" page with a link back to
+Collections and a "404" heading, inside the normal site shell. It has no CMS
+dependency. `src/app/global-not-found.tsx` renders it for URLs that match
+neither the site nor the admin.
 
 ## Machine-readable routes
 
@@ -124,31 +131,27 @@ rendered without the nav and footer.
 
 ## Content management
 
-### Sanity Studio
+### Payload admin
 
-`/studio/*` → `src/app/studio/`, `sanity.config.ts`
+`/admin/*` → `src/app/(payload)/`, `src/payload.config.ts`
 
-- Embedded Studio that requires a Sanity login (shows "Choose login provider").
-- Document types: Collections, Shots, Blog Posts, and Code Block (used inside
-  posts). Plugins: structure tool, Vision (GROQ playground), and code input.
+- Requires an admin account. Deployed sites reject public first-user signup;
+  create admins with `pnpm run create-admin`.
+- Collections: Users, Media, Collections, and Blog Posts.
+- Collections and Blog Posts have drafts. Only published documents are visible
+  to anonymous visitors, on pages and through `/api/*`.
+- Blog post bodies use the Lexical editor with headings, lists, links, and code
+  blocks.
+- Uploads go from the browser straight to Vercel Blob (the Docker emulator
+  locally). Each upload gets generated sizes.
 
-### On-demand revalidation
+### Revalidation
 
-- `POST /api/revalidate`: Sanity webhook endpoint, verified with
-  `SANITY_WEBHOOK_SECRET`.
-  - An invalid signature returns 401.
-  - A `collections` payload revalidates `/collections/<slug>` and `/`.
-  - Other types are acknowledged and ignored.
-- `POST /api/revalidateRoute`: manual revalidation using the headers `secret` and
-  `route`.
+- Publishing, unpublishing, deleting, or changing the slug of a collection or
+  post revalidates the affected pages immediately, including the old URL.
+  Saving a draft of a never-published document does not.
+- Replacing or deleting a photo revalidates the whole site.
+- `POST /api/revalidateRoute`: manual revalidation using the headers `secret`
+  (matching `REVALIDATE_SECRET`) and `route`.
   - A wrong secret returns 401. A missing route returns 400.
   - Success returns 200 with "Revalidated <route>".
-
-### Draft preview
-
-- `GET /api/preview?secret=…&slug=…`: checks the secret against the one stored
-  in Sanity (requires the `SANITY_API_TOKEN` read token).
-  - On success it enables Next draft mode and redirects to `/<slug>`.
-  - Errors: 500 when no token is configured, 401 for a bad or missing secret,
-    404 when the slug is missing.
-- `GET /api/exit-preview`: disables draft mode and redirects to `/`.

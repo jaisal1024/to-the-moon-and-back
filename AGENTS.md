@@ -1,6 +1,6 @@
 # To the Moon and Back: agent guide
 
-Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router, MUI + Tailwind, deployed on Vercel. Content is managed in Payload CMS, embedded at `/admin`, with Postgres (Docker locally, Neon on Vercel) and Vercel Blob for photos. See [docs/architecture/payload-cms.md](docs/architecture/payload-cms.md) and the migration history in [docs/plans/sanity-to-payload-migration.md](docs/plans/sanity-to-payload-migration.md).
+Personal photography portfolio and blog for Jaisal Friedman. Next.js App Router, MUI + Tailwind, deployed on Vercel. Content is managed in Payload CMS, embedded at `/admin`, with Postgres (Docker locally, Neon on Vercel) and Vercel Blob for photos. See [docs/architecture.md](docs/architecture.md) and the migration history in [docs/plans/sanity-to-payload-migration.md](docs/plans/sanity-to-payload-migration.md).
 
 ## Toolchain
 
