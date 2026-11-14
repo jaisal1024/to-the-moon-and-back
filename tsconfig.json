@@ -21,7 +21,6 @@
     ],
     "paths": {
       "src/*": ["./src/*"],
-      "apollo-client": ["./apollo-client.ts"],
       "sanity.config": ["./sanity.config.ts"],
       "@payload-config": ["./src/payload.config.ts"]
     }
