@@ -38,3 +38,9 @@ test('the about page lists collections', async ({ page }) => {
   await page.goto('/about');
   await expect(page.locator('a[href^="/collections/"]').first()).toBeAttached();
 });
+
+test('photos ship a blur placeholder in the server HTML', async ({ request }) => {
+  // next/image inlines the stored placeholder, so a preview paints before the photo downloads.
+  const html = await (await request.get('/')).text();
+  expect(html).toContain('data:image/webp;base64,');
+});

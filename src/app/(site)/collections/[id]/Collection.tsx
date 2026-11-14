@@ -14,6 +14,8 @@ export type CollectionPhoto = {
   title: string;
   width: number;
   height: number;
+  /** Tiny inline preview shown while the photo loads. */
+  blurDataURL?: string;
 };
 
 export type NextCollection = {
@@ -72,7 +74,14 @@ function Plate({
     <figure className={styles.shot} style={{ '--ar': aspect(photo).toFixed(4) } as React.CSSProperties}>
       <div className={clsx(shell.frame, styles.plate)}>
         <div className={styles.plateInner} data-grow>
-          <Image src={photo.src} alt={photo.title} fill sizes={sizes} preload={index === 0} />
+          <Image
+            src={photo.src}
+            alt={photo.title}
+            fill
+            sizes={sizes}
+            preload={index === 0}
+            {...(photo.blurDataURL ? { placeholder: 'blur', blurDataURL: photo.blurDataURL } : {})}
+          />
         </div>
       </div>
       <figcaption className={styles.cap}>

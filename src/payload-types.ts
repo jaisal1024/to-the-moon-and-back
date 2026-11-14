@@ -155,6 +155,7 @@ export interface Media {
   id: number;
   sanityId?: string | null;
   alt: string;
+  blurDataUrl?: string | null;
   prefix?: string | null;
   _objectKey?: string | null;
   updatedAt: string;
@@ -375,6 +376,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   sanityId?: T;
   alt?: T;
+  blurDataUrl?: T;
   prefix?: T;
   _objectKey?: T;
   updatedAt?: T;
