@@ -7,11 +7,6 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import { Providers } from './Providers';
 
-vi.mock('apollo-client', () => ({ default: {} }));
-vi.mock('@apollo/client/react', () => ({
-  ApolloProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
 function ThemeMode() {
   const theme = useTheme();
   return <span data-testid="theme-mode">{theme.palette.mode}</span>;
