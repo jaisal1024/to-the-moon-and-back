@@ -16,7 +16,6 @@ const nextConfig = {
       },
     ],
   },
-  transpilePackages: ['sanity', 'next-sanity', '@sanity/client', 'get-it', 'styled-components'],
   reactStrictMode: true,
   experimental: {
     // Two root layouts, (site) and (payload), need a routing-level 404.

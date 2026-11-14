@@ -116,20 +116,18 @@ className = 'cursor-pointer opacity-70 hover:opacity-100';
 
 ## Images
 
-Always use the `NextImage` wrapper component (not bare `next/image`) when rendering Sanity photos. It handles the Sanity → CDN URL transformation.
+CMS photos reach components as plain props. The server `page.tsx` calls `mediaSource(media, size)` from `src/cms/media.ts`, which picks a generated size from the Payload `Media` document and returns its URL, intrinsic dimensions, and alt text. The component renders them with `next/image`.
 
 ```tsx
-// ✅ Correct
-<NextImage image={photo} alt={title} fill />
+// page.tsx (server): pick a size and pass plain props
+const source = mediaSource(shot.photo, 'xl');
+// → { src, width, height, alt }
 
-// ❌ Incorrect - bypasses Sanity URL transform
-<Image src={photo.url} alt={title} fill />
-```
+// Component (client): render with next/image inside a sized frame
+<Image src={photo.src} alt={photo.title} fill sizes="(max-width: 720px) 100vw, 30vw" />
 
-For layout: use `fill` + `objectFit: 'contain'` for photo display (preserves aspect ratio):
-
-```tsx
-<NextImage fill style={{ objectFit: 'contain', objectPosition: 'center' }} />
+// ❌ Incorrect - reads the Media document in a component, skipping size selection
+<Image src={media.url} alt={title} fill />
 ```
 
 ---
@@ -138,7 +136,7 @@ For layout: use `fill` + `objectFit: 'contain'` for photo display (preserves asp
 
 - Always provide meaningful `alt` text for images
 - Use `aria-label` on icon-only buttons (e.g., close button, menu button)
-- Semantic HTML: use `<nav>`, `<main>`, `<footer>` appropriately inside Layout/NavBar/Footer
+- Semantic HTML: use `<nav>`, `<main>`, `<footer>` appropriately inside `SitePage`, `TopBar`, and `SiteFooter`
 - Ensure color contrast meets WCAG AA (the current carbon-on-white scheme is safe)
 
 ---
