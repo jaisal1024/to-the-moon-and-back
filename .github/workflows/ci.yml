@@ -111,6 +111,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run Payload migrations
         run: pnpm run migrate
+      - name: Seed sample content
+        run: pnpm run seed
       - name: Restore Next.js cache
         uses: actions/cache@v6
         with:

@@ -6,8 +6,9 @@ import { rememberPublished, revalidateAfterChange, revalidateAfterDelete } from 
 
 type CollectionDoc = Pick<Collection, 'slug' | '_status'>;
 
-// The homepage grid lists every collection; each also has its own page.
-const collectionPaths = ({ slug }: CollectionDoc) => ['/', ...(slug ? [`/collections/${slug}`] : [])];
+// Collections appear on the homepage, the about page, their own page, and as the
+// "next collection" on other collection pages, so revalidate the whole site layout.
+const collectionPaths = () => ['/'];
 
 /** A photography series. Each array row in `photos` is one shot. */
 export const Collections: CollectionConfig = {
@@ -72,7 +73,7 @@ export const Collections: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [rememberPublished],
-    afterChange: [revalidateAfterChange<CollectionDoc>(collectionPaths)],
-    afterDelete: [revalidateAfterDelete<CollectionDoc>(collectionPaths)],
+    afterChange: [revalidateAfterChange<CollectionDoc>(collectionPaths, { type: 'layout' })],
+    afterDelete: [revalidateAfterDelete<CollectionDoc>(collectionPaths, { type: 'layout' })],
   },
 };
