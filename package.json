@@ -5,6 +5,8 @@
     "build": "pnpm run generate && next build",
     "dev": "concurrently \"pnpm run dev:next\" \"pnpm run dev:generate\"",
     "dev:next": "next dev -p 3333",
+    "dev-local": "docker compose up -d --wait db && pnpm run dev",
+    "dev-local:down": "docker compose down",
     "dev:generate": "pnpm run generate --watch",
     "format": "prettier --write . --ignore-path .gitignore",
     "generate": "graphql-codegen --config codegen.ts",
@@ -25,7 +27,7 @@
     "test:coverage": "vitest run --coverage",
     "check": "pnpm run lint && pnpm run type-check && pnpm run test && pnpm run knip",
     "deps:audit": "npm-check-updates --target latest --reject typescript",
-    "prepare": "husky"
+    "prepare": "husky && (git config --worktree --unset core.hooksPath 2>/dev/null || true)"
   },
   "dependencies": {
     "@apollo/client": "^4.3.1",
