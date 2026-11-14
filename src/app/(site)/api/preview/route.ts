@@ -1,9 +1,8 @@
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
-
-import { previewSecretDocumentId, readToken } from '../../../sanity/env';
-import { client } from '../../../sanity/lib/client';
-import { getPreviewSecret } from '../../../sanity/lib/previewSecret';
+import { previewSecretDocumentId, readToken } from 'src/sanity/env';
+import { client } from 'src/sanity/lib/client';
+import { getPreviewSecret } from 'src/sanity/lib/previewSecret';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
