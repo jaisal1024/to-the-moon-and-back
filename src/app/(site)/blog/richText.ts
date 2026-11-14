@@ -1,5 +1,5 @@
 // Plain rich-text blocks for blog posts. The presentation only knows these types; the CMS body
-// (currently Sanity Portable Text) is mapped into them on the server.
+// (Payload's Lexical editor state) is mapped into them on the server.
 
 type RichMark = 'strong' | 'em' | 'code';
 
@@ -14,31 +14,41 @@ export type RichBlock =
   | { type: 'list'; ordered: boolean; items: RichSpan[][] }
   | { type: 'code'; code: string; language?: string; filename?: string };
 
-type PortableSpan = { _type?: string; text?: string; marks?: string[] };
-type PortableMarkDef = { _key: string; _type: string; href?: string };
-type PortableNode = {
-  _type: string;
-  style?: string;
-  listItem?: string;
-  children?: PortableSpan[];
-  markDefs?: PortableMarkDef[];
-  code?: string;
-  language?: string;
-  filename?: string;
+// The slice of Lexical's serialized editor state the blog uses. Payload types the body loosely
+// (children are open records), so nodes are read defensively.
+type LexicalNode = {
+  type?: string;
+  children?: unknown[];
+  text?: string;
+  format?: unknown;
+  tag?: string;
+  listType?: string;
+  fields?: { url?: string | null; blockType?: string; code?: string | null; language?: string | null };
 };
+type LexicalBody = { root?: { children?: unknown[] } } | null | undefined;
 
-// The CMS content carries stray zero-width characters (e.g. a leading U+200D) and empty spacer paragraphs.
-const ZERO_WIDTH = /[​-‍﻿]/g;
-const DECORATORS: RichMark[] = ['strong', 'em', 'code'];
+// Lexical text format bitmask.
+const FORMAT: Array<[number, RichMark]> = [
+  [1, 'strong'],
+  [2, 'em'],
+  [16, 'code'],
+];
 
-function toSpans(node: PortableNode): RichSpan[] {
-  const links = new Map((node.markDefs ?? []).filter((d) => d._type === 'link').map((d) => [d._key, d.href]));
-  return (node.children ?? []).flatMap((child) => {
-    const text = (child.text ?? '').replace(ZERO_WIDTH, '');
+// Migrated content carries stray zero-width characters (e.g. a leading U+200D) and empty spacer paragraphs.
+const ZERO_WIDTH = /[\u200B-\u200D\uFEFF]/g;
+
+const childrenOf = (node: LexicalNode) => (node.children ?? []) as LexicalNode[];
+
+function toSpans(nodes: LexicalNode[], href?: string): RichSpan[] {
+  return nodes.flatMap((node): RichSpan[] => {
+    if (node.type === 'link' || node.type === 'autolink') {
+      return toSpans(childrenOf(node), node.fields?.url || href);
+    }
+    const text = node.type === 'linebreak' ? '\n' : (node.text ?? '').replace(ZERO_WIDTH, '');
+    if (node.type !== 'text' && node.type !== 'linebreak') return toSpans(childrenOf(node), href);
     if (!text) return [];
-    const marks = child.marks ?? [];
-    const span: RichSpan = { text, marks: DECORATORS.filter((m) => marks.includes(m)) };
-    const href = marks.map((m) => links.get(m)).find(Boolean);
+    const format = typeof node.format === 'number' ? node.format : 0;
+    const span: RichSpan = { text, marks: FORMAT.filter(([bit]) => format & bit).map(([, mark]) => mark) };
     if (href) span.href = href;
     return [span];
   });
@@ -46,32 +56,34 @@ function toSpans(node: PortableNode): RichSpan[] {
 
 const isBlank = (spans: RichSpan[]) => !spans.some((s) => s.text.trim());
 
-export function portableTextToRichBlocks(body: ReadonlyArray<PortableNode> | null | undefined): RichBlock[] {
+// One entry per list item; items of a nested list follow their parent item.
+function toItems(list: LexicalNode): RichSpan[][] {
+  return childrenOf(list).flatMap((item) => {
+    const nested = childrenOf(item).filter((child) => child.type === 'list');
+    const own = toSpans(childrenOf(item).filter((child) => child.type !== 'list'));
+    return [...(isBlank(own) ? [] : [own]), ...nested.flatMap(toItems)];
+  });
+}
+
+export function lexicalToRichBlocks(body: LexicalBody): RichBlock[] {
   const blocks: RichBlock[] = [];
-  for (const node of body ?? []) {
-    if (node._type === 'code' || node._type === 'codeBlock') {
-      if (!node.code) continue;
+  for (const node of (body?.root?.children ?? []) as LexicalNode[]) {
+    if (node.type === 'block') {
+      if (node.fields?.blockType !== 'Code' || !node.fields.code) continue;
       blocks.push({
         type: 'code',
-        code: node.code,
-        ...(node.language ? { language: node.language } : {}),
-        ...(node.filename ? { filename: node.filename } : {}),
+        code: node.fields.code,
+        ...(node.fields.language ? { language: node.fields.language } : {}),
       });
-      continue;
+    } else if (node.type === 'list') {
+      const items = toItems(node);
+      if (items.length) blocks.push({ type: 'list', ordered: node.listType === 'number', items });
+    } else if (node.type === 'paragraph' || node.type === 'heading') {
+      const spans = toSpans(childrenOf(node));
+      if (isBlank(spans)) continue;
+      const type = node.type === 'heading' && (node.tag === 'h2' || node.tag === 'h3') ? node.tag : 'paragraph';
+      blocks.push({ type, spans });
     }
-    if (node._type !== 'block') continue;
-    const spans = toSpans(node);
-    if (isBlank(spans)) continue;
-
-    if (node.listItem) {
-      const ordered = node.listItem === 'number';
-      const last = blocks[blocks.length - 1];
-      if (last?.type === 'list' && last.ordered === ordered) last.items.push(spans);
-      else blocks.push({ type: 'list', ordered, items: [spans] });
-      continue;
-    }
-    const type = node.style === 'h2' || node.style === 'h3' ? node.style : 'paragraph';
-    blocks.push({ type, spans });
   }
   return blocks;
 }
