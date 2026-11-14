@@ -121,11 +121,11 @@ Use `priority` prop on `next/image` for above-the-fold images (first 2 in a grid
 
 ### Server-Side Data for Client Components
 
-Fetch CMS data in server components through `src/cms/*` and pass it to client components as props (for example, `Layout` passes the nav collections to `NavBar`). Never import `payload` or `@payload-config` into a `'use client'` file.
+Fetch CMS data in server components through `src/cms/*` and pass it to client components as props (for example, `page.tsx` maps collections to the plain props `Home` takes). Never import `payload` or `@payload-config` into a `'use client'` file.
 
 ### Avoid Large Build-Time Payloads
 
-Be careful with queries that fetch deeply nested data. The `GetCollections` query currently fetches all photos per collection just to display the cover — consider optimizing with a `limit: 1` on the photos array if Sanity supports it in the future.
+Be careful with reads that populate deeply nested data. `listCollections` populates every photo per collection just to show the cover; use `select` and `depth` in `src/cms/*` to fetch only what a page renders.
 
 ---
 
